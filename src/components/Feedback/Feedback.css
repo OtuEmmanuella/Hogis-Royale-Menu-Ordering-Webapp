@@ -3,16 +3,23 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
+   
+  }
+
+  .custom-back-to-menu {
+    color: #fff;
+    font-size: 2rem;
+    margin-top: rem;
   }
   
   .custom-feedback-container {
     background-color: #f2f4f6;
-    border-radius: 10px;
+    
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 30px;
     width: 100%;
     max-width: 500px;
+  
   }
   
   .custom-feedback-title {
@@ -21,6 +28,7 @@
     text-align: center;
     font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
+   
   }
   
   .custom-form-group {

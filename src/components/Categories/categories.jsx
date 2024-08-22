@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { IoGrid, IoList } from "react-icons/io5";
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
-import categories from '../CategoryIcon/Categoryicon.jsx'
+import categories from '../CategoryIcon/Categoryicon.jsx';
 import { db } from '../Firebase/FirebaseConfig.jsx';
 import { categories as categoryData } from '../DataCategory/Data.json';
 import menuItemsData from '../MenuItemsFallBackData/menuItemsData.json';
@@ -20,52 +20,52 @@ const Categories = ({ addToCart }) => {
   const [categories, setCategories] = useState(categoryData);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [useJsonFallback, setUseJsonFallback] = useState(false);
 
   const fetchCategoryData = useCallback(async (category) => {
-    if (useJsonFallback) {
-      const items = menuItemsData.filter(item => item.category.toUpperCase() === category.toUpperCase());
-      return { items };
-    }
-  
     try {
       const itemsCollection = collection(db, 'menu_items');
       let q = query(itemsCollection, orderBy('name'));
-  
+
       const querySnapshot = await getDocs(q);
-  
+
       if (querySnapshot.empty) {
         console.warn(`No documents found for category: ${category}`);
-        return { items: [] };
+        const fallbackItems = menuItemsData.filter(item => item.category.toUpperCase() === category.toUpperCase());
+        return { items: fallbackItems };
       } else {
         const allItems = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
         // Filter items by category on the client side
-        const items = allItems.filter(item => item.category.toUpperCase() === category.toUpperCase());
-        
+        const firestoreItems = allItems.filter(item => item.category.toUpperCase() === category.toUpperCase());
+
+        // Fetch fallback items from JSON file
+        const fallbackItems = menuItemsData.filter(item => item.category.toUpperCase() === category.toUpperCase());
+
+        // Merge Firestore and fallback items
+        const items = [...firestoreItems, ...fallbackItems];
+
         return { items };
       }
     } catch (error) {
       console.error("Error fetching category data:", error);
-      setUseJsonFallback(true);
-      const items = menuItemsData.filter(item => item.category.toUpperCase() === category.toUpperCase());
-      return { items };
+      const fallbackItems = menuItemsData.filter(item => item.category.toUpperCase() === category.toUpperCase());
+      return { items: fallbackItems };
     }
-  }, [useJsonFallback]);
+  }, []);
 
-    const loadCategoryData = useCallback(async (category) => {
+  const loadCategoryData = useCallback(async (category) => {
     const cachedData = localStorage.getItem(`menuItems_${category}`);
     const cachedTimestamp = localStorage.getItem(`menuItems_${category}_timestamp`);
-    
+
     if (cachedData && cachedTimestamp) {
       const parsedData = JSON.parse(cachedData);
       const timestamp = parseInt(cachedTimestamp, 10);
-      
+
       if (Date.now() - timestamp < CACHE_EXPIRATION) {
-        setMenuItems(prevItems => ({...prevItems, [category]: parsedData}));
+        setMenuItems(prevItems => ({ ...prevItems, [category]: parsedData }));
         setIsLoading(false);
         return;
       }
@@ -74,7 +74,7 @@ const Categories = ({ addToCart }) => {
     try {
       const { items } = await fetchCategoryData(category);
       if (items.length > 0) {
-        setMenuItems(prevItems => ({...prevItems, [category]: items}));
+        setMenuItems(prevItems => ({ ...prevItems, [category]: items }));
         localStorage.setItem(`menuItems_${category}`, JSON.stringify(items));
         localStorage.setItem(`menuItems_${category}_timestamp`, Date.now().toString());
       } else {
@@ -135,28 +135,28 @@ const Categories = ({ addToCart }) => {
 
   return (
     <section className="categories">
-    {error && <div className="error-message">{error}</div>}
-    <div className='categories-info'>
-      <h3>Categories</h3>
-      <button onClick={toggleView} className="view-toggle">
-        {isGridView ? <IoList className='list'/> : <IoGrid />}
-      </button>
-    </div>
-    <div className={`category-container ${isGridView ? 'grid-view' : 'list-view'}`}>
-      {displayedCategories.map((category) => (
-        <div key={category.title} className="category" onClick={() => openModal(category.title)}>
-            <img 
-              src={category.image} 
-              alt={category.title} 
-              className="category-image" 
+      {error && <div className="error-message">{error}</div>}
+      <div className='categories-info'>
+        <h3>Categories</h3>
+        <button onClick={toggleView} className="view-toggle">
+          {isGridView ? <IoList className='list' /> : <IoGrid />}
+        </button>
+      </div>
+      <div className={`category-container ${isGridView ? 'grid-view' : 'list-view'}`}>
+        {displayedCategories.map((category) => (
+          <div key={category.title} className="category" onClick={() => openModal(category.title)}>
+            <img
+              src={category.image}
+              alt={category.title}
+              className="category-image"
               onError={(e) => {
                 console.error(`Error loading image for ${category.title}:`, e.target.src);
               }}
-      />
-                <span className="category-title">{category.title}</span>
-        </div>
-      ))}
-    </div>
+            />
+            <span className="category-title">{category.title}</span>
+          </div>
+        ))}
+      </div>
       {isGridView && (
         <div className="pagination">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -185,5 +185,3 @@ const Categories = ({ addToCart }) => {
 };
 
 export default Categories;
-
-

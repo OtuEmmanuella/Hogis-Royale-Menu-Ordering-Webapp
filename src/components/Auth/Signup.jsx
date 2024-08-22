@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { auth, db } from '../Firebase/FirebaseConfig';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from "react-icons/fc";
+import { AiFillApple } from "react-icons/ai";
 import { ClipLoader } from "react-spinners";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -41,22 +42,21 @@ function Signup() {
     }
   };
 
-  const handleGoogleSignup = async () => {
+  const handleOAuthSignup = async (provider) => {
     setLoading(true);
-    const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
       await setDoc(doc(db, 'users', user.uid), {
-        firstName: user.displayName.split(' ')[0],
-        lastName: user.displayName.split(' ').slice(1).join(' '),
+        firstName: user.displayName?.split(' ')[0] || '',
+        lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
         email: user.email,
         createdAt: new Date(),
         orderHistory: []
       }, { merge: true });
 
-      toast.success('Google signup successful!');
+      toast.success(`${provider.providerId} signup successful!`);
       navigate('/login');
     } catch (error) {
       toast.error(error.message);
@@ -64,6 +64,9 @@ function Signup() {
       setLoading(false);
     }
   };
+
+  const handleGoogleSignup = () => handleOAuthSignup(new GoogleAuthProvider());
+  const handleAppleSignup = () => handleOAuthSignup(new OAuthProvider('apple.com'));
 
   return (
     <div className="auth-container">
@@ -113,6 +116,13 @@ function Signup() {
           {loading ? <ClipLoader color="#ffffff" size={20} /> : (
             <>
               <FcGoogle className="google-icon" /> Sign up with Google
+            </>
+          )}
+        </button>
+        <button type="button" className="auth-button apple-button" onClick={handleAppleSignup} disabled={loading}>
+          {loading ? <ClipLoader color="#ffffff" size={20} /> : (
+            <>
+              <AiFillApple className="apple-icon" /> Sign up with Apple
             </>
           )}
         </button>

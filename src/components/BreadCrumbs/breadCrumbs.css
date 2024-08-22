@@ -37,3 +37,8 @@
     margin-right: 4px;
     color: #f8f8f8;
   }
+
+  .custom-breadcrumb {
+     margin-left: 1em;
+     padding-top: .5em;
+  }

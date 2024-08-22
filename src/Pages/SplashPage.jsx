@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FaListUl } from 'react-icons/fa';
 import menuicon from '/menu icon.png';
-import welcomeSound from '/public/hogis welcome sound.wav';
+import welcomeSound from '/hogis welcome sound.wav';
 import './SplashPage.css';
 
 const SplashPage = () => {

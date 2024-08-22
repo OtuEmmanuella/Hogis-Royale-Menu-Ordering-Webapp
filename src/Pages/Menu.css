@@ -1,48 +1,62 @@
 /* Menu.css */
 
-
-
 .menu-container {
     max-width: 870px;
     margin: 0 auto;
     padding: .5em;
-    font-family: Arial, sans-serif;
+    margin-bottom: 2rem;
 }
-  
-  
-  header {
-    margin-bottom: 10px;
+
+header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: .85em;
+    padding: 0.85em 1em;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+  }
+  
+  .header-right {
+    display: flex;
+    justify-content: flex-end;
   }
 
-  .dashboard-link {
+
+.user-cart-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-left: 1em;
+}
+
+.dashboard-link {
     margin-left: 3em;
     font-size: 1.6rem;
     color: #f0f0f0;
-   
-  }
+}
 
-  svg.lucide.lucide-user {
+svg.lucide.lucide-user {
     margin-right: 10px;
-  
-  }
-  
-  h1, h2, h3 {
+}
+
+h1, h2, h3 {
     margin: 0;
     color: #f0f0f0;
-  }
+}
 
-  .dish-ideas {
+.dish-ideas {
     font-size: .8rem;
     font-weight: 900;
     text-transform: capitalize;
     font-style: italic;
-  }
-  
-  .bottom-nav {
+}
+
+.bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -52,35 +66,31 @@
     background: white;
     padding: 10px 0;
     box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-  }
-  
-  .bottom-nav button {
+}
+
+.bottom-nav button {
     background: none;
     border: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     font-size: 0.8em;
-  }
-  
-  .bottom-nav button.active {
-    color: #4CAF50;
-  }
+}
 
-  .user-display {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+.bottom-nav button.active {
+    color: #4CAF50;
+}
+
+.user-display {
     font-size: 16px;
     font-weight: bold;
-    color: #f8f8f8; 
-    padding-bottom: 50px;
-  }
+    color: #f8f8f8;
+}
 
-
-  .shopping-cart {
+.shopping-cart {
     position: relative;
     display: inline-block;
+    margin-left: auto;
 }
 
 .cart-toggle {
@@ -95,14 +105,14 @@
 
 .cart-count {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: #0b0a0a;
-    color: white;
+    top: -3px;
+    right: -4px;
+    background-color: #fbf9f9;
+    color: rgb(13, 13, 13);
     border-radius: 50%;
     padding: 2px 6px;
     font-size: .5rem;
-    font-weight: bold;
+    font-weight: 900;
     min-width: 18px;
     height: 18px;
     display: flex;
@@ -216,6 +226,10 @@
     margin-right: 5px;
 }
 
+
+/* NotificationPage.css */
+
+
 /* Responsive Styles */
 @media (max-width: 768px) {
     .cart-modal {
@@ -227,23 +241,28 @@
         max-height: 80vh;
         overflow-y: auto;
     }
-   
-    .user-display {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #f8f8f8;
+
+    header {
+        flex-wrap: nowrap;
     }
-    .dish-ideas{
-      margin-top: 20px;
+
+    div.user-display {
+        font-size: 1rem;
+    }
+
+    a.cart-toggle {
+        font-size: 1.8rem;
+    }
+
+    .dish-ideas {
+        margin-top: 20px;
     }
 }
 
 @media (max-width: 480px) {
     header {
         flex-wrap: wrap;
+        padding: 0.5em;
     }
 
     .cart-toggle {
@@ -254,10 +273,12 @@
     .cart-modal {
         width: 95%;
     }
+
+    .user-display {
+        font-size: 12px;
+    }
+
+    .cart-toggle {
+        font-size: 1rem;
+    }
 }
-
-
-
-
-  
-  

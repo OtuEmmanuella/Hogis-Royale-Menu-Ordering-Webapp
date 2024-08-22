@@ -13,6 +13,8 @@ import { ShoppingCartIcon } from '../components/ShoppingCart/ShoppingCart';
 import { auth, db } from '../components/Firebase/FirebaseConfig';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { useShoppingCart } from '../components/ShoppingCart/ShoppingCartContext';
+import NavBar from '../components/NavBar/TempNavBar';
+import NotificationIcon from '../components/Notification/NotificationIcon';
 import './Menu.css';
 
 const AnimatedFeedbackHeading = ({ navigate, showLoginAlert }) => {
@@ -103,8 +105,10 @@ const Menu = () => {
       setLoading(false);
     });
 
+    
+
     const fetchRecommendedRecipes = async () => {
-      try {
+      try { 
         const recipesCollection = collection(db, 'recipes');
         const recipesSnapshot = await getDocs(recipesCollection);
         const recipesData = recipesSnapshot.docs.map(doc => ({
@@ -159,15 +163,17 @@ const Menu = () => {
   return (
     <div className='menu-container'>
       <header>
-        <UserDisplay />
-        <AnimatedFeedbackHeading navigate={navigate} showLoginAlert={showLoginAlert} />
-        {isAdmin && (
-          <Link to="/admin-dashboard">
-            <FaCog className='dashboard-link'/>
-          </Link>
-        )} 
-        <UserMenu user={user} classname="user" />
-        <ShoppingCartIcon />
+        <div className="header-left">
+          <UserDisplay />
+          {isAdmin && (
+            <Link to="/admin-dashboard">
+              <FaCog className='dashboard-link'/>
+            </Link>
+          )}
+        </div>
+        <div className="header-right">
+          <ShoppingCartIcon />
+        </div>
       </header>
       <SearchBar />
       <main>
@@ -185,6 +191,7 @@ const Menu = () => {
         draggable
         pauseOnHover
       />
+      <NavBar />
     </div>
   );
 };

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../Firebase/FirebaseConfig';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, OAuthProvider, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { FcGoogle } from "react-icons/fc";
+import { AiFillApple } from "react-icons/ai";
+import { FaChevronRight } from 'react-icons/fa';
+import { TiArrowBack } from "react-icons/ti";
 import './Auth-styles.css';
 
 function Login() {
@@ -17,11 +20,7 @@ function Login() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const isAdmin = await checkIfAdmin(user.uid);
-        if (isAdmin) {
-          navigate('/menu');
-        } else {
-          navigate('/menu');
-        }
+        navigate('/menu');
       } else {
         setLoading(false);
       }
@@ -39,12 +38,7 @@ function Login() {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const isAdmin = await checkIfAdmin(userCredential.user.uid);
-      if (isAdmin) {
-        navigate('/menu');
-      } else {
-        navigate('/menu');
-      }
+      navigate('/menu');
     } catch (error) {
       if (error.code === 'auth/user-not-found') {
         setError("You don't have an account yet! Please sign up.");
@@ -54,63 +48,83 @@ function Login() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
+  const handleOAuthLogin = async (provider) => {
     try {
       const result = await signInWithPopup(auth, provider);
-      const isAdmin = await checkIfAdmin(result.user.uid);
-      if (isAdmin) {
-        navigate('/menu');
-      } else {
-        navigate('/menu');
-      }
+      const user = result.user;
+      
+      // Add or update user in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        firstName: user.displayName ? user.displayName.split(' ')[0] : '',
+        lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
+        email: user.email,
+        // Add any other fields you want to store
+      }, { merge: true });
+
+      navigate('/menu');
     } catch (error) {
       setError(error.message);
     }
   };
+
+  const handleGoogleLogin = () => handleOAuthLogin(new GoogleAuthProvider());
+  const handleAppleLogin = () => handleOAuthLogin(new OAuthProvider('apple.com'));
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="auth-container">
-      <form className="auth-form" onSubmit={handleLogin}>
-        <h2 className="auth-title">Login</h2>
-        {error && <p className="auth-error">{error}</p>}
-        <input
-          type="email"
-          className="auth-input"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="email"
-        />
-        <input
-          type="password"
-          className="auth-input"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="current-password"
-        />
-        <button type="submit" className="auth-button">Login</button>
-        
-        <div className="auth-divider">
-          <span>or</span>
-        </div>
-        
-        <button type="button" className="auth-button google-button" onClick={handleGoogleLogin}>
-          <FcGoogle className="google-icon" /> Sign in with Google
-        </button>
-        
-        <div className="auth-links">
-          <Link to="/signup" className="auth-link">Don't have an account? <span className='link'>Sign up</span></Link>
-          <Link to="/forgot-password" className="auth-link">Forgot Password?</Link>
-        </div>
-      </form>
+    <div className="auth-page">
+      <nav className="breadcrumb">
+        <Link to="/menu" className="back-to-menu">
+          <TiArrowBack className="back-icon" />
+        </Link>
+        <FaChevronRight className="breadcrumb-separator" />
+        <span>Login</span>
+      </nav>
+      <div className="auth-container">
+        <form className="auth-form" onSubmit={handleLogin}>
+          <h2 className="auth-title">Login</h2>
+          {error && <p className="auth-error">{error}</p>}
+          <input
+            type="email"
+            className="auth-input"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+          <input
+            type="password"
+            className="auth-input"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+          />
+          <button type="submit" className="auth-button">Login</button>
+          
+          <div className="auth-divider">
+            <span>or</span>
+          </div>
+          
+          <button type="button" className="auth-button google-button" onClick={handleGoogleLogin}>
+            <FcGoogle className="google-icon" /> Sign in with Google
+          </button>
+          
+          <button type="button" className="auth-button apple-button" onClick={handleAppleLogin}>
+            <AiFillApple className="apple-icon" /> Sign in with Apple
+          </button>
+          
+          <div className="auth-links">
+            <Link to="/signup" className="auth-link">Don't have an account? <span className='link'>Sign up</span></Link>
+            <Link to="/forgot-password" className="auth-link">Forgot Password?</Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

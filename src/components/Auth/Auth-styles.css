@@ -17,7 +17,7 @@
     width: 100%;
     max-width: 340px;
     padding: 20px;
-    background-color: #ffffff;
+    background-color: #f8f8f8;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
@@ -395,6 +395,44 @@
     display: flex;
     justify-content: center; 
  }
+
+ .back-icon {
+   color: #ced4da;
+   font-size: 2rem;
+ }
+
+ .breadcrumb {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.breadcrumb a {
+  color: #f8f8f8;
+  text-decoration: none;
+}
+
+
+.breadcrumb-separator {
+  margin: 0 10px;
+  color: #f4f4f4;
+}
+
+button.apple-button {
+  background-color: #000000;
+  color: #ffffff;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apple-icon {
+  margin-right: 8px;
+  font-size: 1.3rem;
+}
   
   @media (max-width: 768px) {
     .uap-account-grid {

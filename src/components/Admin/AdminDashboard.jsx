@@ -4,7 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './AdminDashboard.css'
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
@@ -30,22 +30,25 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   if (!user || !isAdmin) {
-    return <div>Loading...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   return (
-    <div className='dashboard'>
-      <h1>ADMIN DASHBOARD</h1>
-      <nav className='dashboard-nav'>
-        <ul>
-        <Link to="/admin/manage-menu" className='nav-links'>MANAGE MENU</Link>
-         {/* <li><Link to="/admin/orders" className='nav-links'>ORDERS</Link></li>
-          <li><Link to="/admin/users" className='nav-links'>USERS</Link></li>
-          <li><Link to="/admin/sales-reports" className='nav-links'>SALES REPORTS</Link></li>
-          <li><Link to="/admin/customer-inquiries" className='nav-links'>CUSTOMER INQUIRIES</Link></li> */}
-        </ul>
-      </nav>
+    <div className="admin-dashboard">
       <ToastContainer />
+      <header className="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <nav className='dashboard-nav'>
+          <Link className='admin-link' to="/admin/manage-menu">Manage Menu</Link>
+          <Link className='admin-link' to="/admin/manage-notifications">Manage Notifications</Link>
+          {/* <Link to="/orders">Orders</Link>
+          <Link to="/users">Users</Link>
+          <Link to="/sales-reports">Sales Reports</Link>
+          <Link to="/customer-inquiries">Customer Inquiries</Link> */}
+        </nav>
+      </header>
+      <main className="dashboard-main">
+      </main>
     </div>
   );
 };

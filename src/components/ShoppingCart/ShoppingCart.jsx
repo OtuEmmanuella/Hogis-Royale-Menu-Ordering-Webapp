@@ -64,6 +64,14 @@ export const ShoppingCartPage = () => {
     });
   };
 
+  const handleCheckout = () => {
+    if (!deliveryOption) {
+      toast.error('Please select a delivery option before proceeding to checkout.');
+      return;
+    }
+    navigate(`/checkout?delivery=${encodeURIComponent(deliveryOption)}&deliveryPrice=${deliveryPrice}`);
+  };
+
   return (
     <div className="shopping-cart-page">
       <h1 className="cart-title">Cart</h1>
@@ -149,8 +157,8 @@ export const ShoppingCartPage = () => {
               <span>TOTAL PRICE</span>
               <span>{formatPrice(totalPrice + deliveryPrice)}</span>
             </div>
-            <Link to="/checkout" className="checkout-btn">CHECKOUT</Link>
-          </div>
+            <Link to="/checkout" className="checkout-link">CHECKOUT</Link>
+            </div>
         </div>
       )}
       {cartItems.length > 0 && <Link to="/menu" className="back-to-shop">← continue shopping</Link>}

@@ -2,9 +2,10 @@
     max-width: 1200px;
     margin: 1rem auto;
     padding: 1rem;
-    background-color: #faf9f6;
+    background-color: #fafaf9;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-height: 100vh;
   }
   
   .cart-title {
@@ -20,6 +21,7 @@
     gap: 2rem;
   }
   
+
   .cart-items-container {
     flex: 1 1 37%;
   }
@@ -48,7 +50,7 @@
   
   span.item-name {
     font-weight: 500;
-    color: #f8f8f8;
+    color: #000;
     margin-bottom: 0.5rem;
     width: 100%;
     font-size: .75rem;
@@ -88,7 +90,7 @@
   span.item-price {
     font-weight: 700;
     margin-right: 1rem;
-    color: #f8f8f8;
+    color: #000;
   }
 
   .item-amount-price {

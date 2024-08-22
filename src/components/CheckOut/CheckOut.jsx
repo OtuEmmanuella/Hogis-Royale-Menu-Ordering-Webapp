@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Lock, User, FileText  } from 'lucide-react';
 import { IoMdArrowBack } from "react-icons/io";
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { usePaystackPayment } from 'react-paystack';
+import { ClipLoader } from 'react-spinners';
 import { useShoppingCart } from '../ShoppingCart/ShoppingCartContext';
 import { getFlutterwaveConfig, getPaystackConfig } from '../FlutterWave/FlutterwaveConfig';
 import { jsPDF } from 'jspdf';
@@ -11,11 +13,17 @@ import 'jspdf-autotable';
 import './CheckOut.css';
 
 const CheckoutPage = () => {
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialDeliveryOption = searchParams.get('delivery') || '';
+  const initialDeliveryPrice = Number(searchParams.get('deliveryPrice')) || 0;
+
   const [paymentMethod, setPaymentMethod] = useState('flutterwave');
   const [saveInfo, setSaveInfo] = useState(false);
   const [payingForSomeone, setPayingForSomeone] = useState(false);
-  const [isHogisGuest, setIsHogisGuest] = useState(null);
-  const [deliveryOption, setDeliveryOption] = useState('');
+  const [deliveryOption, setDeliveryOption] = useState(initialDeliveryOption);
+  const [deliveryPrice, setDeliveryPrice] = useState(initialDeliveryPrice);
   const [showInvoice, setShowInvoice] = useState(false);
 
   // Form fields
@@ -28,28 +36,7 @@ const CheckoutPage = () => {
 
   const { cartItems } = useShoppingCart();
 
-  const hogisLocations = {
-    'Room Service': 0,
-    'Within Hogis Royale': 0
-  };
-
-  const deliveryPrices = {
-    'Calabar Municipality': 1500,
-    'Calabar South': 1500,
-    '8 miles': 2000,
-    'Akpabuyo': 3000
-  };
-
-  const getDeliveryPrice = () => {
-    if (isHogisGuest) {
-      return hogisLocations[deliveryOption] || 0;
-    } else {
-      return deliveryPrices[deliveryOption] || 0;
-    }
-  };
-
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const deliveryPrice = getDeliveryPrice();
   const finalAmount = totalPrice + deliveryPrice;
 
   const formatPrice = (price) => {
@@ -79,14 +66,31 @@ const CheckoutPage = () => {
     const logoHeight = 40;
     doc.addImage(logoUrl, 'PNG', 10, 10, logoWidth, logoHeight);
 
+    useEffect(() => {
+      // Simulate loading time
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000); // Adjust this time as needed
+  
+      return () => clearTimeout(timer);
+    }, []);
+  
+    if (loading) {
+      return (
+        <div className="loading-container">
+          <ClipLoader color="#0066CC" size={50} />
+        </div>
+      );
+    }
+
     // Company details
     doc.setFontSize(20);
     doc.setTextColor(0, 102, 204);
     doc.text('Hogis Royale', 105, 20, null, null, 'center');
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.text('123 Royale Street, Calabar, Nigeria', 105, 30, null, null, 'center');
-    doc.text('Phone: +234123456789 | Email: info@hogisroyale.com', 105, 35, null, null, 'center');
+    doc.text('6 Bishop Moynagh Avenue, State Housing Calabar, Nigeria', 105, 30, null, null, 'center');
+    doc.text('Phone: +2348100072049 | Email: info@hogisroyale.com', 105, 35, null, null, 'center');
 
     // Invoice title and number
     doc.setFontSize(16);
@@ -208,15 +212,16 @@ const CheckoutPage = () => {
 
   return (
     <div className="checkout-page">
-    <div className="checkout-container">
-      <div className="breadcrumb non-fixed">
-        <Link to="/cart" className="breadcrumb-link">
-          <IoMdArrowBack size={25} />
-        </Link>
-      </div>
-      <h1 className="checkout-title">Checkout</h1>
+      <div className="checkout-container">
+        <div className="chk-breadcrumb non-fixed">
+          <Link to="/cart" className="chk-breadcrumb-link">
+            <IoMdArrowBack size={25} />
+          </Link>
+        </div>
+        <h1 className="checkout-title">Checkout</h1>
         
-        <div className="checkout-content">
+        
+            <div className="checkout-content">
           <div className="checkout-form-container">
             <form className="checkout-form" onSubmit={handleSubmit}>
               <div className="form-group">
@@ -343,6 +348,8 @@ const CheckoutPage = () => {
               )}
             </form>
           </div>
+              
+          </div>
           
           <div className="checkout-summary-container">
             <div className="order-summary">
@@ -369,54 +376,36 @@ const CheckoutPage = () => {
               </div>
               <div className="summary-row">
                 <span className="delivery">DELIVERY</span>
-                {isHogisGuest === null ? (
-                  <div>
-                    <p>Are you a guest @Hogis Royale?</p>
-                    <div className="guest-flex">
-                      <button type="button" onClick={() => setIsHogisGuest(true)} className="isGuest-btn">Yes</button>
-                      <button type="button" onClick={() => setIsHogisGuest(false)} className="isGuest-btn">No</button>
-                    </div>
-                  </div>
-                ) : (
-                  <select
-                    value={deliveryOption} 
-                    onChange={(e) => setDeliveryOption(e.target.value)}
-                    className="delivery-select"
-                  >
-                    <option value="">Select a location</option>
-                    {isHogisGuest
-                      ? Object.entries(hogisLocations).map(([location, price]) => (
-                          <option key={location} value={location}>
-                            {location} - {formatPrice(price)}
-                          </option>
-                        ))
-                      : Object.entries(deliveryPrices).map(([location, price]) => (
-                          <option key={location} value={location}>
-                            {location} - {formatPrice(price)}
-                          </option>
-                        ))
-                    }
-                  </select>
-                )}
+                <span>{deliveryOption} - {formatPrice(deliveryPrice)}</span>
               </div>
-              <div className="total-price">
-                <span>TOTAL PRICE</span>
-                <span>{formatPrice(finalAmount)}</span>
-              </div>
+            </div>
+            <div className="total-price">
+              <span>TOTAL PRICE</span>
+              <span>{formatPrice(finalAmount)}</span>
             </div>
             
             <button type="submit" className="pay-button" onClick={handleSubmit}>
-            Pay Now with {' '}
-            <img 
-              src={paymentMethod === 'flutterwave' 
-                ? '/flutterwave-1.svg'  // Replace with actual path
-                : '/paystack-2.svg'     // Replace with actual path
-              } 
-              alt={`${paymentMethod} logo`}
-              className="payment-logo"
-            />
-            <Lock className="lock-icon" />
-          </button>
+              {paymentMethod === 'flutterwave' ? (
+                <>
+                  Pay Now with {' '}
+                  <img 
+                    src='/flutterwave-1.svg'
+                    alt="Flutterwave logo"
+                    className="payment-logo"
+                  />
+                </>
+              ) : (
+                <>
+                  Pay Now with {' '}
+                  <img 
+                    src='/paystack-2.svg'
+                    alt="Paystack logo"
+                    className="payment-logo"
+                  />
+                </>
+              )}
+              <Lock className="lock-icon" />
+            </button>
             
             <button 
               type="button" 
@@ -433,11 +422,9 @@ const CheckoutPage = () => {
             <p className="secure-text">
               Secured by {paymentMethod === 'flutterwave' ? 'Flutterwave' : 'Paystack'}
             </p>
-
           </div>
         </div>
-      </div>
-    </div>
+     </div>
   );
 };
 

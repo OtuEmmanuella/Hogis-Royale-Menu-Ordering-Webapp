@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { TiArrowBack } from "react-icons/ti";
 import Swal from 'sweetalert2';
-import './Feedback.css'
+import { auth } from '../Firebase/FirebaseConfig'; // Adjust this path as needed
+import { onAuthStateChanged } from 'firebase/auth';
+import './Feedback.css';
 
 const EMOJI_RATINGS = [
   { emoji: '☹️', label: 'Very Dissatisfied', value: 1 },
@@ -157,6 +161,9 @@ const SuggestionButtons = ({ setComment, selectedSuggestions, setSelectedSuggest
 };
 
 const FeedbackForm = () => {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
   const {
     rating,
     setRating,
@@ -172,61 +179,104 @@ const FeedbackForm = () => {
     handleSubmit
   } = useFeedbackForm();
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        setName(currentUser.displayName || '');
+        setEmail(currentUser.email || '');
+      } else {
+        setUser(null);
+        showLoginAlert();
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const showLoginAlert = () => {
+    Swal.fire({
+      title: 'Login Required',
+      text: 'Please sign in or log in to access the feedback form.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Go to Login',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate('/login'); // Adjust this route as needed
+      } else {
+        navigate('/menu'); // Redirect to menu if they cancel
+      }
+    });
+  };
+
+  if (!user) {
+    return null; // Don't render anything if user is not logged in
+  }
+
   return (
-    <div className="custom-feedback-wrapper">
-      <div className="custom-feedback-container">
-        <h2 className="custom-feedback-title">We'd love your feedback!👍🏼</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="custom-form-group">
-            <label className="custom-form-label">How was your experience?</label>
-            <EmojiRating rating={rating} setRating={setRating} />
-          </div>
-          <div className="custom-form-group">
-            <label className="custom-form-label">Quick suggestions:</label>
-            <SuggestionButtons 
-              setComment={setComment} 
-              selectedSuggestions={selectedSuggestions}
-              setSelectedSuggestions={setSelectedSuggestions}
-            />
-          </div>
-          <div className="custom-form-group">
-            <label htmlFor="name" className="custom-form-label">Name:</label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your Name"
-              required
-              className="custom-form-input"
-            />
-          </div>
-          <div className="custom-form-group">
-            <label htmlFor="email" className="custom-form-label">Email (optional):</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              className="custom-form-input"
-            />
-          </div>
-          <div className="custom-form-group">
-            <label htmlFor="comment" className="custom-form-label">Comments:</label>
-            <textarea
-              id="comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Tell us about your experience..."
-              required
-              className="custom-form-input custom-form-textarea"
-            />
-          </div>
-          <button type="submit" disabled={isSubmitting} className="custom-submit-button">
-            {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
-          </button>
-        </form>
+    <div className="custom-feedback-page">
+      <nav className="custom-breadcrumb">
+        <Link to="/menu" className="custom-back-to-menu">
+          <TiArrowBack className="custom-back-icon" />
+        </Link>
+      </nav>
+      <div className="custom-feedback-wrapper">
+        <div className="custom-feedback-container">
+          <h2 className="custom-feedback-title">We'd love your feedback!👍🏼</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="custom-form-group">
+              <label className="custom-form-label">How was your experience?</label>
+              <EmojiRating rating={rating} setRating={setRating} />
+            </div>
+            <div className="custom-form-group">
+              <label className="custom-form-label">Quick suggestions:</label>
+              <SuggestionButtons 
+                setComment={setComment} 
+                selectedSuggestions={selectedSuggestions}
+                setSelectedSuggestions={setSelectedSuggestions}
+              />
+            </div>
+            <div className="custom-form-group">
+              <label htmlFor="name" className="custom-form-label">Name:</label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your Name"
+                required
+                className="custom-form-input"
+              />
+            </div>
+            <div className="custom-form-group">
+              <label htmlFor="email" className="custom-form-label">Email (optional):</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="custom-form-input"
+              />
+            </div>
+            <div className="custom-form-group">
+              <label htmlFor="comment" className="custom-form-label">Comments:</label>
+              <textarea
+                id="comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Tell us about your experience..."
+                required
+                className="custom-form-input custom-form-textarea"
+              />
+            </div>
+            <button type="submit" disabled={isSubmitting} className="custom-submit-button">
+              {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

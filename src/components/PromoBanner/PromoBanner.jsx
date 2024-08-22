@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './PromoBanner.css';
 
 // Import your images here
-import cinemaImage from '/public/cinema00.jpg';
+import cinemaImage from '/cinema00.jpg';
 import arcadeImage from '/game 2.jpg';
-import clubImage from '/public/club.jpg';
+import clubImage from '/club.jpg';
 import hotelImage from '/hotel.jpg';
 import loungeImage from '/menu icon.png';
-import banquetImage from '/public/hall.jpg';
+import banquetImage from '/hall.jpg';
 import Recommended from '../Recommended/Recommended';
 
 const banners = [
