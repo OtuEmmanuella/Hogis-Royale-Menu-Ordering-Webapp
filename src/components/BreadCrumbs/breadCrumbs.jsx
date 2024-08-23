@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import './breadCrumbs.css'; // We'll create this CSS file
+import './breadCrumbs.css'; 
 
 const Breadcrumb = () => {
   const location = useLocation();

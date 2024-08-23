@@ -13,7 +13,7 @@
     border-radius: 10px;
     margin-top: 1em;
     touch-action: pan-y;
-    height: 300px; /* Adjust as needed */
+    height: 300px; 
   }
   
   .promo-banner {
@@ -111,7 +111,7 @@
   
   @media (max-width: 768px) {
     .promo-banner-container {
-      height: 250px; /* Adjust for smaller screens */
+      height: 250px; 
     }
   
     .banner-content {
@@ -134,7 +134,7 @@
   
   @media (max-width: 480px) {
     .promo-banner-container {
-      height: 200px; /* Further adjust for very small screens */
+      height: 200px; 
     }
   
     .banner-content {

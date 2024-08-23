@@ -159,7 +159,6 @@ const CheckoutPage = () => {
     console.log(response);
     const { orderDetails, customerInfo } = prepareInvoiceData();
     generateInvoice(orderDetails, customerInfo);
-    // Additional success handling...
   };
 
   const onPaystackSuccess = (reference) => {

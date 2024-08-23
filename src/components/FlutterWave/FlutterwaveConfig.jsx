@@ -22,7 +22,7 @@ export const getFlutterwaveConfig = (amount, customer) => ({
     reference: (new Date()).getTime().toString(),
   });
   
-  // Optional: You can add a function to get all payment configs if needed
+ 
   export const getPaymentConfigs = (amount, customer) => ({
     flutterwave: getFlutterwaveConfig(amount, customer),
     paystack: getPaystackConfig(amount, customer)

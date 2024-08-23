@@ -30,7 +30,7 @@ const UserAccountPage = () => {
             setOrderHistory(userDoc.data().orderHistory || []);
           } else {
             console.error('User authenticated but not in Firestore');
-            // You might want to add the user to Firestore here as a fallback
+           
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
