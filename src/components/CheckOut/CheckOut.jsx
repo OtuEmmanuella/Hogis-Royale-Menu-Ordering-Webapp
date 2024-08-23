@@ -1,8 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Lock, User, FileText  } from 'lucide-react';
-import { IoMdArrowBack } from "react-icons/io";
+import { Lock, User, FileText } from 'lucide-react';
+
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCity } from 'react-icons/fa';
+
+import { IoMdArrowBack, IoMdLock } from "react-icons/io";
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { usePaystackPayment } from 'react-paystack';
 import { ClipLoader } from 'react-spinners';
@@ -61,27 +63,10 @@ const CheckoutPage = () => {
   const generateInvoice = (orderDetails, customerInfo) => {
     const doc = new jsPDF();
 
-    const logoUrl = '/Hogis.jpg'; // Updated path
+    const logoUrl = '/Hogis.jpg';
     const logoWidth = 40;
     const logoHeight = 40;
     doc.addImage(logoUrl, 'PNG', 10, 10, logoWidth, logoHeight);
-
-    useEffect(() => {
-      // Simulate loading time
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 1000); // Adjust this time as needed
-  
-      return () => clearTimeout(timer);
-    }, []);
-  
-    if (loading) {
-      return (
-        <div className="loading-container">
-          <ClipLoader color="#0066CC" size={50} />
-        </div>
-      );
-    }
 
     // Company details
     doc.setFontSize(20);
@@ -210,221 +195,203 @@ const CheckoutPage = () => {
     }
   };
 
+  useEffect(() => {
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000); // Adjust this time as needed
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <ClipLoader color="#0066CC" size={50} />
+      </div>
+    );
+  }
+
   return (
     <div className="checkout-page">
       <div className="checkout-container">
-        <div className="chk-breadcrumb non-fixed">
-          <Link to="/cart" className="chk-breadcrumb-link">
-            <IoMdArrowBack size={25} />
+        <div className="checkout-header">
+          <Link to="/cart" className="back-link">
+            <IoMdArrowBack size={24} />
+            <span>Back to Cart</span>
           </Link>
+          <h1 className="checkout-title">Checkout</h1>
         </div>
-        <h1 className="checkout-title">Checkout</h1>
         
-        
-            <div className="checkout-content">
+        <div className="checkout-content">
           <div className="checkout-form-container">
             <form className="checkout-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="name">Full Name</label>
-                <input 
-                  id="name" 
-                  type="text" 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)} 
-                  placeholder="John Doe" 
-                  required 
-                />
+              <div className="form-section">
+                <h2 className="section-title">Delivery Information</h2>
+                <div className="form-group">
+                  <FaUser className="input-icon" />
+                  <input 
+                    id="name" 
+                    type="text" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    placeholder="Full Name" 
+                    required 
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <FaEnvelope className="input-icon" />
+                  <input 
+                    id="email" 
+                    type="email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    placeholder="Email" 
+                    required 
+                  />
+                </div>
+
+                <div className="form-group">
+                  <FaPhone className="input-icon" />
+                  <input 
+                    id="phone" 
+                    type="tel" 
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)} 
+                    placeholder="Phone Number" 
+                    required 
+                  />
+                </div>
+
+                <div className="form-group">
+                  <FaMapMarkerAlt className="input-icon" />
+                  <input 
+                    id="address" 
+                    type="text" 
+                    value={address} 
+                    onChange={(e) => setAddress(e.target.value)} 
+                    placeholder="Address" 
+                    required 
+                  />
+                </div>
+
+                <div className="form-group">
+                  <FaCity className="input-icon" />
+                  <input 
+                    id="city" 
+                    type="text" 
+                    value={city} 
+                    onChange={(e) => setCity(e.target.value)} 
+                    placeholder="City" 
+                    required 
+                  />
+                </div>
               </div>
               
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input 
-                  id="email" 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  placeholder="john@example.com" 
-                  required 
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="phone">Phone Number</label>
-                <input 
-                  id="phone" 
-                  type="tel" 
-                  value={phone} 
-                  onChange={(e) => setPhone(e.target.value)} 
-                  placeholder="+234567890469" 
-                  required 
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="address">Address</label>
-                <input 
-                  id="address" 
-                  type="text" 
-                  value={address} 
-                  onChange={(e) => setAddress(e.target.value)} 
-                  placeholder="123 Main St" 
-                  required 
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="city">City</label>
-                <input 
-                  id="city" 
-                  type="text" 
-                  value={city} 
-                  onChange={(e) => setCity(e.target.value)} 
-                  placeholder="Calabar" 
-                  required 
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Payment Method</label>
-                <div className="radio-group">
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      value="flutterwave"
-                      checked={paymentMethod === 'flutterwave'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                    />
-                    Flutterwave
-                  </label>
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      value="paystack"
-                      checked={paymentMethod === 'paystack'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                    />
-                    Paystack
-                  </label>
+              <div className="form-section">
+                <h2 className="section-title">Payment Method</h2>
+                <div className="payment-options">
+                  <button
+                    type="button"
+                    className={`payment-option ${paymentMethod === 'paystack' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('paystack')}
+                    aria-label="Pay with Paystack"
+                  >
+                    <img className='paystack' src='/paystack-2.svg' alt="Paystack" />
+                  </button>
+                  <button
+                    type="button"
+                    className={`payment-option ${paymentMethod === 'flutterwave' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('flutterwave')}
+                    aria-label="Pay with Flutterwave"
+                  >
+                    <img src='/flutterwave-1.svg' alt="Flutterwave" />
+                  </button>
                 </div>
               </div>
 
-              <div className="form-group checkbox-group">
+              <div className="form-section">
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
                     checked={saveInfo}
                     onChange={() => setSaveInfo(!saveInfo)}
                   />
-                  Save this information for next time
+                  <span>Save this information for next time</span>
                 </label>
               </div>
 
-              <div className="form-group checkbox-group">
+              <div className="form-section">
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
                     checked={payingForSomeone}
                     onChange={() => setPayingForSomeone(!payingForSomeone)}
                   />
-                  Are you paying for someone else?
+                  <span>Paying for someone else?</span>
                 </label>
               </div>
 
               {payingForSomeone && (
                 <div className="form-group">
-                  <label htmlFor="recipient">Recipient's Name</label>
-                  <div className="recipient-input-wrapper">
-                    <User className="recipient-icon" />
-                    <input 
-                      id="recipient" 
-                      type="text" 
-                      value={recipientName}
-                      onChange={(e) => setRecipientName(e.target.value)}
-                      placeholder="Recipient's name" 
-                      required 
-                    />
-                  </div>
+                  <FaUser className="input-icon" />
+                  <input 
+                    id="recipient" 
+                    type="text" 
+                    value={recipientName}
+                    onChange={(e) => setRecipientName(e.target.value)}
+                    placeholder="Recipient's name" 
+                    required 
+                  />
                 </div>
               )}
             </form>
           </div>
-              
-          </div>
           
           <div className="checkout-summary-container">
             <div className="order-summary">
-              <h2>Order Summary</h2>
-              <div className="order-items">
-                <button className="view-invoice-btn" onClick={() => setShowInvoice(!showInvoice)}>
-                  {showInvoice ? 'Hide Invoice' : 'View Invoice'}
-                </button>
-                {showInvoice && (
-                  <ul className="invoice-list">
-                    {cartItems.map((item, index) => (
-                      <li key={index} className="invoice-item">
-                        <span className="invoice-item-name">{item.name}</span>
-                        <span className="invoice-item-quantity">Quantity: {item.quantity}</span>
-                        <span className="invoice-item-price">{formatPrice(item.price * item.quantity)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+              <h2 className="section-title">Order Summary</h2>
+              <button className="toggle-invoice-btn" onClick={() => setShowInvoice(!showInvoice)}>
+                {showInvoice ? 'Hide Details' : 'Show Details'}
+              </button>
+              {showInvoice && (
+                <ul className="invoice-list">
+                  {cartItems.map((item, index) => (
+                    <li key={index} className="invoice-item">
+                      <span className="invoice-item-name">{item.name}</span>
+                      <span className="invoice-item-quantity">x{item.quantity}</span>
+                      <span className="invoice-item-price">{formatPrice(item.price * item.quantity)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="summary-row">
+                <span>Subtotal</span>
+                <span>{formatPrice(totalPrice)}</span>
               </div>
               <div className="summary-row">
-                <span className="items-amount">{cartItems.length} ITEMS</span>
-                <span className="item-amount-price">{formatPrice(totalPrice)}</span>
+                <span>Delivery</span>
+                <span>{formatPrice(deliveryPrice)}</span>
               </div>
-              <div className="summary-row">
-                <span className="delivery">DELIVERY</span>
-                <span>{deliveryOption} - {formatPrice(deliveryPrice)}</span>
+              <div className="summary-row total">
+                <span>Total</span>
+                <span>{formatPrice(finalAmount)}</span>
               </div>
-            </div>
-            <div className="total-price">
-              <span>TOTAL PRICE</span>
-              <span>{formatPrice(finalAmount)}</span>
             </div>
             
             <button type="submit" className="pay-button" onClick={handleSubmit}>
-              {paymentMethod === 'flutterwave' ? (
-                <>
-                  Pay Now with {' '}
-                  <img 
-                    src='/flutterwave-1.svg'
-                    alt="Flutterwave logo"
-                    className="payment-logo"
-                  />
-                </>
-              ) : (
-                <>
-                  Pay Now with {' '}
-                  <img 
-                    src='/paystack-2.svg'
-                    alt="Paystack logo"
-                    className="payment-logo"
-                  />
-                </>
-              )}
-              <Lock className="lock-icon" />
-            </button>
-            
-            <button 
-              type="button" 
-              onClick={() => {
-                const { orderDetails, customerInfo } = prepareInvoiceData();
-                generateInvoice(orderDetails, customerInfo);
-              }}
-              className="generate-invoice-button"
-            >
-              Generate Invoice
-              <FileText className="file-icon" />
+              Pay {formatPrice(finalAmount)}
+              <IoMdLock className="lock-icon" />
             </button>
             
             <p className="secure-text">
-              Secured by {paymentMethod === 'flutterwave' ? 'Flutterwave' : 'Paystack'}
+              <IoMdLock /> Secured by {paymentMethod === 'flutterwave' ? 'Flutterwave' : 'Paystack'}
             </p>
           </div>
         </div>
-     </div>
+      </div>
+    </div>
   );
 };
 

@@ -2,7 +2,7 @@
     max-width: 1200px;
     margin: 1rem auto;
     padding: 1rem;
-    background-color: #fafaf9;
+    background-color: #f2f4f6;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     min-height: 100vh;
@@ -226,6 +226,17 @@
   
   .back-to-shop:hover {
     background-color: #555;
+  }
+
+  .checkout-link {
+    color: #fff;
+    padding: 1rem;
+    font-weight: 600;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: #2c3e50;
+    margin: 5px 0;
   }
   
   
