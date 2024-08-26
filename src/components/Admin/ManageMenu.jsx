@@ -7,7 +7,6 @@ import Papa from 'papaparse';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './AdminDashboard.css';
 
 const ManageMenu = () => {
   const [user, loading, error] = useAuthState(auth);
@@ -22,6 +21,8 @@ const ManageMenu = () => {
     price: '',
   });
   const [editItemId, setEditItemId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(8);
 
   const fetchMenuItems = useCallback(async () => {
     try {
@@ -139,6 +140,12 @@ const ManageMenu = () => {
     (selectedCategory === 'All' || item.category === selectedCategory)
   );
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredMenuItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   const formatPrice = (price) => {
     return price.toLocaleString('en-NG', {
       style: 'currency',
@@ -148,77 +155,107 @@ const ManageMenu = () => {
     });
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-  if (!user) return <div className="manage-menu-container">Please log in to manage menu items.</div>;
+  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (error) return <div className="flex justify-center items-center h-screen">Error: {error.message}</div>;
+  if (!user) return <div className="flex justify-center items-center h-screen">Please log in to manage menu items.</div>;
 
   return (
-    <div className="manage-menu-container">
-      <h1 className="dashboard-title">Manage Menu</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Manage Menu</h1>
 
-      <div className="controls">
+      <div className="mb-8 flex flex-wrap gap-4">
         <input
           type="text"
           placeholder="Search menu items..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
+          className="flex-grow p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="category-select"
+          className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="All">All Categories</option>
           {categories.map(category => (
             <option key={category.id} value={category.id}>{category.title}</option>
           ))}
         </select>
-        <input type="file" accept=".csv" onChange={handleCSVUpload} className="file-input" />
+        <label className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600 transition duration-300">
+          <span>Upload CSV</span>
+          <input type="file" accept=".csv" onChange={handleCSVUpload} className="hidden" />
+        </label>
       </div>
 
-      <form onSubmit={handleAddMenuItem} className="add-menu-item-form">
-        <input
-          type="text"
-          placeholder="Category"
-          value={newMenuItem.category}
-          onChange={(e) => setNewMenuItem({...newMenuItem, category: e.target.value})}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Name"
-          value={newMenuItem.name}
-          onChange={(e) => setNewMenuItem({...newMenuItem, name: e.target.value})}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Price"
-          value={newMenuItem.price}
-          onChange={(e) => setNewMenuItem({...newMenuItem, price: e.target.value})}
-          required
-        />
-        <button type="submit">{editItemId ? 'Update Menu Item' : 'Add Menu Item'}</button>
+      <form onSubmit={handleAddMenuItem} className="mb-8 bg-white shadow-md rounded-lg p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input
+            type="text"
+            placeholder="Category"
+            value={newMenuItem.category}
+            onChange={(e) => setNewMenuItem({...newMenuItem, category: e.target.value})}
+            required
+            className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            placeholder="Name"
+            value={newMenuItem.name}
+            onChange={(e) => setNewMenuItem({...newMenuItem, name: e.target.value})}
+            required
+            className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="number"
+            placeholder="Price"
+            value={newMenuItem.price}
+            onChange={(e) => setNewMenuItem({...newMenuItem, price: e.target.value})}
+            required
+            className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <button type="submit" className="mt-4 w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300">
+          {editItemId ? 'Update Menu Item' : 'Add Menu Item'}
+        </button>
       </form>
 
-      <div className="menu-item-grid">
-        {isLoading ? (
-          <div>Loading menu items...</div>
-        ) : filteredMenuItems.length > 0 ? (
-          filteredMenuItems.map(item => (
-            <div key={item.id} className="menu-item-card">
-              <h3 className='item-name'>{item.name}</h3>
-              <p className='item-price'>Price: {formatPrice(parseFloat(item.price))}</p>
-              <p className='item-category'>Category: {item.category}</p>
-              <div className="actions">
-                <button onClick={() => handleEditMenuItem(item)} className='btn-edit'>Edit</button>
-                <button onClick={() => handleDeleteMenuItem(item.id, item.imageUrl)} className='btn-delete'>Delete</button>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">Loading menu items...</div>
+      ) : currentItems.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {currentItems.map(item => (
+            <div key={item.id} className="bg-white shadow-md rounded-lg p-6 transition duration-300 hover:shadow-lg">
+              <h3 className="text-xl font-semibold mb-2 text-black">{item.name}</h3>
+              <p className="text-gray-600 mb-2">Price: {formatPrice(parseFloat(item.price))}</p>
+              <p className="text-gray-600 mb-4">Category: {item.category}</p>
+              <div className="flex justify-between">
+                <button onClick={() => handleEditMenuItem(item)} className="bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 transition duration-300">Edit</button>
+                <button onClick={() => handleDeleteMenuItem(item.id, item.imageUrl)} className="bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-300">Delete</button>
               </div>
             </div>
-          ))
-        ) : (
-          <div>No menu items found. Try adjusting your search or category filter.</div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-600">No menu items found. Try adjusting your search or category filter.</div>
+      )}
+
+      <div className="mt-8 flex justify-center">
+        {filteredMenuItems.length > itemsPerPage && (
+          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            {Array.from({ length: Math.ceil(filteredMenuItems.length / itemsPerPage) }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                  currentPage === index + 1
+                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </nav>
         )}
       </div>
     </div>

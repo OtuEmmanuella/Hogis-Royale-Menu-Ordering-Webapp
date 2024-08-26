@@ -161,7 +161,7 @@ const Menu = () => {
   }
 
   return (
-    <div className='menu-container'>
+    <div className='menu-container-menu'>
       <header>
         <div className="header-left">
           <UserDisplay />

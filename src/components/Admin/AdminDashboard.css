@@ -1,4 +1,5 @@
-.manage-menu-container {
+
+/* .manage-menu-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
@@ -180,7 +181,6 @@
     color: #f44336;
   }
 
-  /* src/components/Admin/ManageNotifications.css */
 .manage-notifications {
   padding: 2rem;
   border: 1px solid red;
@@ -241,5 +241,5 @@
     .add-menu-item-form {
       grid-template-columns: 1fr;
     }
-  }
+  } */
 
