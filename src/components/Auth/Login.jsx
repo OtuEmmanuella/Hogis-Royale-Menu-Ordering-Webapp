@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../Firebase/FirebaseConfig';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, OAuthProvider, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, GoogleAuthProvider, OAuthProvider, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { FcGoogle } from "react-icons/fc";
@@ -37,9 +37,10 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       navigate('/menu');
     } catch (error) {
+      console.error('Email/Password Sign-In Error:', error);
       if (error.code === 'auth/user-not-found') {
         setError("You don't have an account yet! Please sign up.");
       } else {
@@ -50,20 +51,32 @@ function Login() {
 
   const handleOAuthLogin = async (provider) => {
     try {
+      setError(null);
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      
-      // Add or update user in Firestore
+
       await setDoc(doc(db, 'users', user.uid), {
         firstName: user.displayName ? user.displayName.split(' ')[0] : '',
         lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
         email: user.email,
-        // Add any other fields you want to store
       }, { merge: true });
 
       navigate('/menu');
     } catch (error) {
-      setError(error.message);
+      console.error('OAuth Sign-In Error:', error);
+      if (error.code === 'auth/cancelled-popup-request') {
+        setError('Sign-in was cancelled. Please try again.');
+      } else if (error.code === 'auth/popup-blocked') {
+        console.log('Popup blocked, trying redirect...');
+        try {
+          await signInWithRedirect(auth, provider);
+        } catch (redirectError) {
+          console.error('Redirect Sign-In Error:', redirectError);
+          setError('An error occurred during sign-in. Please try again.');
+        }
+      } else {
+        setError(error.message);
+      }
     }
   };
 
@@ -106,19 +119,19 @@ function Login() {
             autoComplete="current-password"
           />
           <button type="submit" className="auth-button">Login</button>
-          
+
           <div className="auth-divider">
             <span>or</span>
           </div>
-          
+
           <button type="button" className="auth-button google-button" onClick={handleGoogleLogin}>
             <FcGoogle className="google-icon" /> Sign in with Google
           </button>
-          
+
           <button type="button" className="auth-button apple-button" onClick={handleAppleLogin}>
             <AiFillApple className="apple-icon" /> Sign in with Apple
           </button>
-          
+
           <div className="auth-links">
             <Link to="/signup" className="auth-link">Don't have an account? <span className='link'>Sign up</span></Link>
             <Link to="/forgot-password" className="auth-link">Forgot Password?</Link>

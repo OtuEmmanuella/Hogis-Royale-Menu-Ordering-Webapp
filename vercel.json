@@ -10,6 +10,7 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/__/auth/handler", "dest": "/index.html" },
+    { "src": "/auth/google/callback", "dest": "/index.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
