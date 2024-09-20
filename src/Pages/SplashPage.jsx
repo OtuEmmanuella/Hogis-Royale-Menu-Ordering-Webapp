@@ -40,7 +40,7 @@ const SplashPage = () => {
         whileTap={{ scale: 0.95 }}
       >
         <FaListUl />
-        Explore Menu
+        Explore
       </motion.button>
 
       <motion.p

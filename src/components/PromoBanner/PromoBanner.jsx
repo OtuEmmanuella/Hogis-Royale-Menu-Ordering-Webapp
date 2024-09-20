@@ -73,7 +73,7 @@ const PromoBanner = () => {
     setTimeout(() => {
       setCurrentBanner(nextBanner);
       setIsTransitioning(false);
-    }, 50); // Match this with the CSS transition duration
+    }, 50); 
   }, []);
 
   const resetAutoSwipeTimer = useCallback(() => {
@@ -82,7 +82,7 @@ const PromoBanner = () => {
     }
     autoSwipeTimerRef.current = setInterval(() => {
       changeBanner((prev) => (prev + 1) % banners.length);
-    }, 4000); // 8 seconds interval
+    }, 4000); 
   }, [changeBanner]);
 
   useEffect(() => {
@@ -115,9 +115,9 @@ const PromoBanner = () => {
       } else {
         changeBanner((currentBanner - 1 + banners.length) % banners.length);
       }
-      resetAutoSwipeTimer(); // Reset the timer after a manual swipe
+      resetAutoSwipeTimer(); 
     } else {
-      // If the swipe wasn't significant, snap back to the current banner
+     
       changeBanner(currentBanner);
     }
 

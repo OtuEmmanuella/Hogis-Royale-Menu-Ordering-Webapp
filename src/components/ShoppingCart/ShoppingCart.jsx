@@ -4,20 +4,23 @@ import { IoCart, IoRemove, IoAdd, IoTrash } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useShoppingCart } from './ShoppingCartContext';
-import emptybag from '/empty-bag.svg'
+import emptybag from '/empty-bag.svg';
 import './ShoppingCart.css';
 
 export const ShoppingCartIcon = () => {
   const { cartItems } = useShoppingCart();
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   return (
-    <div>
-      <Link to="/cart" className="cart-toggle">
-        <IoCart />
-        <span className="cart-count">{itemCount}</span>
-      </Link>
-    </div>
+    <Link to="/cart" className="relative inline-flex items-center p-2 text-gray-700 hover:text-gray-900 transition-colors duration-200">
+      <IoCart className="w-6 h-6 text-white" />
+      {itemCount > 0 && (
+    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+      {itemCount}
+    </span>
+  )}
+   </Link>
+
   );
 };
 
@@ -74,7 +77,10 @@ export const ShoppingCartPage = () => {
 
   return (
     <div className="shopping-cart-page">
-      <h1 className="cart-title">My Cart</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="cart-title">My Cart</h1>
+        <ShoppingCartIcon />
+      </div>
       {cartItems.length === 0 ? (
         <div className="empty-cart-container">
           <img 
@@ -126,8 +132,8 @@ export const ShoppingCartPage = () => {
                   <div>
                     <p>Are you a guest @Hogis Royale?</p>
                     <div className='guest-flex'>
-                    <button onClick={() => setIsHogisGuest(true)} className='isGuest-btn'>Yes</button>
-                    <button onClick={() => setIsHogisGuest(false)} className='isGuest-btn'>No</button>
+                      <button onClick={() => setIsHogisGuest(true)} className='isGuest-btn'>Yes</button>
+                      <button onClick={() => setIsHogisGuest(false)} className='isGuest-btn'>No</button>
                     </div>
                   </div>
                 ) : (

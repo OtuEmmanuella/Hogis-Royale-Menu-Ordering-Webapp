@@ -7,6 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 import { AiFillApple } from "react-icons/ai";
 import { FaChevronRight } from 'react-icons/fa';
 import { TiArrowBack } from "react-icons/ti";
+import { DotSpinner } from '@uiball/loaders';
 import './Auth-styles.css';
 
 function Login() {
@@ -84,7 +85,21 @@ function Login() {
   const handleAppleLogin = () => handleOAuthLogin(new OAuthProvider('apple.com'));
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: adds a semi-transparent overlay
+      }}>
+      <DotSpinner size={40} speed={0.9} color="white" />
+      </div>
+    );
   }
 
   return (

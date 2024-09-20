@@ -5,26 +5,26 @@
     margin: 0 auto;
     padding: .5em;
     margin-bottom: 2rem;
+    /* border: 2px solid red; */
 }
 
-header {
+header.menu-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.85em 1em;
-    border: 1px solid red;
+    width: 100%;
+    padding: .5em 0;
   }
   
   .header-left {
     display: flex;
     align-items: center;
-    flex-grow: 1;
-  }
-  
-  .header-right {
+}
+
+.header-right {
     display: flex;
-    justify-content: flex-end;
-  }
+    align-items: center;
+}
 
 
 .user-cart-wrapper {
@@ -36,7 +36,7 @@ header {
 }
 
 .dashboard-link {
-    margin-left: 3em;
+    margin-right: 1em;
     font-size: 1.6rem;
     color: #f0f0f0;
 }
@@ -82,6 +82,10 @@ h1, h2, h3 {
     color: #4CAF50;
 }
 
+.user-display-wrapper {
+    margin-right: 1em;
+}
+
 .user-display {
     font-size: 16px;
     font-weight: bold;
@@ -89,9 +93,8 @@ h1, h2, h3 {
 }
 
 .shopping-cart {
-    position: relative;
-    display: inline-block;
-    margin-left: auto;
+    display: flex;
+    align-items: center;
 }
 
 .cart-toggle {
@@ -102,6 +105,8 @@ h1, h2, h3 {
     cursor: pointer;
     padding: 5px;
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .cart-count {
@@ -226,6 +231,7 @@ h1, h2, h3 {
 .add-to-cart svg {
     margin-right: 5px;
 }
+
 
 
 /* NotificationPage.css */

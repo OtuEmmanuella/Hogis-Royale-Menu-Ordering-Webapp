@@ -6,6 +6,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, ShoppingBag, LogOut, ChevronRight } from 'lucide-react';
 import emptyBasket from '/empty-bag.svg';
 import { useShoppingCart } from '../ShoppingCart/ShoppingCartContext';
+import { DotSpinner } from '@uiball/loaders';
+
 
 const UserAccountPage = () => {
   const [user, setUser] = useState(null);
@@ -79,7 +81,19 @@ const UserAccountPage = () => {
   };
 
   if (loading) {
-    return <div className="uap-loading">Loading...</div>;
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: adds a semi-transparent overlay
+    }}>
+    <DotSpinner size={40} speed={0.9} color="white" />
+    </div>
   }
 
   if (!user) {

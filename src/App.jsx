@@ -4,7 +4,8 @@ import AppRoutes from './Routes/router';
 import { generateToken, messaging, initializeFirebaseMessaging, auth } from './components/Firebase/FirebaseConfig';
 import { onMessage } from 'firebase/messaging';
 import { onAuthStateChanged } from 'firebase/auth';
-import './index.css'
+import BrevoConversationsWidget from './components/Brevo/BrevoConversationsWidget'; // Import the new component
+import './index.css';
 
 const App = () => {
   const [fcmToken, setFcmToken] = useState(null);
@@ -73,6 +74,7 @@ const App = () => {
     <Router>
       <div className="App">
         <AppRoutes />
+        <BrevoConversationsWidget /> {/* Add the Brevo widget here */}
       </div>
     </Router>
   );

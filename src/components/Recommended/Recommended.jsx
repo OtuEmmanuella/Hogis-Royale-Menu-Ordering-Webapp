@@ -18,7 +18,6 @@ const Recommended = ({ recipes, addToCart }) => (
       ))}
       <span className="see-more">See more</span>
     </div>
-    <PromoBanner />
   </section>
 );
 

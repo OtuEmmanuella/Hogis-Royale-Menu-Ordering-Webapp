@@ -8,14 +8,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import SearchBar from '../components/SearchBar/SearchBar';
 import Categories from '../components/Categories/categories';
 import RecommendedSection from '../components/Recommended/Recommended';
-import UserMenu from '../components/Auth/UserMenu';
 import { ShoppingCartIcon } from '../components/ShoppingCart/ShoppingCart';
 import { auth, db } from '../components/Firebase/FirebaseConfig';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { useShoppingCart } from '../components/ShoppingCart/ShoppingCartContext';
 import NavBar from '../components/NavBar/TempNavBar';
-import NotificationIcon from '../components/Notification/NotificationIcon';
+import { DotSpinner } from '@uiball/loaders';
 import './Menu.css';
+import PromoBanner from '../components/PromoBanner/PromoBanner';
+import BrevoConversationsWidget from '../components/Brevo/BrevoConversationsWidget';
+
 
 const AnimatedFeedbackHeading = ({ navigate, showLoginAlert }) => {
   const headingVariants = {
@@ -39,7 +41,7 @@ const AnimatedFeedbackHeading = ({ navigate, showLoginAlert }) => {
       showLoginAlert();
     }
   };
-  
+
   return (
     <motion.h2
       className='dish-ideas'
@@ -105,8 +107,6 @@ const Menu = () => {
       setLoading(false);
     });
 
-    
-
     const fetchRecommendedRecipes = async () => {
       try { 
         const recipesCollection = collection(db, 'recipes');
@@ -157,27 +157,43 @@ const Menu = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: adds a semi-transparent overlay
+      }}>
+      <DotSpinner size={40} speed={0.9} color="white" />
+      </div>
+    );
   }
+
 
   return (
     <div className='menu-container-menu'>
-      <header>
+      <header className='menu-header'>
         <div className="header-left">
           <UserDisplay />
+        </div>
+        <div className="header-right">
           {isAdmin && (
             <Link to="/admin-dashboard">
               <FaCog className='dashboard-link'/>
             </Link>
           )}
-        </div>
-        <div className="header-right">
           <ShoppingCartIcon />
         </div>
       </header>
       <SearchBar />
       <main>
         <Categories addToCart={handleAddToCart} />
+        <PromoBanner />
         <RecommendedSection recipes={recommendedRecipes} addToCart={handleAddToCart} />
       </main>
       <ToastContainer 
@@ -193,7 +209,10 @@ const Menu = () => {
       />
       <NavBar />
     </div>
+    
   );
 };
+
+
 
 export default Menu;

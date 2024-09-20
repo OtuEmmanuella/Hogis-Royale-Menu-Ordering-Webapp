@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { TiArrowBack } from "react-icons/ti";
 import Swal from 'sweetalert2';
-import { auth } from '../Firebase/FirebaseConfig'; // Adjust this path as needed
+import { auth, db, storage } from '../Firebase/FirebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import './Feedback.css';
 
 const EMOJI_RATINGS = [
@@ -34,6 +36,7 @@ const useFeedbackForm = () => {
   const [comment, setComment] = useState('');
   const [selectedSuggestions, setSelectedSuggestions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [photos, setPhotos] = useState([]);
 
   const validateForm = () => {
     const errors = [];
@@ -42,6 +45,24 @@ const useFeedbackForm = () => {
     if (comment.trim() === '') errors.push('Please provide a comment');
     if (email && !/\S+@\S+\.\S+/.test(email)) errors.push('Please provide a valid email');
     return errors;
+  };
+
+  const handlePhotoCapture = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      if (photos.length < 3) {
+        setPhotos(prevPhotos => [...prevPhotos, e.target.files[0]]);
+      } else {
+        Swal.fire({
+          title: 'Maximum Photos Reached',
+          text: 'You can only upload up to 3 photos.',
+          icon: 'warning',
+        });
+      }
+    }
+  };
+
+  const removePhoto = (index) => {
+    setPhotos(prevPhotos => prevPhotos.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -59,34 +80,41 @@ const useFeedbackForm = () => {
 
     setIsSubmitting(true);
     
-    const formData = new FormData();
-    formData.append('rating', rating);
-    formData.append('name', name);
-    formData.append('email', email);
-    formData.append('comment', comment);
+    let photoURLs = [];
+    for (let photo of photos) {
+      const photoRef = ref(storage, `feedback-photos/${Date.now()}-${photo.name}`);
+      await uploadBytes(photoRef, photo);
+      const url = await getDownloadURL(photoRef);
+      photoURLs.push(url);
+    }
+
+    const feedbackData = {
+      rating,
+      name,
+      email,
+      comment,
+      suggestions: selectedSuggestions,
+      createdAt: serverTimestamp(),
+      photoURLs,
+    };
 
     try {
-      const response = await fetch('https://getform.io/f/ayvpwzmb', {
-        method: 'POST',
-        body: formData,
+      await addDoc(collection(db, 'feedbacks'), feedbackData);
+      
+      Swal.fire({
+        title: 'Thank you!',
+        text: 'Your feedback has been submitted successfully.',
+        icon: 'success',
       });
-
-      if (response.ok) {
-        Swal.fire({
-          title: 'Thank you!',
-          text: 'Your feedback has been submitted successfully.',
-          icon: 'success',
-        });
-        // Reset form
-        setRating(null);
-        setName('');
-        setEmail('');
-        setComment('');
-        setSelectedSuggestions([]);
-      } else {
-        throw new Error('Form submission failed');
-      }
+      // Reset form
+      setRating(null);
+      setName('');
+      setEmail('');
+      setComment('');
+      setSelectedSuggestions([]);
+      setPhotos([]);
     } catch (error) {
+      console.error("Error submitting feedback: ", error);
       Swal.fire({
         title: 'Error!',
         text: 'Failed to submit feedback. Please try again.',
@@ -109,7 +137,10 @@ const useFeedbackForm = () => {
     selectedSuggestions,
     setSelectedSuggestions,
     isSubmitting,
-    handleSubmit
+    handleSubmit,
+    photos,
+    handlePhotoCapture,
+    removePhoto
   };
 };
 
@@ -176,7 +207,10 @@ const FeedbackForm = () => {
     selectedSuggestions,
     setSelectedSuggestions,
     isSubmitting,
-    handleSubmit
+    handleSubmit,
+    photos,
+    handlePhotoCapture,
+    removePhoto
   } = useFeedbackForm();
 
   useEffect(() => {
@@ -204,15 +238,15 @@ const FeedbackForm = () => {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        navigate('/login'); // Adjust this route as needed
+        navigate('/login');
       } else {
-        navigate('/menu'); // Redirect to menu if they cancel
+        navigate('/menu');
       }
     });
   };
 
   if (!user) {
-    return null; // Don't render anything if user is not logged in
+    return null;
   }
 
   return (
@@ -224,7 +258,10 @@ const FeedbackForm = () => {
       </nav>
       <div className="custom-feedback-wrapper">
         <div className="custom-feedback-container">
-          <h2 className="custom-feedback-title">We'd love your feedback!👍🏼</h2>
+        <div className="custom-feedback-header">
+            <img src="/Hogis.jpg" alt="Hogis Logo" className="custom-feedback-logo" />
+            <h2 className="custom-feedback-title">We'd love your feedback!👍🏼</h2>
+          </div>
           <form onSubmit={handleSubmit}>
             <div className="custom-form-group">
               <label className="custom-form-label">How was your experience?</label>
@@ -246,7 +283,6 @@ const FeedbackForm = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your Name"
-                required
                 className="custom-form-input"
               />
             </div>
@@ -272,6 +308,30 @@ const FeedbackForm = () => {
                 className="custom-form-input custom-form-textarea"
               />
             </div>
+            <div className="custom-form-group">
+              <label htmlFor="photo" className="custom-form-label">Take a photo (optional):</label>
+              <input
+                type="file"
+                id="photo"
+                accept="image/*"
+                capture="environment"
+                onChange={handlePhotoCapture}
+                className="custom-form-input custom-file-input"
+              />
+              <label htmlFor="photo" className="custom-file-label">
+                {photos.length < 5 ? 'Take a Photo 📸' : 'Maximum Photos Reached'}
+              </label>
+            </div>
+            {photos.length > 0 && (
+              <div className="custom-form-group custom-photo-preview">
+                {photos.map((photo, index) => (
+                  <div key={index} className="custom-photo-item">
+                    <img src={URL.createObjectURL(photo)} alt={`Captured ${index + 1}`} className="custom-photo-thumbnail" />
+                    <button type="button" onClick={() => removePhoto(index)} className="custom-photo-remove">Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
             <button type="submit" disabled={isSubmitting} className="custom-submit-button">
               {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
             </button>

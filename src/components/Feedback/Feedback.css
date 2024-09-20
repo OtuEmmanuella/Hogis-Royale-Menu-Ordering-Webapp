@@ -134,6 +134,24 @@
     background-color: #cccccc;
     cursor: not-allowed;
   }
+
+  .custom-feedback-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .custom-feedback-logo {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+    object-fit: contain;
+  }
+  
+  .custom-feedback-title {
+    margin: 0;
+  }
+
   
   @media (max-width: 600px) {
     .custom-feedback-container {

@@ -46,31 +46,45 @@ export const initializeFirebaseMessaging = async () => {
   }
 };
 
+export const requestNotificationPermission = async () => {
+  if (!('Notification' in window)) {
+    console.warn("This browser does not support desktop notification");
+    return false;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    return permission === 'granted';
+  } catch (error) {
+    console.error('Error requesting notification permission:', error);
+    return false;
+  }
+};
+
 export const generateToken = async () => {
   if (!messaging) {
     console.warn("Messaging is not supported on this browser.");
     return null;
   }
+
   try {
-    console.log('Requesting notification permission...');
-    const permission = await Notification.requestPermission();
-    console.log('Permission:', permission);
-    if (permission === 'granted') {
-      console.log('Permission granted, getting token...');
-      const currentToken = await getToken(messaging, { vapidKey: "BAaJSYaSnFBejdhv7h4w1lhED2LgK3k908rTe4sEMs6vb7aNqgTuWD7PFE7nGqgx6ZF3PxyY7CKQ-jgkUluBSxM" });
-      if (currentToken) {
-        console.log('FCM token:', currentToken);
-        return currentToken;
-      } else {
-        console.log('No registration token available. Request permission to generate one.');
-        return null;
-      }
+    const currentToken = await getToken(messaging, {
+      vapidKey: "BAaJSYaSnFBejdhv7h4w1lhED2LgK3k908rTe4sEMs6vb7aNqgTuWD7PFE7nGqgx6ZF3PxyY7CKQ-jgkUluBSxM"
+    });
+    
+    if (currentToken) {
+      console.log('FCM token:', currentToken);
+      return currentToken;
     } else {
-      console.log('Notification permission denied');
+      console.log('No registration token available. Request permission to generate one.');
       return null;
     }
   } catch (error) {
-    console.error('An error occurred while retrieving token:', error);
+    if (error.code === 'messaging/permission-blocked') {
+      console.log('Notifications are blocked. Please enable them in your browser settings.');
+    } else {
+      console.error('An error occurred while retrieving token:', error);
+    }
     return null;
   }
 };
