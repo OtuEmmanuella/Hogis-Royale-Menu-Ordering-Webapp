@@ -15,6 +15,8 @@ import { ShoppingCartPage } from '../components/ShoppingCart/ShoppingCart';
 import { ShoppingCartProvider } from '../components/ShoppingCart/ShoppingCartContext';
 import UserAccountPage from '../components/Auth/UserAccountPage';
 import NotificationPage from '../components/Notification/NotificationPage';
+import OrderConfirmation from '../components/CheckOut/OrderConfirmation';
+
 
 // Import the new pages
 import OrdersPage from '../components/Admin/OrdersPage';
@@ -38,6 +40,7 @@ const AppRoutes = () => {
         <Route path="/message" element={<NotificationPage />} />
         <Route path="/cart" element={<ShoppingCartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
         <Route path="/account" element={<UserAccountPage />} />
 
         {/* Add new routes for the admin pages */}

@@ -1,11 +1,146 @@
+// ShoppingCartContext.jsx
+// import React, { createContext, useContext, useState, useEffect } from 'react';
+// import { auth, db } from '../Firebase/FirebaseConfig';
+// import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+
+// const ShoppingCartContext = createContext();
+
+// export const ShoppingCartProvider = ({ children }) => {
+//   const [cartItems, setCartItems] = useState([]);
+//   const [user, setUser] = useState(null);
+
+//   useEffect(() => {
+//     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+//       if (currentUser) {
+//         setUser(currentUser);
+//         await loadCartFromFirebase(currentUser.uid);
+//       } else {
+//         setUser(null);
+//         setCartItems([]);
+//       }
+//     });
+//     return () => unsubscribe();
+//   }, []);
+
+//   const loadCartFromFirebase = async (userId) => {
+//     try {
+//       const userDoc = await getDoc(doc(db, 'users', userId));
+//       if (userDoc.exists()) {
+//         const userData = userDoc.data();
+//         setCartItems(userData.cart || []);
+//       }
+//     } catch (error) {
+//       console.error('Error loading cart from Firebase:', error);
+//     }
+//   };
+
+//   const saveCartToFirebase = async (updatedCart) => {
+//     if (user) {
+//       try {
+//         await updateDoc(doc(db, 'users', user.uid), { cart: updatedCart });
+//       } catch (error) {
+//         console.error('Error saving cart to Firebase:', error);
+//       }
+//     }
+//   };
+
+//   const addToCart = async (item) => {
+//     const cartItemId = `${item.id}-${Date.now()}`;
+//     const newItem = { ...item, cartItemId, quantity: 1 };
+//     const updatedCart = [...cartItems, newItem];
+//     setCartItems(updatedCart);
+//     await saveCartToFirebase(updatedCart);
+//   };
+
+//   const updateQuantity = async (cartItemId, newQuantity) => {
+//     if (newQuantity > 0) {
+//       const updatedCart = cartItems.map((item) =>
+//         item.cartItemId === cartItemId ? { ...item, quantity: newQuantity } : item
+//       );
+//       setCartItems(updatedCart);
+//       await saveCartToFirebase(updatedCart);
+//     } else {
+//       await removeItem(cartItemId);
+//     }
+//   };
+
+//   const removeItem = async (cartItemId) => {
+//     const updatedCart = cartItems.filter((item) => item.cartItemId !== cartItemId);
+//     setCartItems(updatedCart);
+//     await saveCartToFirebase(updatedCart);
+//   };
+
+//   const clearCart = async () => {
+//     setCartItems([]);
+//     await saveCartToFirebase([]);
+//   };
+
+//   const addToOrderHistory = async (order) => {
+//     if (user) {
+//       try {
+//         await updateDoc(doc(db, 'users', user.uid), {
+//           orderHistory: arrayUnion(order),
+//         });
+//       } catch (error) {
+//         console.error('Error adding to order history:', error);
+//       }
+//     }
+//   };
+
+//   const incrementQuantity = async (cartItemId) => {
+//     const updatedCart = cartItems.map((item) =>
+//       item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
+//     );
+//     setCartItems(updatedCart);
+//     await saveCartToFirebase(updatedCart);
+//   };
+
+//   const decrementQuantity = async (cartItemId) => {
+//     const item = cartItems.find((item) => item.cartItemId === cartItemId);
+//     if (item.quantity > 1) {
+//       const updatedCart = cartItems.map((item) =>
+//         item.cartItemId === cartItemId ? { ...item, quantity: item.quantity - 1 } : item
+//       );
+//       setCartItems(updatedCart);
+//       await saveCartToFirebase(updatedCart);
+//     } else {
+//       await removeItem(cartItemId);
+//     }
+//   };
+
+//   return (
+//     <ShoppingCartContext.Provider
+//       value={{
+//         cartItems,
+//         user,
+//         addToCart,
+//         updateQuantity,
+//         removeItem,
+//         clearCart,
+//         addToOrderHistory,
+//         incrementQuantity,
+//         decrementQuantity,
+//       }}
+//     >
+//       {children}
+//     </ShoppingCartContext.Provider>
+//   );
+// };
+
+// export const useShoppingCart = () => useContext(ShoppingCartContext);
+
+
+
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db } from '../Firebase/FirebaseConfig';
-import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 
-const ShoppingCartContext = createContext();
+const ShoppingCartContext = createContext(null);
 
 export const ShoppingCartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState(null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -27,18 +162,24 @@ export const ShoppingCartProvider = ({ children }) => {
       if (userDoc.exists()) {
         const userData = userDoc.data();
         setCartItems(userData.cart || []);
+        if (userData.selectedBranch) {
+          setSelectedBranch(userData.selectedBranch);
+        }
       }
     } catch (error) {
-      console.error('Error loading cart from Firebase:', error);
+      console.error('Error loading cart:', error);
     }
   };
 
   const saveCartToFirebase = async (updatedCart) => {
     if (user) {
       try {
-        await updateDoc(doc(db, 'users', user.uid), { cart: updatedCart });
+        await updateDoc(doc(db, 'users', user.uid), {
+          cart: updatedCart,
+          selectedBranch
+        });
       } catch (error) {
-        console.error('Error saving cart to Firebase:', error);
+        console.error('Error saving cart:', error);
       }
     }
   };
@@ -51,10 +192,23 @@ export const ShoppingCartProvider = ({ children }) => {
     await saveCartToFirebase(updatedCart);
   };
 
-  const updateQuantity = async (cartItemId, newQuantity) => {
-    if (newQuantity > 0) {
-      const updatedCart = cartItems.map((item) =>
-        item.cartItemId === cartItemId ? { ...item, quantity: newQuantity } : item
+  const incrementQuantity = async (cartItemId) => {
+    const updatedCart = cartItems.map(item =>
+      item.cartItemId === cartItemId
+        ? { ...item, quantity: (item.quantity || 1) + 1 }
+        : item
+    );
+    setCartItems(updatedCart);
+    await saveCartToFirebase(updatedCart);
+  };
+
+  const decrementQuantity = async (cartItemId) => {
+    const item = cartItems.find(item => item.cartItemId === cartItemId);
+    if (item && item.quantity > 1) {
+      const updatedCart = cartItems.map(item =>
+        item.cartItemId === cartItemId
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
       );
       setCartItems(updatedCart);
       await saveCartToFirebase(updatedCart);
@@ -64,7 +218,7 @@ export const ShoppingCartProvider = ({ children }) => {
   };
 
   const removeItem = async (cartItemId) => {
-    const updatedCart = cartItems.filter((item) => item.cartItemId !== cartItemId);
+    const updatedCart = cartItems.filter(item => item.cartItemId !== cartItemId);
     setCartItems(updatedCart);
     await saveCartToFirebase(updatedCart);
   };
@@ -74,50 +228,32 @@ export const ShoppingCartProvider = ({ children }) => {
     await saveCartToFirebase([]);
   };
 
-  const addToOrderHistory = async (order) => {
-    if (user) {
-      try {
-        await updateDoc(doc(db, 'users', user.uid), {
-          orderHistory: arrayUnion(order),
-        });
-      } catch (error) {
-        console.error('Error adding to order history:', error);
-      }
-    }
+  const getCartTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const itemPrice = parseFloat(item.price) || 0;
+      const quantity = item.quantity || 1;
+      return total + (itemPrice * quantity);
+    }, 0);
   };
 
-  const incrementQuantity = async (cartItemId) => {
-    const updatedCart = cartItems.map((item) =>
-      item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
-    );
-    setCartItems(updatedCart);
-    await saveCartToFirebase(updatedCart);
-  };
-
-  const decrementQuantity = async (cartItemId) => {
-    const item = cartItems.find((item) => item.cartItemId === cartItemId);
-    if (item.quantity > 1) {
-      const updatedCart = cartItems.map((item) =>
-        item.cartItemId === cartItemId ? { ...item, quantity: item.quantity - 1 } : item
-      );
-      setCartItems(updatedCart);
-      await saveCartToFirebase(updatedCart);
-    } else {
-      await removeItem(cartItemId);
-    }
+  const getCartCount = () => {
+    return cartItems.reduce((count, item) => count + (item.quantity || 1), 0);
   };
 
   return (
     <ShoppingCartContext.Provider
       value={{
         cartItems,
+        selectedBranch,
+        setSelectedBranch,
         addToCart,
-        updateQuantity,
-        removeItem,
-        clearCart,
-        addToOrderHistory,
         incrementQuantity,
         decrementQuantity,
+        removeItem,
+        clearCart,
+        getCartTotal,
+        getCartCount,
+        user
       }}
     >
       {children}
@@ -125,4 +261,10 @@ export const ShoppingCartProvider = ({ children }) => {
   );
 };
 
-export const useShoppingCart = () => useContext(ShoppingCartContext);
+export const useShoppingCart = () => {
+  const context = useContext(ShoppingCartContext);
+  if (!context) {
+    throw new Error('useShoppingCart must be used within ShoppingCartProvider');
+  }
+  return context;
+};
