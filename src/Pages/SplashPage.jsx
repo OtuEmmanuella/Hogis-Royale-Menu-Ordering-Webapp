@@ -49,7 +49,7 @@ const SplashPage = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.5 }}
       >
-        © 2024 Hogis Royale and Apartments. All rights reserved.
+        © 2024 Hogis Group. All rights reserved.
       </motion.p>
     </div>
   );
