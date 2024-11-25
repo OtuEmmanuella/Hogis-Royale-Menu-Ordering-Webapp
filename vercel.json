@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/server.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
     },
     {
@@ -14,11 +14,7 @@
   "routes": [
     {
       "src": "/api/webhooks/paystack",
-      "dest": "api/server.js"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "api/server.js"
+      "dest": "api/webhooks/paystack.js"
     },
     {
       "handle": "filesystem"

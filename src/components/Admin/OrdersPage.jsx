@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../Firebase/FirebaseConfig';
-import { collection, query, orderBy, limit, getDocs, onSnapshot } from 'firebase/firestore';
-import BranchSelector from '../BranchSelector/BranchSelector';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { Clock, User, CreditCard } from 'lucide-react';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedBranch, setSelectedBranch] = useState('all');
-
 
   const formatOrderData = (doc) => {
     try {
@@ -49,13 +47,7 @@ const OrdersPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        let ordersRef;
-        if (selectedBranch === 'all') {
-          ordersRef = collection(db, 'orders');
-        } else {
-          ordersRef = collection(db, 'branches', selectedBranch, 'orders');
-        }
-
+        const ordersRef = collection(db, 'orders');
         const q = query(
           ordersRef,
           orderBy('createdAt', 'desc'),
@@ -74,9 +66,9 @@ const OrdersPage = () => {
     };
 
     fetchOrders();
-  }, [selectedBranch]);
+  }, []);
 
-  const getStatusStyle = (status, paymentStatus) => {
+  const getStatusStyle = (status) => {
     const styles = {
       completed: 'bg-green-100 text-green-800',
       processing: 'bg-yellow-100 text-yellow-800',
@@ -84,7 +76,11 @@ const OrdersPage = () => {
       failed: 'bg-red-100 text-red-800',
       paid: 'bg-green-100 text-green-800'
     };
-    return styles[paymentStatus] || styles[status] || 'bg-gray-100 text-gray-800';
+    return styles[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const formatPrice = (price) => {
+    return `₦${price.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   if (loading) {
@@ -127,7 +123,6 @@ const OrdersPage = () => {
           </span>
         </div>
         
-        
         {orders.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-6 text-center">
             <p className="text-gray-600">No orders found.</p>
@@ -151,23 +146,17 @@ const OrdersPage = () => {
                     <div className="mt-2 sm:flex sm:justify-between">
                       <div className="sm:flex">
                         <p className="flex items-center text-sm text-gray-500">
-                          <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                          </svg>
+                          <User className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
                           {order.customerName}
                         </p>
                         <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                          <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                          </svg>
+                          <Clock className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
                           {order.createdAt.toLocaleString()}
                         </p>
                       </div>
                       <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                        <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                        ₦{order.total.toFixed(2)}
+                        <CreditCard className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+                        {formatPrice(order.total)}
                       </div>
                     </div>
                     <div className="mt-2 text-sm text-gray-500">
@@ -185,4 +174,3 @@ const OrdersPage = () => {
 };
 
 export default OrdersPage;
-

@@ -8,7 +8,8 @@
     "build": "vite build",
     "vercel-build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.js"
   },
   "dependencies": {
     "@formio/react": "^5.3.0",
@@ -29,6 +30,7 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "lucide-react": "^0.424.0",
+    "nodemailer": "^6.9.16",
     "papaparse": "^5.4.1",
     "paystack": "^2.0.1",
     "react": "^18.3.1",
@@ -54,6 +56,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "globals": "^15.12.0",
+    "nodemon": "^3.1.7",
     "postcss": "^8.4.41",
     "postcss-loader": "^8.1.1",
     "tailwindcss": "^3.4.10",
