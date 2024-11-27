@@ -1,20 +1,28 @@
 {
-    "short_name": "Hogis Royale",
-    "name": "Hogis Royale Menu",
-    "icons": [
-      {
-        "src": "Hogis.jpg",
-        "sizes": "192x192",
-        "type": "image/jpg"
-      },
-      {
-        "src": "Hogis.jpg",
-        "sizes": "512x512",
-        "type": "image/jpg"
-      }
-    ],
-    "start_url": ".",
-    "display": "standalone",
-    "theme_color": "#000000",
-    "background_color": "#ffffff"
-  }
+  "short_name": "Hogis Royale",
+  "name": "Hogis Royale Menu",
+  "icons": [
+    {
+      "src": "/Hogis.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Hogis.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "description": "Order delicious meals from Hogis Royale Menu",
+  "lang": "en-US",
+  "orientation": "any",
+  "categories": ["food", "lifestyle"]
+}
+

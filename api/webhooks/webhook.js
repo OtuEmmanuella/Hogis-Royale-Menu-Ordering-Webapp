@@ -1,13 +1,13 @@
+// /api/webhooks/webhook.js
+
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { createHmac } from 'crypto';
 import { createTransport } from 'nodemailer';
+import * as path from 'path';
 
-// Initialize Firebase Admin
-const serviceAccount = {
-  // Add your Firebase service account credentials here
-  // Get this from Firebase Console > Project Settings > Service Accounts
-};
+// Firebase Admin SDK initialization
+const serviceAccount = require(path.resolve(__dirname, process.env.FIREBASE_SERVICE_ACCOUNT_PATH));
 
 if (!global.firebaseApp) {
   global.firebaseApp = initializeApp({
@@ -19,13 +19,13 @@ const db = getFirestore();
 
 // Configure nodemailer
 const transporter = createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
+  host: 'smtp.gmail.com',
+  port: 465,  // SSL port
   secure: true,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
+    user: process.env.BRANCH1_EMAIL,
+    pass: process.env.BRANCH1_APP_PASSWORD, // Use the correct email credentials for sending
+  },
 });
 
 export default async function handler(req, res) {
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 
   try {
     // Verify Paystack signature
-    const hash = createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
+    const hash = createHmac('sha512', process.env.VITE_PAYSTACK_SECRET_KEY)
       .update(JSON.stringify(req.body))
       .digest('hex');
 
@@ -78,16 +78,16 @@ async function handleSuccessfulPayment(orderRef, orderData, paymentData) {
   const updates = {
     status: 'paid',
     paymentDetails: paymentData,
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   await orderRef.update(updates);
 
-  // Send confirmation email
+  // Send order confirmation email
   await sendOrderConfirmation(orderData.customer.email, {
     orderId: orderRef.id,
     amount: paymentData.amount / 100,
-    items: orderData.items
+    items: orderData.items,
   });
 }
 
@@ -95,21 +95,21 @@ async function handleFailedPayment(orderRef, orderData, paymentData) {
   const updates = {
     status: 'failed',
     paymentError: paymentData.gateway_response,
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   await orderRef.update(updates);
 
-  // Send failure notification
+  // Send payment failure notification
   await sendPaymentFailureNotification(orderData.customer.email, {
     orderId: orderRef.id,
-    error: paymentData.gateway_response
+    error: paymentData.gateway_response,
   });
 }
 
 async function sendOrderConfirmation(email, orderDetails) {
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: process.env.BRANCH1_EMAIL,
     to: email,
     subject: `Order Confirmation #${orderDetails.orderId}`,
     html: `
@@ -117,11 +117,13 @@ async function sendOrderConfirmation(email, orderDetails) {
       <p>Your payment of ₦${orderDetails.amount} has been confirmed.</p>
       <h2>Order Details:</h2>
       <ul>
-        ${orderDetails.items.map(item => `
-          <li>${item.name} x ${item.quantity} - ₦${item.price * item.quantity}</li>
-        `).join('')}
+        ${orderDetails.items
+          .map(item => `
+            <li>${item.name} x ${item.quantity} - ₦${item.price * item.quantity}</li>
+          `)
+          .join('')}
       </ul>
-    `
+    `,
   };
 
   await transporter.sendMail(mailOptions);
@@ -129,7 +131,7 @@ async function sendOrderConfirmation(email, orderDetails) {
 
 async function sendPaymentFailureNotification(email, details) {
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: process.env.BRANCH1_EMAIL,
     to: email,
     subject: `Payment Failed for Order #${details.orderId}`,
     html: `
@@ -137,7 +139,7 @@ async function sendPaymentFailureNotification(email, details) {
       <p>We were unable to process your payment for order #${details.orderId}.</p>
       <p>Error: ${details.error}</p>
       <p>Please try again or contact support if you need assistance.</p>
-    `
+    `,
   };
 
   await transporter.sendMail(mailOptions);

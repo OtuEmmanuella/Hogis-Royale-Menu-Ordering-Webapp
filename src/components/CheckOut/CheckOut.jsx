@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, auth } from '../Firebase/FirebaseConfig';
-import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { usePaystackPayment } from 'react-paystack';
-import { getFlutterwaveConfig, getPaystackConfig } from '../FlutterWave/FlutterwaveConfig';
 import { useShoppingCart } from '../ShoppingCart/ShoppingCartContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCity } from 'react-icons/fa';
@@ -14,10 +12,11 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
+  const branchId = searchParams.get('branch');
   const initialDeliveryOption = searchParams.get('delivery') || '';
   const initialDeliveryPrice = Number(searchParams.get('deliveryPrice')) || 0;
 
-  const [paymentMethod, setPaymentMethod] = useState('flutterwave');
+  const [paymentMethod, setPaymentMethod] = useState('paystack');
   const [saveInfo, setSaveInfo] = useState(false);
   const [payingForSomeone, setPayingForSomeone] = useState(false);
   const [deliveryOption, setDeliveryOption] = useState(initialDeliveryOption);
@@ -34,6 +33,12 @@ const CheckoutPage = () => {
 
   const { cartItems, clearCart } = useShoppingCart();
 
+  const branches = {
+    '1': 'Hogis Royale And Apartment',
+    '2': 'Hogis Luxury Suites',
+    '3': 'Hogis Exclusive Resorts'
+  };
+
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const finalAmount = totalPrice + deliveryPrice;
 
@@ -46,7 +51,7 @@ const CheckoutPage = () => {
 
   const createOrder = async () => {
     const user = auth.currentUser;
-    const orderRef = await addDoc(collection(db, 'orders'), {
+    const orderData = {
       customer: {
         userId: user ? user.uid : null,
         name: payingForSomeone ? recipientName : name,
@@ -62,62 +67,51 @@ const CheckoutPage = () => {
       paymentMethod,
       deliveryOption,
       deliveryPrice,
-    });
+      branchId: branchId,
+      branchName: branches[branchId] || 'Unknown Branch'
+    };
+
+    console.log('Creating order with data:', orderData);
+
+    const orderRef = await addDoc(collection(db, 'orders'), orderData);
     return orderRef.id;
   };
 
   const handlePaymentSuccess = (orderId) => {
     setShowInvoice(true);
     clearCart();
-    // You might want to navigate to a success page or show a success modal
     navigate(`/order-confirmation/${orderId}`);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!deliveryOption) {
-      alert("Please select a delivery option before proceeding to payment.");
-      return;
-    }
     
     const orderId = await createOrder();
     
-    if (paymentMethod === 'flutterwave') {
+    if (paymentMethod === 'paystack') {
       const config = {
-        ...getFlutterwaveConfig(finalAmount, { email, phone_number: phone, name }),
-        tx_ref: orderId,
-      };
-      const handleFlutterPayment = useFlutterwave(config);
-      handleFlutterPayment({
-        callback: (response) => {
-          console.log(response);
-          closePaymentModal();
-          if (response.status === "successful") {
-            handlePaymentSuccess(orderId);
-          } else {
-            console.log("Flutterwave payment failed");
-          }
-        },
-        onClose: () => {},
-      });
-    } else if (paymentMethod === 'paystack') {
-      const config = {
-        ...getPaystackConfig(finalAmount, { email }),
         reference: orderId,
+        email: email,
+        amount: finalAmount * 100, // Convert to kobo
+        publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+        metadata: {
+          branchId: branchId,
+          deliveryOption: deliveryOption
+        }
       };
+
       const initializePayment = usePaystackPayment(config);
       initializePayment(
         (response) => {
-          console.log(response);
+          console.log('Payment successful:', response);
           handlePaymentSuccess(orderId);
         },
         () => {
-          console.log("Paystack payment closed");
+          console.log("Payment closed");
         }
       );
     }
   };
-
 
   return (
     <div className="checkout-page">
@@ -138,7 +132,6 @@ const CheckoutPage = () => {
                 <div className="form-group">
                   <FaUser className="input-icon" />
                   <input 
-                    id="name" 
                     type="text" 
                     value={name} 
                     onChange={(e) => setName(e.target.value)} 
@@ -150,7 +143,6 @@ const CheckoutPage = () => {
                 <div className="form-group">
                   <FaEnvelope className="input-icon" />
                   <input 
-                    id="email" 
                     type="email" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
@@ -162,7 +154,6 @@ const CheckoutPage = () => {
                 <div className="form-group">
                   <FaPhone className="input-icon" />
                   <input 
-                    id="phone" 
                     type="tel" 
                     value={phone} 
                     onChange={(e) => setPhone(e.target.value)} 
@@ -174,7 +165,6 @@ const CheckoutPage = () => {
                 <div className="form-group">
                   <FaMapMarkerAlt className="input-icon" />
                   <input 
-                    id="address" 
                     type="text" 
                     value={address} 
                     onChange={(e) => setAddress(e.target.value)} 
@@ -186,7 +176,6 @@ const CheckoutPage = () => {
                 <div className="form-group">
                   <FaCity className="input-icon" />
                   <input 
-                    id="city" 
                     type="text" 
                     value={city} 
                     onChange={(e) => setCity(e.target.value)} 
@@ -206,14 +195,6 @@ const CheckoutPage = () => {
                     aria-label="Pay with Paystack"
                   >
                     <img className='paystack' src='/paystack-2.svg' alt="Paystack" />
-                  </button>
-                  <button
-                    type="button"
-                    className={`payment-option ${paymentMethod === 'flutterwave' ? 'selected' : ''}`}
-                    onClick={() => setPaymentMethod('flutterwave')}
-                    aria-label="Pay with Flutterwave"
-                  >
-                    <img src='/flutterwave-1.svg' alt="Flutterwave" />
                   </button>
                 </div>
               </div>
@@ -244,7 +225,6 @@ const CheckoutPage = () => {
                 <div className="form-group">
                   <FaUser className="input-icon" />
                   <input 
-                    id="recipient" 
                     type="text" 
                     value={recipientName}
                     onChange={(e) => setRecipientName(e.target.value)}
@@ -274,6 +254,14 @@ const CheckoutPage = () => {
                 </ul>
               )}
               <div className="summary-row">
+                <span>Branch</span>
+                <span>{branches[branchId] || 'Unknown Branch'}</span>
+              </div>
+              <div className="summary-row">
+                <span>Delivery Location</span>
+                <span>{deliveryOption}</span>
+              </div>
+              <div className="summary-row">
                 <span>Subtotal</span>
                 <span>{formatPrice(totalPrice)}</span>
               </div>
@@ -293,7 +281,7 @@ const CheckoutPage = () => {
             </button>
             
             <p className="secure-text">
-              <IoMdLock /> Secured by {paymentMethod === 'flutterwave' ? 'Flutterwave' : 'Paystack'}
+              <IoMdLock /> Secured by Paystack
             </p>
           </div>
         </div>
@@ -303,13 +291,3 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
-
-
-
-
-
-
-
-
-
-

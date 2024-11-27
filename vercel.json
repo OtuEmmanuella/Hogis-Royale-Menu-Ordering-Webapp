@@ -2,22 +2,35 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    },
-    {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/webhooks/paystack",
-      "dest": "api/webhooks/paystack.js"
+      "methods": ["POST"],
+      "dest": "/api/webhooks/paystack.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST",
+        "Access-Control-Allow-Headers": "X-Paystack-Signature, Content-Type"
+      }
     },
     {
-      "handle": "filesystem"
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "^/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "^/(.*)\\.(js|css|ico|jpg|jpeg|png|gif|svg)$",
+      "dest": "/$1.$2"
     },
     {
       "src": "/(.*)",

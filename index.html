@@ -6,14 +6,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
     <title>Hogis Royale Menu</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script src="https://checkout.flutterwave.com/v3.js"></script>
-    <script>
+    <!-- <script>
       (function(d, w, c) {
         w.BrevoConversationsID = '66ce29eebe00513d87073f1f';
         w[c] = w[c] || function() {
@@ -24,6 +24,6 @@
         s.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
         if (d.head) d.head.appendChild(s);
       })(document, window, 'BrevoConversations');
-    </script>
+    </script> -->
   </body>
 </html>

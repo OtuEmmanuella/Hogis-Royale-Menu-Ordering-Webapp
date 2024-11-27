@@ -1,16 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../Firebase/FirebaseConfig';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { Clock, User, CreditCard } from 'lucide-react';
+import { collection, query, orderBy, limit, getDocs, where} from 'firebase/firestore';
+import { Clock, User, CreditCard, Store, Truck } from 'lucide-react';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState('all');
+
+  const branches = {
+    '1': 'Hogis Royale And Apartment',
+    '2': 'Hogis Luxury Suites',
+    '3': 'Hogis Exclusive Resorts'
+  };
 
   const formatOrderData = (doc) => {
     try {
       const data = doc.data();
+      const branchId = data.branchId?.toString() || 'unknown';
+      
+      // Log the branch information for debugging
+      console.log('Order branch info:', {
+        orderId: doc.id,
+        branchId: branchId,
+        rawBranchId: data.branchId,
+        branchName: branches[branchId]
+      });
+
       return {
         id: doc.id,
         customerName: data.customer?.name || 'Guest User',
@@ -20,27 +37,15 @@ const OrdersPage = () => {
         createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
         status: data.status || 'pending',
         paymentReference: data.paymentReference || 'N/A',
-        branchId: data.branchId || 'unknown',
-        branchName: data.branchName || 'Unknown Branch',
+        branchId: branchId,
+        branchName: branches[branchId] || 'Unknown Branch',
         items: data.items || [],
-        deliveryOption: data.deliveryOption || 'N/A'
+        deliveryOption: data.deliveryOption || 'N/A',
+        deliveryPrice: data.deliveryPrice || 0
       };
     } catch (err) {
       console.error(`Error formatting order ${doc.id}:`, err);
-      return {
-        id: doc.id,
-        customerName: 'Error Loading Data',
-        email: 'Error',
-        phone: 'Error',
-        total: 0,
-        createdAt: new Date(),
-        status: 'error',
-        branchId: 'unknown',
-        branchName: 'Error',
-        items: [],
-        deliveryOption: 'N/A',
-        paymentReference: 'N/A'
-      };
+      return null;
     }
   };
 
@@ -48,14 +53,24 @@ const OrdersPage = () => {
     const fetchOrders = async () => {
       try {
         const ordersRef = collection(db, 'orders');
-        const q = query(
-          ordersRef,
-          orderBy('createdAt', 'desc'),
-          limit(50)
-        );
+        let q = query(ordersRef, orderBy('createdAt', 'desc'), limit(50));
+        
+        if (selectedBranch !== 'all') {
+          q = query(ordersRef, 
+            where('branchId', '==', selectedBranch),
+            orderBy('createdAt', 'desc'),
+            limit(50)
+          );
+        }
 
         const querySnapshot = await getDocs(q);
-        const ordersData = querySnapshot.docs.map(formatOrderData);
+        const ordersData = querySnapshot.docs
+          .map(formatOrderData)
+          .filter(order => order !== null);
+        
+        // Log the processed orders for debugging
+        console.log('Processed orders:', ordersData);
+        
         setOrders(ordersData);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -66,7 +81,7 @@ const OrdersPage = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [selectedBranch]);
 
   const getStatusStyle = (status) => {
     const styles = {
@@ -118,9 +133,23 @@ const OrdersPage = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-          <span className="text-gray-500">
-            Total Orders: {orders.length}
-          </span>
+          <div className="flex items-center gap-4">
+            <select
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
+              className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-4"
+            >
+              <option value="all">All Branches</option>
+              {Object.entries(branches).map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            <span className="text-gray-500">
+              Total Orders: {orders.length}
+            </span>
+          </div>
         </div>
         
         {orders.length === 0 ? (
@@ -159,8 +188,18 @@ const OrdersPage = () => {
                         {formatPrice(order.total)}
                       </div>
                     </div>
-                    <div className="mt-2 text-sm text-gray-500">
-                      <span className="font-medium">Branch:</span> {order.branchName}
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <p className="flex items-center text-sm text-gray-500">
+                        <Store className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+                        <span className="font-medium mr-1">Branch:</span> 
+                        {order.branchName}
+                      </p>
+                      <p className="flex items-center text-sm text-gray-500">
+                        <Truck className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+                        <span className="font-medium mr-1">Delivery:</span> 
+                        {order.deliveryOption}
+                        {order.deliveryPrice > 0 && ` (${formatPrice(order.deliveryPrice)})`}
+                      </p>
                     </div>
                   </div>
                 </li>
