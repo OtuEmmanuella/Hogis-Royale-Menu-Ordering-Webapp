@@ -36,10 +36,12 @@ if (!global.firebaseApp) {
 const db = getFirestore();
 
 export default async function handler(req, res) {
-  console.log('Webhook received:', {
+  console.log('Full Webhook Request Details:', {
     method: req.method,
     headers: req.headers,
-    body: req.body
+    body: req.body,
+    rawBody: req.rawBody,  
+    timestamp: new Date().toISOString()
   });
 
   if (req.method !== 'POST') {
@@ -53,10 +55,11 @@ export default async function handler(req, res) {
       .update(JSON.stringify(req.body))
       .digest('hex');
 
-    console.log('Signature verification:', {
-      calculated: hash,
-      received: req.headers['x-paystack-signature']
-    });
+      console.log('Signature Verification:', {
+        calculatedHash: hash,
+        receivedSignature: req.headers['x-paystack-signature'],
+        signatureMatch: hash === req.headers['x-paystack-signature']
+      });
 
     if (hash !== req.headers['x-paystack-signature']) {
       console.error('Invalid signature');
