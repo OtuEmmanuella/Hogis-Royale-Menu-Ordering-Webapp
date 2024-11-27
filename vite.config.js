@@ -39,8 +39,12 @@ export default defineConfig(({ mode }) => {
       },
     ],
     server: {
-      host: true,
+      host: '0.0.0.0', // This ensures the server is accessible from external connections
       port: 3000,
+      strictPort: true, // This ensures Vite only uses port 3000
+      hmr: {
+        clientPort: 443, // This helps with HTTPS tunneling
+      }
     },
     define: {
       'process.env': env

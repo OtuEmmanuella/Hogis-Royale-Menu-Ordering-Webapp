@@ -7,6 +7,10 @@
       "config": {
         "distDir": "dist"
       }
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -25,11 +29,15 @@
       "dest": "/manifest.json"
     },
     {
-      "src": "^/assets/(.*)",
+      "src": "^/assets/(.*)$",
       "dest": "/assets/$1"
     },
     {
-      "src": "^/(.*)\\.(js|css|ico|jpg|jpeg|png|gif|svg)$",
+      "src": "^/background\\ music/(.*)$",
+      "dest": "/background music/$1"
+    },
+    {
+      "src": "^/(.*)\\.(js|css|ico|jpg|jpeg|png|gif|svg|mp3|wav|mp4)$",
       "dest": "/$1.$2"
     },
     {
