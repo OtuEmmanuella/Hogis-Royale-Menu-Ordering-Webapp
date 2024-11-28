@@ -7,8 +7,8 @@ function createEmailTransporter(email, password) {
   const transporter = createTransport({
     service: 'Gmail',
     auth: {
-      user: email,
-      pass: password // This should be an App Password, not regular Gmail password
+      user: process.env.BRANCH1_EMAIL,
+      pass: process.env.BRANCH1_APP_PASSWORD,
     }
   });
 
