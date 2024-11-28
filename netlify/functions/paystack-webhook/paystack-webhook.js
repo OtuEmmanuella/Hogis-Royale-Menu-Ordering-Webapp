@@ -1,33 +1,66 @@
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+// paystack-webhook.js
 import { createHmac } from 'crypto';
-import { sendOrderConfirmation, sendPaymentFailureNotification } from './services/emailService.js';
+import admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
 
-// Initialize Firebase Admin
-let firebaseApp;
-
-function initializeFirebase() {
-  if (!firebaseApp) {
-    const serviceAccount = {
-      type: "service_account",
-      project_id: process.env.FIREBASE_PROJECT_ID,
-      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-      private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      client_email: process.env.FIREBASE_CLIENT_EMAIL,
-      client_id: process.env.FIREBASE_CLIENT_ID,
-      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-      client_x509_cert_url: process.env.FIREBASE_CERT_URL
-    };
-
-    firebaseApp = initializeApp({
-      credential: cert(serviceAccount)
+// Firebase initialization service
+export const initializeFirebase = () => {
+  if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+      })
     });
   }
-  return firebaseApp;
-}
+  return admin;
+};
 
+// Payment handling services
+export const handleSuccessfulPayment = async (orderRef, orderData, paymentData) => {
+  const updateData = {
+    paymentStatus: 'paid',
+    paymentDetails: paymentData,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+
+  await orderRef.update(updateData);
+
+  // Update inventory if necessary
+  if (orderData.items) {
+    const db = getFirestore();
+    const batch = db.batch();
+
+    for (const item of orderData.items) {
+      const menuItemRef = db.collection('menu_items').doc(item.id);
+      batch.update(menuItemRef, {
+        quantity: admin.firestore.FieldValue.increment(-item.quantity)
+      });
+    }
+
+    await batch.commit();
+  }
+};
+
+export const handleFailedPayment = async (orderRef, orderData, paymentData) => {
+  await orderRef.update({
+    paymentStatus: 'failed',
+    paymentDetails: paymentData,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+};
+
+// Main webhook handler
 export const handler = async (event, context) => {
-  // Only allow POST requests
+  const PAYSTACK_SECRET_KEY = 'sk_test_ba77305f373265f6edc410a39f0432a6c07eecae';
+
+  console.log('Webhook received:', {
+    headers: event.headers,
+    method: event.httpMethod,
+    bodyLength: event.body ? event.body.length : 0
+  });
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -36,33 +69,55 @@ export const handler = async (event, context) => {
   }
 
   try {
-    const body = JSON.parse(event.body);
-    const signature = event.headers['x-paystack-signature'];
+    const signature = event.headers['x-paystack-signature'] || 
+                     event.headers['X-Paystack-Signature'];
 
-    // Verify Paystack signature
-    const hash = createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
-      .update(JSON.stringify(body))
-      .digest('hex');
-
-    if (hash !== signature) {
+    if (!signature) {
+      console.error('Paystack signature header missing');
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid signature' })
+        body: JSON.stringify({ error: 'Signature header missing' }),
       };
     }
 
-    // Initialize Firebase
-    initializeFirebase();
+    const hash = createHmac('sha512', PAYSTACK_SECRET_KEY)
+      .update(event.body)
+      .digest('hex');
+
+    console.log('Received Paystack Payload:', event.body);
+    console.log('Calculated Hash:', hash);
+    console.log('Received Signature:', signature);
+
+    console.log('Full comparison:', {
+      calculatedHashLength: hash.length,
+      receivedSignatureLength: signature.length,
+      match: hash === signature
+    });
+
+    if (hash !== signature) {
+      console.error('Signature mismatch:', { calculated: hash, received: signature });
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Invalid signature' }),
+      };
+    }
+
+    const body = JSON.parse(event.body);
+    if (!body || !body.data) {
+      throw new Error('Invalid webhook payload structure');
+    }
+
+    await initializeFirebase();
     const db = getFirestore();
 
     const { event: webhookEvent, data } = body;
     const orderId = data.reference;
 
-    // Get order from Firestore
     const orderRef = db.collection('orders').doc(orderId);
     const orderDoc = await orderRef.get();
 
     if (!orderDoc.exists) {
+      console.error('Order not found:', orderId);
       return {
         statusCode: 404,
         body: JSON.stringify({ error: 'Order not found' })
@@ -73,12 +128,14 @@ export const handler = async (event, context) => {
 
     switch (webhookEvent) {
       case 'charge.success':
+      case 'payment.success':
         await handleSuccessfulPayment(orderRef, orderData, data);
         break;
       case 'charge.failed':
         await handleFailedPayment(orderRef, orderData, data);
         break;
       default:
+        console.warn('Unhandled webhook event:', webhookEvent);
         return {
           statusCode: 400,
           body: JSON.stringify({ error: 'Unhandled event type' })
@@ -87,86 +144,21 @@ export const handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Webhook processed successfully' })
+      body: JSON.stringify({
+        message: 'Webhook processed successfully',
+        event: webhookEvent,
+        orderId: orderId
+      })
     };
+
   } catch (error) {
-    console.error('Webhook error:', error);
+    console.error('Webhook processing error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
+      body: JSON.stringify({
+        error: 'Internal server error',
+        message: error.message
+      })
     };
   }
 };
-
-async function handleSuccessfulPayment(orderRef, orderData, paymentData) {
-  const updates = {
-    status: 'paid',
-    paymentDetails: paymentData,
-    paymentReference: paymentData.reference,
-    updatedAt: FieldValue.serverTimestamp(),
-    paymentDate: FieldValue.serverTimestamp()
-  };
-
-  await orderRef.update(updates);
-
-  // Create payment record
-  const db = getFirestore();
-  const paymentRef = db.collection('payments').doc(orderRef.id);
-  await paymentRef.set({
-    orderId: orderRef.id,
-    status: 'success',
-    amount: paymentData.amount / 100,
-    currency: paymentData.currency,
-    paymentReference: paymentData.reference,
-    paymentGateway: 'paystack',
-    customerEmail: paymentData.customer.email,
-    branchId: orderData.branchId,
-    metadata: paymentData,
-    createdAt: FieldValue.serverTimestamp()
-  });
-
-  // Send confirmation email
-  await sendOrderConfirmation(orderData.customer.email, {
-    orderId: orderRef.id,
-    branchId: orderData.branchId,
-    amount: paymentData.amount / 100,
-    items: orderData.items,
-    deliveryOption: orderData.deliveryOption,
-    deliveryPrice: orderData.deliveryPrice
-  });
-}
-
-async function handleFailedPayment(orderRef, orderData, paymentData) {
-  const updates = {
-    status: 'failed',
-    paymentError: paymentData.gateway_response,
-    updatedAt: FieldValue.serverTimestamp(),
-    paymentReference: paymentData.reference
-  };
-
-  await orderRef.update(updates);
-
-  // Create payment record
-  const db = getFirestore();
-  const paymentRef = db.collection('payments').doc(orderRef.id);
-  await paymentRef.set({
-    orderId: orderRef.id,
-    status: 'failed',
-    amount: paymentData.amount / 100,
-    currency: paymentData.currency,
-    paymentReference: paymentData.reference,
-    paymentGateway: 'paystack',
-    customerEmail: paymentData.customer.email,
-    branchId: orderData.branchId,
-    errorMessage: paymentData.gateway_response,
-    metadata: paymentData,
-    createdAt: FieldValue.serverTimestamp()
-  });
-
-  // Send failure notification
-  await sendPaymentFailureNotification(orderData.customer.email, {
-    orderId: orderRef.id,
-    branchId: orderData.branchId,
-    error: paymentData.gateway_response
-  });
-}

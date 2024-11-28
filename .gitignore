@@ -73,3 +73,6 @@ Thumbs.db
 *.swo
 .vercel
 src/Key/hogis-royale-menu-firebase-adminsdk-atxqb-ff6756e1af.json
+
+# Local Netlify folder
+.netlify
