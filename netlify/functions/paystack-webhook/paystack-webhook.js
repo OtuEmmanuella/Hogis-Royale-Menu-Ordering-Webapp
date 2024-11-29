@@ -2,7 +2,7 @@
 import { createHmac } from 'crypto';
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
-import { emailService } from './emailService.js'; 
+import { emailService } from './services/emailService'; 
 
 // Firebase initialization service
 export const initializeFirebase = () => {
