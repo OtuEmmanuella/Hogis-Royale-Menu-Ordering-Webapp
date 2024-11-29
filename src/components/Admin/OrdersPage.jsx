@@ -15,10 +15,38 @@ const OrdersPage = () => {
     '3': 'Hogis Exclusive Resorts'
   };
 
+   // Enhanced status mapping function
+   const mapPaymentStatusToOrderStatus = (status, paymentStatus) => {
+    const statusMap = {
+      'pending': {
+        'paid': 'success',
+        'failed': 'failed',
+        'default': 'pending'
+      },
+      'processing': {
+        'paid': 'completed',
+        'failed': 'failed',
+        'default': 'processing'
+      }
+    };
+
+    // First, check if there's a direct mapping for the current base status
+    const baseStatusMap = statusMap[status] || statusMap['pending'];
+    
+    // Return mapped status or default to the current status
+    return baseStatusMap[paymentStatus] || baseStatusMap['default'];
+  };
+
   const formatOrderData = (doc) => {
     try {
       const data = doc.data();
       const branchId = data.branchId?.toString() || 'unknown';
+
+        // Determine the final order status
+        const finalStatus = mapPaymentStatusToOrderStatus(
+          data.status || 'pending', 
+          data.paymentStatus || 'pending'
+        );
       
       // Log the branch information for debugging
       console.log('Order branch info:', {
@@ -35,18 +63,30 @@ const OrdersPage = () => {
         phone: data.customer?.phone || 'N/A',
         total: parseFloat(data.totalAmount) || 0,
         createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
-        status: data.status || 'pending',
+        status: finalStatus,
         paymentReference: data.paymentReference || 'N/A',
         branchId: branchId,
         branchName: branches[branchId] || 'Unknown Branch',
         items: data.items || [],
         deliveryOption: data.deliveryOption || 'N/A',
-        deliveryPrice: data.deliveryPrice || 0
+        deliveryPrice: data.deliveryPrice || 0,
+        paymentDetails: data.paymentDetails || null
       };
     } catch (err) {
       console.error(`Error formatting order ${doc.id}:`, err);
       return null;
     }
+  };
+
+  const getStatusStyle = (status) => {
+    const styles = {
+      completed: 'bg-green-100 text-green-800',
+      processing: 'bg-yellow-100 text-yellow-800',
+      pending: 'bg-blue-100 text-blue-800',
+      failed: 'bg-red-100 text-red-800',
+      paid: 'bg-green-100 text-green-800'
+    };
+    return styles[status] || 'bg-gray-100 text-gray-800';
   };
 
   useEffect(() => {
@@ -83,16 +123,6 @@ const OrdersPage = () => {
     fetchOrders();
   }, [selectedBranch]);
 
-  const getStatusStyle = (status) => {
-    const styles = {
-      completed: 'bg-green-100 text-green-800',
-      processing: 'bg-yellow-100 text-yellow-800',
-      pending: 'bg-blue-100 text-blue-800',
-      failed: 'bg-red-100 text-red-800',
-      paid: 'bg-green-100 text-green-800'
-    };
-    return styles[status] || 'bg-gray-100 text-gray-800';
-  };
 
   const formatPrice = (price) => {
     return `₦${price.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -171,6 +201,12 @@ const OrdersPage = () => {
                           {order.status}
                         </p>
                       </div>
+                      {order.paymentDetails && (
+                        <div className="mt-2 text-sm text-gray-500">
+                          <p>Payment Method: {order.paymentDetails.channel || 'N/A'}</p>
+                          <p>Payment Gateway Response: {order.paymentDetails.gateway_response || 'N/A'}</p>
+                        </div>
+                      )}
                     </div>
                     <div className="mt-2 sm:flex sm:justify-between">
                       <div className="sm:flex">

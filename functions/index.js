@@ -306,3 +306,4 @@ async function generateAndSendInvoice(orderData) {
 function sendInvoiceEmail(email, invoiceUrl) {
   console.log(`Sending invoice to ${email} with URL: ${invoiceUrl}`);
 }
+
