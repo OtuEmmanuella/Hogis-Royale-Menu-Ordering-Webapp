@@ -92,7 +92,7 @@ const CheckoutPage = () => {
       const config = {
         reference: orderId,
         email: email,
-        amount: finalAmount,
+        amount: finalAmount * 100, // Convert to kobo
         publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
         metadata: {
           branchId: branchId,
