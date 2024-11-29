@@ -19,7 +19,7 @@ const OrdersPage = () => {
    const mapPaymentStatusToOrderStatus = (status, paymentStatus) => {
     const statusMap = {
       'pending': {
-        'paid': 'completed',
+        'paid': 'success',
         'failed': 'failed',
         'default': 'pending'
       },

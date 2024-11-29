@@ -20,12 +20,9 @@ export const initializeFirebase = () => {
 // Payment handling services
 export const handleSuccessfulPayment = async (orderRef, orderData, paymentData) => {
   const updateData = {
-    status: 'completed',  
-      paymentStatus: 'paid',
-      paymentDetails: paymentData,
-      paymentReference: paymentData.reference,
-      updatedAt: FieldValue.serverTimestamp(),
-      paymentDate: FieldValue.serverTimestamp()
+    paymentStatus: 'paid',
+    paymentDetails: paymentData,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
   };
 
   await orderRef.update(updateData);
