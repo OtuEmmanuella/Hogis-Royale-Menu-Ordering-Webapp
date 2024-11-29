@@ -2,6 +2,7 @@
 import { createHmac } from 'crypto';
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
+import { emailService } from './emailService.js'; 
 
 // Firebase initialization service
 export const initializeFirebase = () => {
@@ -31,6 +32,10 @@ export const handleSuccessfulPayment = async (orderRef, orderData, paymentData) 
 
   try {
     await orderRef.update(updateData);
+
+     // Send order confirmation email
+     await emailService.sendOrderConfirmation(orderRef, orderData, paymentData);
+
   } catch (error) {
     console.error('Error updating order:', error);
   }
@@ -55,10 +60,36 @@ export const handleSuccessfulPayment = async (orderRef, orderData, paymentData) 
   }
 };
 
+export const handleFailedPayment = async (orderRef, orderData, paymentData) => {
+  if (!orderRef || !orderRef.id) {
+    console.error('Invalid orderRef:', orderRef);
+    return;
+  }
+  
+  const updateData = {
+    paymentStatus: 'failed',
+    paymentDetails: paymentData,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    await orderRef.update(updateData);
+
+    // Send payment failure notification email
+    await emailService.sendPaymentFailureNotification(orderData.customer.email, {
+      orderId: orderRef.id,
+      error: paymentData.gateway_response || 'Payment failed',
+      branchId: orderData.branchId,
+      branchName: orderData.branchName
+    });
+  } catch (error) {
+    console.error('Error updating order or sending failure email:', error);
+  }
+};
 
 // Main webhook handler
 export const handler = async (event, context) => {
-  const PAYSTACK_SECRET_KEY = 'sk_test_ba77305f373265f6edc410a39f0432a6c07eecae';
+  const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
   console.log('Webhook received:', {
     headers: event.headers,
