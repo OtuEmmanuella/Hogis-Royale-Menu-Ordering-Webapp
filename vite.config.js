@@ -39,11 +39,12 @@ export default defineConfig(({ mode }) => {
       },
     ],
     server: {
-      host: '0.0.0.0', // This ensures the server is accessible from external connections
-      port: 3000,
-      strictPort: true, // This ensures Vite only uses port 3000
+      host: true, // This is more flexible than '0.0.0.0'
+      port: 5173, // Default Vite port
+      strictPort: false, // Allow port to change if 5173 is occupied
       hmr: {
-        clientPort: 443, // This helps with HTTPS tunneling
+        // Remove clientPort to use default
+        overlay: true
       }
     },
     define: {

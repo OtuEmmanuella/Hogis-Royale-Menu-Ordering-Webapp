@@ -1,4 +1,6 @@
-
+ body, html {
+    background-color: #020d19;
+}
   
   .splash-container {
     display: flex;
@@ -7,7 +9,7 @@
     align-items: center;
     min-height: 70vh;
     width: 100%;
-    background: #000;
+    /* background: #030000; */
     color: #ffffff;
     font-family: 'Montserrat', sans-serif;
     text-align: center;
@@ -55,7 +57,7 @@
   
   .rights-reserved {
     font-size: 8px;
-    color: #555;
+    color: #8e8c8c;
     opacity: 0.7;
   }
   

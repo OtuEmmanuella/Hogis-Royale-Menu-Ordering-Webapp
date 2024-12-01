@@ -54,13 +54,17 @@ const CheckoutPage = () => {
     const orderData = {
       customer: {
         userId: user ? user.uid : null,
-        name: payingForSomeone ? recipientName : name,
+        customerName: name, // Always capture the buyer's name
+       recipientName: payingForSomeone ? recipientName : null,
         email,
         phone,
         address,
         city,
       },
-      items: cartItems,
+      items: cartItems.map(item => ({
+        ...item,
+        specifications: item.specifications || 'No special instructions'
+      })),
       totalAmount: finalAmount,
       status: 'pending',
       createdAt: new Date(),
@@ -246,13 +250,23 @@ const CheckoutPage = () => {
                 <ul className="invoice-list">
                   {cartItems.map((item, index) => (
                     <li key={index} className="invoice-item">
-                      <span className="invoice-item-name">{item.name}</span>
-                      <span className="invoice-item-quantity">x{item.quantity}</span>
-                      <span className="invoice-item-price">{formatPrice(item.price * item.quantity)}</span>
+                      <div className="invoice-item-main">
+                        <span className="invoice-item-name">{item.name}</span>
+                        <span className="invoice-item-quantity">x{item.quantity}</span>
+                        <span className="invoice-item-price"> -{formatPrice(item.price * item.quantity)}</span>
+                      </div>
+                    
+                      {item.specifications && (
+                        <div className="invoice-item-specifications">
+                          <strong>Special Instructions:</strong> {item.specifications}
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
+                
               )}
+
               <div className="summary-row">
                 <span>Branch</span>
                 <span>{branches[branchId] || 'Unknown Branch'}</span>
@@ -261,6 +275,26 @@ const CheckoutPage = () => {
                 <span>Delivery Location</span>
                 <span>{deliveryOption}</span>
               </div>
+              <div className="summary-row">
+                <span>Delivery Address</span>
+                <span>{address}, {city}</span>
+              </div>
+              <div className="summary-row">
+                <span>Phone</span>
+                <span>{phone}</span>
+              </div>
+              {payingForSomeone && (
+                  <>
+                    <div className="summary-row">
+                      <span>Buyer Name</span>
+                      <span>{name}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span>Recipient Name</span>
+                      <span>{recipientName}</span>
+                    </div>
+                  </>
+                )}
               <div className="summary-row">
                 <span>Subtotal</span>
                 <span>{formatPrice(totalPrice)}</span>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { db } from '../Firebase/FirebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
-import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Bell } from 'lucide-react';
 
 const OrderConfirmation = () => {
   const { orderId } = useParams();
@@ -58,6 +58,17 @@ const OrderConfirmation = () => {
             </p>
           </div>
 
+          {/* New notification section */}
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+            <div className="flex items-center">
+              <Bell className="h-6 w-6 text-blue-500 mr-3" />
+              <p className="text-blue-700 font-medium">
+                You'll be receiving a notification with your order details
+              </p>
+            </div>
+          </div>
+
+          {/* Existing order details */}
           <div className="border-t border-gray-200 pt-8">
             <h3 className="text-lg font-medium text-gray-900">Order Details</h3>
             <dl className="mt-4 space-y-4">
@@ -71,11 +82,15 @@ const OrderConfirmation = () => {
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <dt className="text-sm font-medium text-gray-500">Delivery Address</dt>
-                <dd className="text-sm text-gray-900 col-span-2">{order.address}</dd>
+                <dd className="text-sm text-gray-900 col-span-2">
+                  {order.customer.address}, {order.customer.city}
+                </dd>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <dt className="text-sm font-medium text-gray-500">Total Amount</dt>
-                <dd className="text-sm text-gray-900 col-span-2">₦{order.total.toLocaleString()}</dd>
+                <dd className="text-sm text-gray-900 col-span-2">
+                  ₦{order.totalAmount.toLocaleString()}
+                </dd>
               </div>
             </dl>
           </div>

@@ -15,7 +15,7 @@
     width: 100%;
     overflow-x: hidden;
     /* background-color: #101720; */
-    background-color: #020d19;
+    /* background-color: #020d19; */
     /* background-color: #0d1717; */
  
   }
@@ -36,5 +36,4 @@
   right: 20px !important;
   bottom: 50% !important;
   transform: translateY(50%) !important;
-  border: 1px solid red;
 }

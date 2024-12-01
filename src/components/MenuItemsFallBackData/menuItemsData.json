@@ -1865,7 +1865,7 @@
       {
         "name": "COLESLAW",
         "category": "SALAD",
-        "price": 1500
+        "price": 2000
       },
       {
         "name": "CHICKEN SALAD",
@@ -1875,7 +1875,7 @@
       {
         "name": "BEEF SALAD",
         "category": "SALAD",
-        "price": 3500
+        "price": 2500
       },
       {
         "name": "CEASAR SALAD",
@@ -1907,12 +1907,12 @@
       {
         "name": "GOAT KEBAB (WITH YAM CHIPS, COLESLAW AND SAUCE)",
         "category": "GRILLS",
-        "price": 3500
+        "price": 2500
       },
       {
         "name": "GRILLED TURKEY",
         "category": "GRILLS",
-        "price": 4500
+        "price": 6500
       },
       {
         "name": "WHOLE GRILLED CHICKEN(WITH YAM CHIPS, COLESLAW AND SAUCE)",
@@ -2202,17 +2202,17 @@
       {
         "name": "CHICKEN BURGER(DOUBLE DECKER)",
         "category": "PASTRY",
-        "price": 5000
+        "price": 1000
       },
       {
         "name": "BEEF BURGER(DOUBLE DECKER)",
         "category": "PASTRY",
-        "price": 5000
+        "price": 3000
       },
       {
         "name": "BEEF BURGER(SINGLE)",
         "category": "PASTRY",
-        "price": 3000
+        "price": 1200
       },
       {
         "name": "BURGER BREAD",
@@ -2237,12 +2237,12 @@
       {
         "name": "CHICKEN PIE",
         "category": "PASTRY",
-        "price": 800
+        "price": 900
       },
       {
         "name": "SMOOTHIE",
         "category": "PASTRY",
-        "price": 2000
+        "price": 2500
       },
       {
         "name": "WHEAT BREAD",
@@ -2262,12 +2262,12 @@
       {
         "name": "CHICKEN SHAWARMA",
         "category": "PASTRY",
-        "price": 3000
+        "price": 3500
       },
       {
         "name": "GOAT MEAT SHAWARMA",
         "category": "PASTRY",
-        "price": 3000
+        "price": 4000
       },
       {
         "name": "COOKIES",
@@ -2280,19 +2280,14 @@
         "price": 2000
       },
       {
-        "name": "SMALL CHOP",
+        "name": "SMALL CHOPS",
         "category": "PASTRY",
-        "price": 2500
+        "price": 3000
       },
       {
         "name": "BUTTER CREAM CAKE",
         "category": "PASTRY",
         "price": 500
-      },
-      {
-        "name": "SMALL CHOP(S)",
-        "category": "PASTRY",
-        "price": 1500
       },
       {
         "name": "PORK SHAWARMA",
@@ -2524,7 +2519,7 @@
       {
         "name": "HOGIS STIR FRIED NOODLES & EGG",
         "category": "BREAKFAST",
-        "price": 3700
+        "price": 4000
       },
       {
         "name": "JOLLOF SPAGHETTI",

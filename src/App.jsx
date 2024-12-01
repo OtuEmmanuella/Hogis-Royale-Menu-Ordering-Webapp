@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom'; 
 import AppRoutes from './Routes/router';
 import { generateToken, messaging, initializeFirebaseMessaging, auth } from './components/Firebase/FirebaseConfig';
 import { onMessage } from 'firebase/messaging';
@@ -71,12 +71,12 @@ const App = () => {
   };
 
   return (
-    <Router>
+   
       <div className="App">
         <AppRoutes />
         <BrevoConversationsWidget /> {/* Add the Brevo widget here */}
       </div>
-    </Router>
+  
   );
 };
 

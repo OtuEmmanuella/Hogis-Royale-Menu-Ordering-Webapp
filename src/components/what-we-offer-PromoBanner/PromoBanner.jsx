@@ -12,10 +12,10 @@ import Recommended from '../Recommended/Recommended';
 
 const banners = [
     {
-        title: "Cinema",
+        title: "Hogis Cinemas",
         description: "Experience the latest blockbusters",
         buttonText: "Book Now",
-        startTime: "Shows start at 6 PM Daily",
+        startTime: "Shows start at 12PM Daily",
         image: cinemaImage,
         buttonLink: {
           url: "https://www.hogiscinemas.com/",
@@ -34,11 +34,25 @@ const banners = [
     title: "Club Voltage",
     description: "Dance the night away",
     buttonText: "Get on the List",
-    startTime: "Opens at 9 PM",
+    startTime: "Opens at 10PM",
     image: clubImage
   },
   {
-    title: "Hotel",
+    title: "Hogis Royale & Apartments",
+    description: "Your home away from home",
+    buttonText: "Book a Room",
+    startTime: "Check-in from 2 PM",
+    image: hotelImage
+  },
+  {
+    title: "Hogis Luxury Suites",
+    description: "Your home away from home",
+    buttonText: "Book a Room",
+    startTime: "Check-in from 2 PM",
+    image: hotelImage
+  },
+  {
+    title: "Hogis Exclusive Suites",
     description: "Your home away from home",
     buttonText: "Book a Room",
     startTime: "Check-in from 2 PM",
@@ -52,7 +66,7 @@ const banners = [
     image: loungeImage
   },
   {
-    title: "Hogis Royale Banquet Hall",
+    title: "Royale Banquet Hall",
     description: "Perfect for your special events",
     buttonText: "Plan Your Event",
     startTime: "Available for bookings",

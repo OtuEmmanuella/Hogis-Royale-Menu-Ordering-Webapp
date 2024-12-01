@@ -19,14 +19,16 @@ const EMOJI_RATINGS = [
 const SUGGESTIONS = [
   "Great service",
   "Delicious food",
-  "Clean rooms",
-  "Friendly staff",
-  "Comfortable seating",
   "Good value for money",
-  "Excellent atmosphere",
   "Quick service",
   "Needs improvement",
   "Outstanding experience"
+];
+
+const BRANCHES = [
+  "Hogis Royale and Apartments",
+  "Hogis Luxury Suites",
+  "Hogis Exclusive Suites",
 ];
 
 const useFeedbackForm = () => {
@@ -34,6 +36,7 @@ const useFeedbackForm = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [comment, setComment] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState('');
   const [selectedSuggestions, setSelectedSuggestions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photos, setPhotos] = useState([]);
@@ -43,6 +46,7 @@ const useFeedbackForm = () => {
     if (rating === null) errors.push('Please provide a reaction');
     if (name.trim() === '') errors.push('Please provide your name');
     if (comment.trim() === '') errors.push('Please provide a comment');
+    if (!selectedBranch) errors.push('Please select a branch');
     if (email && !/\S+@\S+\.\S+/.test(email)) errors.push('Please provide a valid email');
     return errors;
   };
@@ -93,6 +97,7 @@ const useFeedbackForm = () => {
       name,
       email,
       comment,
+      branch: selectedBranch,
       suggestions: selectedSuggestions,
       createdAt: serverTimestamp(),
       photoURLs,
@@ -111,6 +116,7 @@ const useFeedbackForm = () => {
       setName('');
       setEmail('');
       setComment('');
+      setSelectedBranch('');
       setSelectedSuggestions([]);
       setPhotos([]);
     } catch (error) {
@@ -134,6 +140,8 @@ const useFeedbackForm = () => {
     setEmail,
     comment,
     setComment,
+    selectedBranch,
+    setSelectedBranch,
     selectedSuggestions,
     setSelectedSuggestions,
     isSubmitting,
@@ -204,6 +212,8 @@ const FeedbackForm = () => {
     setEmail,
     comment,
     setComment,
+    selectedBranch,
+    setSelectedBranch,
     selectedSuggestions,
     setSelectedSuggestions,
     isSubmitting,
@@ -258,11 +268,28 @@ const FeedbackForm = () => {
       </nav>
       <div className="custom-feedback-wrapper">
         <div className="custom-feedback-container">
-        <div className="custom-feedback-header">
+          <div className="custom-feedback-header">
             <img src="/Hogis.jpg" alt="Hogis Logo" className="custom-feedback-logo" />
             <h2 className="custom-feedback-title">We'd love your feedback!👍🏼</h2>
           </div>
           <form onSubmit={handleSubmit}>
+            <div className="custom-form-group">
+              <label htmlFor="branch" className="custom-form-label">Select Branch:</label>
+              <select
+                id="branch"
+                value={selectedBranch}
+                onChange={(e) => setSelectedBranch(e.target.value)}
+                className="custom-form-input"
+                required
+              >
+                <option value="">Select a branch</option>
+                {BRANCHES.map((branch) => (
+                  <option key={branch} value={branch}>
+                    {branch}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="custom-form-group">
               <label className="custom-form-label">How was your experience?</label>
               <EmojiRating rating={rating} setRating={setRating} />

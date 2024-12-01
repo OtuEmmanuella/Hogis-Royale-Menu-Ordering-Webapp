@@ -186,11 +186,12 @@ export const ShoppingCartProvider = ({ children }) => {
 
   const addToCart = async (item) => {
     const cartItemId = `${item.id}-${Date.now()}`;
-    const newItem = { ...item, cartItemId, quantity: 1 };
+    const newItem = { ...item, cartItemId, quantity: 1, specifications: '' };
     const updatedCart = [...cartItems, newItem];
     setCartItems(updatedCart);
     await saveCartToFirebase(updatedCart);
   };
+
 
   const incrementQuantity = async (cartItemId) => {
     const updatedCart = cartItems.map(item =>
@@ -240,10 +241,21 @@ export const ShoppingCartProvider = ({ children }) => {
     return cartItems.reduce((count, item) => count + (item.quantity || 1), 0);
   };
 
+  const updateItemSpecifications = async (cartItemId, specifications) => {
+    const updatedCart = cartItems.map(item =>
+      item.cartItemId === cartItemId
+        ? { ...item, specifications }
+        : item
+    );
+    setCartItems(updatedCart);
+    await saveCartToFirebase(updatedCart);
+  };
+
   return (
     <ShoppingCartContext.Provider
       value={{
         cartItems,
+        updateItemSpecifications,
         selectedBranch,
         setSelectedBranch,
         addToCart,

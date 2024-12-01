@@ -1,6 +1,6 @@
 import React from 'react';
 import RecipeCard from '../Recipe/Recipe';
-import PromoBanner from '../PromoBanner/PromoBanner';
+import PromoBanner from '../what-we-offer-PromoBanner/PromoBanner';
 import './Recommended.css';
 
 const Recommended = ({ recipes, addToCart }) => (

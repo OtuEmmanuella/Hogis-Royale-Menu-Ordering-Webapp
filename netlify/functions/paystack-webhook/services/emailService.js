@@ -5,6 +5,30 @@ import { getDb } from './firebaseServices.js';
 
 dotenv.config();
 
+export const branchConfig = {
+  '1': {
+    name: 'Hogis Royale And Apartment',
+    email: process.env.BRANCH1_EMAIL,
+    password: process.env.BRANCH1_APP_PASSWORD,
+    phone: '+2348100072049',
+    address: '6 Bishop Moynagh Avenue, State Housing Calabar',
+  },
+  '2': {
+    name: 'Hogis Luxury Suites',
+    email: process.env.BRANCH2_EMAIL,
+    password: process.env.BRANCH2_APP_PASSWORD,
+    phone: '+2348100072049',
+    address: 'Hogis Luxury Suites Location',
+  },
+  '3': {
+    name: 'Hogis Exclusive Resorts',
+    email: process.env.BRANCH3_EMAIL,
+    password: process.env.BRANCH3_APP_PASSWORD,
+    phone: '+2348100072049',
+    address: 'Hogis Exclusive Resorts Location',
+  },
+};
+
 class EmailService {
   constructor() {
     this.transporters = new Map();
@@ -12,8 +36,8 @@ class EmailService {
 
   getTransporter(branchId) {
     if (!this.transporters.has(branchId)) {
-      const email = process.env[`BRANCH${branchId}_EMAIL`];
-      const password = process.env[`BRANCH${branchId}_APP_PASSWORD`];
+      const email = branchConfig[branchId].email;
+      const password = branchConfig[branchId].password;
 
       if (!email || !password) {
         throw new Error(`Missing email configuration for branch ${branchId}`);
@@ -44,14 +68,97 @@ class EmailService {
     }
   }
 
+  async sendOrderConfirmation(orderRef, orderData, paymentData) {
+    const db = getDb();
+    
+    try {
+      // Check if confirmation email was already sent
+      const orderDoc = await orderRef.get();
+      if (orderDoc.data().confirmationEmailSent) {
+        console.log(`Confirmation email already sent for order ${orderRef.id}`);
+        return;
+      }
+
+      // Update order status
+      await orderRef.update({
+        status: 'paid',
+        paymentDetails: paymentData,
+        paymentReference: paymentData.reference,
+        updatedAt: FieldValue.serverTimestamp(),
+        paymentDate: FieldValue.serverTimestamp()
+      });
+
+      // Create payment record with idempotency check
+      const paymentRef = db.collection('payments').doc(orderRef.id);
+      const paymentDoc = await paymentRef.get();
+      
+      if (!paymentDoc.exists) {
+        await paymentRef.set({
+          orderId: orderRef.id,
+          status: 'success',
+          amount: paymentData.amount / 100,
+          currency: paymentData.currency,
+          paymentReference: paymentData.reference,
+          paymentGateway: 'paystack',
+          customerEmail: paymentData.customer.email,
+          branchId: orderData.branchId,
+          metadata: paymentData,
+          createdAt: FieldValue.serverTimestamp()
+        });
+      }
+
+      // Send confirmation email
+      const emailOptions = {
+        from: `${orderData.branchName} <${process.env[`BRANCH${orderData.branchId}_EMAIL`]}>`,
+        to: orderData.customer.email,
+        cc: process.env[`BRANCH${orderData.branchId}_EMAIL`],
+        subject: `Order Confirmation #${orderRef.id}`,
+        html: this.createOrderHTML(orderData)
+      };
+
+      let retries = 3;
+      let emailSent = false;
+      
+      while (retries > 0 && !emailSent) {
+        try {
+          await this.sendEmail(orderData.branchId, emailOptions);
+          emailSent = true;
+          
+          // Mark email as sent in the order document
+          await orderRef.update({
+            confirmationEmailSent: true,
+            confirmationEmailSentAt: FieldValue.serverTimestamp()
+          });
+          
+          break;
+        } catch (error) {
+          retries--;
+          if (retries === 0) throw error;
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+    } catch (error) {
+      console.error('Error in sendOrderConfirmation:', error);
+      await orderRef.update({
+        emailError: error.message,
+        emailSendAttempts: FieldValue.increment(1)
+      });
+      throw error;
+    }
+  }
+
   createOrderHTML(orderDetails) {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
         <h1 style="color: #333; text-align: center;">Thank you for your order!</h1>
-        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <p style="font-size: 16px; margin: 0;">Your payment of ₦${orderDetails.amount.toLocaleString()} has been confirmed.</p>
-        </div>
+<div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <p style="font-size: 16px; margin: 0;"><strong>Customer Name:</strong> ${orderDetails.customer.name}</p>
+        <p style="font-size: 16px; margin: 0;"><strong>Order ID:</strong> ${orderDetails.reference}</p>
+        <p style="font-size: 16px; margin: 0;">Your payment of ₦${orderDetails.amount.toLocaleString()} has been confirmed.</p>
+      </div>
         
+      
         <h2 style="color: #444; margin-top: 30px;">Order Details:</h2>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <thead>
@@ -66,6 +173,7 @@ class EmailService {
             ${orderDetails.items.map(item => `
               <tr>
                 <td style="padding: 12px; border: 1px solid #ddd;">${item.name}</td>
+                <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${item.specifications}</td>
                 <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${item.quantity}</td>
                 <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">₦${item.price.toLocaleString()}</td>
                 <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">₦${(item.price * item.quantity).toLocaleString()}</td>
@@ -77,7 +185,20 @@ class EmailService {
         <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
           <p style="margin: 5px 0;"><strong>Delivery Location:</strong> ${orderDetails.deliveryOption}</p>
           <p style="margin: 5px 0;"><strong>Delivery Fee:</strong> ₦${orderDetails.deliveryPrice.toLocaleString()}</p>
+         <p style="margin: 5px 0;"><strong>Delivery Address:</strong> ${orderDetails.address}, ${orderDetails.city}</p>
+          <p style="margin: 5px 0;"><strong>Phone:</strong> ${orderDetails.phone}</p>
+          ${
+            orderDetails.payingForSomeone
+              ? `<p style="margin: 5px 0;"><strong>Recipient Name:</strong> ${orderDetails.recipientName}</p>`
+              : ''
+          }
           <p style="margin: 5px 0; font-size: 18px;"><strong>Total Amount:</strong> ₦${orderDetails.amount.toLocaleString()}</p>
+        </div>
+
+        <div style="margin-top: 30px;">
+          <h2 style="color: #444;">Need Help?</h2>
+          <p>Please contact our branch support:</p>
+          <p><strong>Branch Phone:</strong> ${branchConfig[orderDetails.branchId].phone}</p>
         </div>
       </div>
     `;

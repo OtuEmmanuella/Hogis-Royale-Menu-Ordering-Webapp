@@ -10,6 +10,18 @@ import { TiArrowBack } from "react-icons/ti";
 import { DotSpinner } from '@uiball/loaders';
 import './Auth-styles.css';
 
+const checkUserRole = async (uid) => {
+  const adminDoc = await getDoc(doc(db, 'admins', uid));
+  if (adminDoc.exists() && adminDoc.data().isAdmin) {
+    return 'admin';
+  }
+  const cashierDoc = await getDoc(doc(db, 'cashiers', uid));
+  if (cashierDoc.exists() && cashierDoc.data().isCashier) {
+    return 'cashier';
+  }
+  return 'customer';
+};
+
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,8 +32,8 @@ function Login() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const isAdmin = await checkIfAdmin(user.uid);
-        navigate('/menu');
+        const role = await checkUserRole(user.uid);
+        navigate('/menu', { state: { userRole: role } });
       } else {
         setLoading(false);
       }
@@ -30,16 +42,12 @@ function Login() {
     return () => unsubscribe();
   }, [navigate]);
 
-  const checkIfAdmin = async (uid) => {
-    const adminDoc = await getDoc(doc(db, 'admins', uid));
-    return adminDoc.exists() && adminDoc.data().isAdmin;
-  };
-
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/menu');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const role = await checkUserRole(userCredential.user.uid);
+      navigate('/menu', { state: { userRole: role } });
     } catch (error) {
       console.error('Email/Password Sign-In Error:', error);
       if (error.code === 'auth/user-not-found') {
@@ -49,6 +57,10 @@ function Login() {
       }
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   const handleOAuthLogin = async (provider) => {
     try {

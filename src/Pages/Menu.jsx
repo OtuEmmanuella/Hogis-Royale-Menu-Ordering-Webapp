@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { FaCommentDots, FaCog } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { ToastContainer, toast } from 'react-toastify';
@@ -14,8 +14,10 @@ import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { useShoppingCart } from '../components/ShoppingCart/ShoppingCartContext';
 import NavBar from '../components/NavBar/TempNavBar';
 import { DotSpinner } from '@uiball/loaders';
+import { checkUserRole } from '../utils/authUtils';
 import './Menu.css';
-import PromoBanner from '../components/PromoBanner/PromoBanner';
+import PromoBanner from '../components/what-we-offer-PromoBanner/PromoBanner';
+import PopularMeals from '../MealsData/popularMealsData';
 import BrevoConversationsWidget from '../components/Brevo/BrevoConversationsWidget';
 
 
@@ -83,54 +85,31 @@ const UserDisplay = () => {
   ) : null;
 };
 
+
+
 const Menu = () => {
   const { addToCart } = useShoppingCart();
   const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [userRole, setUserRole] = useState('customer');
   const [recommendedRecipes, setRecommendedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         setUser(user);
-        const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-        if (adminDoc.exists() && adminDoc.data().isAdmin) {
-          setIsAdmin(true);
-        }
+        const role = location.state?.userRole || await checkUserRole(user.uid);
+        setUserRole(role);
       } else {
         setUser(null);
-        setIsAdmin(false);
+        setUserRole('customer');
       }
       setLoading(false);
     });
-
-    const fetchRecommendedRecipes = async () => {
-      try { 
-        const recipesCollection = collection(db, 'recipes');
-        const recipesSnapshot = await getDocs(recipesCollection);
-        const recipesData = recipesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setRecommendedRecipes(recipesData);
-      } catch (error) {
-        console.error("Error fetching recommended recipes:", error);
-        toast.error("Failed to load recommended recipes. Using default data.");
-        setRecommendedRecipes([
-          { id: '1', title: 'Spaghetti Oglio', rating: 4.9, image: '/IMG_6013.jpg' },
-          { id: '2', title: 'Chicken Steak', rating: 5.0, image: '/IMG_6013.jpg' },
-          { id: '3', title: 'Seafood Fried Rice', rating: 4.8, image: '/IMG_6013.jpg' },
-        ]);
-      }
-    };
-
-    fetchRecommendedRecipes();
-
-    return () => unsubscribe();
-  }, []);
+   }, [location]);
 
   const handleAddToCart = (item) => {
     addToCart(item);
@@ -176,14 +155,20 @@ const Menu = () => {
 
 
   return (
+    <div className='body'>
     <div className='menu-container-menu'>
       <header className='menu-header'>
         <div className="header-left">
           <UserDisplay />
         </div>
         <div className="header-right">
-          {isAdmin && (
+        {userRole === 'admin' && (
             <Link to="/admin-dashboard">
+              <FaCog className='dashboard-link'/>
+            </Link>
+          )}
+          {userRole === 'cashier' && (
+            <Link to="/cashier-dashboard">
               <FaCog className='dashboard-link'/>
             </Link>
           )}
@@ -194,7 +179,8 @@ const Menu = () => {
       <main>
         <Categories addToCart={handleAddToCart} />
         <PromoBanner />
-        <RecommendedSection recipes={recommendedRecipes} addToCart={handleAddToCart} />
+        <PopularMeals />
+        {/* <RecommendedSection recipes={recommendedRecipes} addToCart={handleAddToCart} /> */}
       </main>
       <ToastContainer 
         position="bottom-right" 
@@ -208,6 +194,7 @@ const Menu = () => {
         pauseOnHover
       />
       <NavBar />
+    </div>
     </div>
     
   );

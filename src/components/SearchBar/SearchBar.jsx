@@ -1,40 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { FiSearch } from 'react-icons/fi';
 import { IoClose, IoFastFoodOutline } from 'react-icons/io5';
-import './SearchBar.css';
+import styles from './SearchBar.module.css';
 import menuItemsData from '../MenuItemsFallBackData/menuItemsData.json';
 import { categories as categoryData } from '../DataCategory/Data.json';
-
 
 const formatPrice = (price) => {
   return price.toLocaleString('en-NG', {
     style: 'currency',
     currency: 'NGN',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   });
 };
 
 const FilterModal = ({ isOpen, onClose, filters, setFilters }) => {
   const handleFilterChange = (filter) => {
-    setFilters(prev => ({ ...prev, [filter]: !prev[filter] }));
+    setFilters((prev) => ({ ...prev, [filter]: !prev[filter] }));
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+    <div className={styles.modalOverlay}>
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
           <h2>Filter Options</h2>
-          <button className="close-btn" onClick={onClose}>
+          <button className={styles.closeBtn} onClick={onClose}>
             <IoClose size={24} />
           </button>
         </div>
-        <div className="filter-options">
+        <div className={styles.filterOptions}>
           {Object.entries(filters).map(([key, value]) => (
-            <div key={key} className="filter-option">
-              <input className='checkbox'
+            <div key={key} className={styles.filterOption}>
+              <input
+                className={styles.checkbox}
                 type="checkbox"
                 id={key}
                 checked={value}
@@ -46,7 +46,9 @@ const FilterModal = ({ isOpen, onClose, filters, setFilters }) => {
             </div>
           ))}
         </div>
-        <button className="apply-btn" onClick={onClose}>Apply Filters</button>
+        <button className={styles.applyBtn} onClick={onClose}>
+          Apply Filters
+        </button>
       </div>
     </div>
   );
@@ -54,19 +56,22 @@ const FilterModal = ({ isOpen, onClose, filters, setFilters }) => {
 
 const SearchResultsModal = ({ items, categories, onClose }) => {
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <IoClose className="close-icon" onClick={onClose} />
-        <h2 className="categories-name">Search Results</h2>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div
+        className={styles.modalContent}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <IoClose className={styles.closeIcon} onClick={onClose} />
+        <h2 className={styles.categoriesName}>Search Results</h2>
         {(categories.length > 0 || items.length > 0) ? (
           <>
             {categories.length > 0 && (
               <div>
-                <h3 className="categories-name">Categories</h3>
+                <h3 className={styles.categoriesName}>Categories</h3>
                 <ul>
                   {categories.map((category, index) => (
                     <li key={`category-${index}`}>
-                      <span className="item-name">{category.title}</span>
+                      <span className={styles.itemName}>{category.title}</span>
                     </li>
                   ))}
                 </ul>
@@ -74,12 +79,14 @@ const SearchResultsModal = ({ items, categories, onClose }) => {
             )}
             {items.length > 0 && (
               <div>
-                <h3 className="categories-name">Menu Items</h3>
+                <h3 className={styles.categoriesName}>Menu Items</h3>
                 <ul>
                   {items.map((item, index) => (
                     <li key={`item-${index}`}>
-                      <span className="item-name">{item.name}</span>
-                      <span className="item-price">{formatPrice(parseFloat(item.price))}</span>
+                      <span className={styles.itemName}>{item.name}</span>
+                      <span className={styles.itemPrice}>
+                        {formatPrice(parseFloat(item.price))}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -114,15 +121,16 @@ const SearchBar = () => {
 
   const filterMenuItems = (searchTerm) => {
     const lowerSearchTerm = searchTerm.toLowerCase();
-    return allMenuItems.filter(item => 
-      item.name.toLowerCase().includes(lowerSearchTerm) ||
-      (item.category && item.category.toLowerCase().includes(lowerSearchTerm))
+    return allMenuItems.filter(
+      (item) =>
+        item.name.toLowerCase().includes(lowerSearchTerm) ||
+        (item.category && item.category.toLowerCase().includes(lowerSearchTerm))
     );
   };
 
   const filterCategories = (searchTerm) => {
     const lowerSearchTerm = searchTerm.toLowerCase();
-    return categoryData.filter(category =>
+    return categoryData.filter((category) =>
       category.title.toLowerCase().includes(lowerSearchTerm)
     );
   };
@@ -130,7 +138,7 @@ const SearchBar = () => {
   const handleSearch = (e) => {
     const newSearchTerm = e.target.value;
     setSearchTerm(newSearchTerm);
-    
+
     if (newSearchTerm.length > 0) {
       const filteredMenuItems = filterMenuItems(newSearchTerm);
       const filteredCategoryItems = filterCategories(newSearchTerm);
@@ -145,9 +153,12 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="search-container">
-      <form onSubmit={(e) => e.preventDefault()} className="search-bar">
-        <div className="search-icon">
+    <div className={styles.searchContainer}>
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className={styles.searchBar}
+      >
+        <div className={styles.searchIcon}>
           <FiSearch size={20} />
         </div>
         <input
@@ -158,7 +169,7 @@ const SearchBar = () => {
         />
         <button
           type="button"
-          className="filter-btn pulsating"
+          className={`${styles.filterBtn} ${styles.pulsating}`}
           onClick={() => setIsFilterOpen(true)}
         >
           <IoFastFoodOutline size={20} />

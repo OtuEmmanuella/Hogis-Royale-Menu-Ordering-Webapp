@@ -62,7 +62,7 @@ export const ShoppingCartIcon = () => {
 };
 
 export const ShoppingCartPage = () => {
-  const { cartItems, incrementQuantity, decrementQuantity, removeItem, user } = useShoppingCart();
+  const { cartItems, incrementQuantity, decrementQuantity, removeItem,updateItemSpecifications, user } = useShoppingCart();
   const navigate = useNavigate();
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [deliveryOption, setDeliveryOption] = useState('');
@@ -103,6 +103,11 @@ export const ShoppingCartPage = () => {
 
     navigate(`/checkout?branch=${selectedBranch.id}&delivery=${encodeURIComponent(deliveryOption)}&deliveryPrice=${deliveryPrice}`);
   };
+
+  const handleSpecificationsChange = (cartItemId, specifications) => {
+    updateItemSpecifications(cartItemId, specifications);
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -159,11 +164,24 @@ export const ShoppingCartPage = () => {
                           </button>
                         </div>
                       </div>
+                      <div className="mt-4">
+                        <label htmlFor={`specifications-${item.cartItemId}`} className="block text-sm font-medium text-gray-700">
+                          Special Instructions
+                        </label>
+                        <textarea
+                          id={`specifications-${item.cartItemId}`}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          rows={3}
+                          placeholder="Add any special instructions for this item"
+                          value={item.specifications || ''}
+                          onChange={(e) => handleSpecificationsChange(item.cartItemId, e.target.value)}
+                        ></textarea>
+                      </div>
                     </li>
                   ))}
                 </ul>
               </div>
-            </div>
+            </div> 
 
             <div className="lg:col-span-5">
               <div className="bg-white shadow sm:rounded-lg p-6">
@@ -229,7 +247,7 @@ export const ShoppingCartPage = () => {
                       </div>
                     </dl>
                   </div>
-
+                   
                   <button
                     onClick={handleCheckout}
                     className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

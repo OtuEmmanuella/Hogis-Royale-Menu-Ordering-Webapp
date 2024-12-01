@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../Firebase/FirebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc,doc,getAggregateFromServer, AggregateField } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Line, Doughnut } from 'react-chartjs-2';
+import { Line, Doughnut, Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
@@ -24,6 +24,7 @@ const AdminNavigation = () => {
     { to: "/sales-reports", text: "Sales Reports" },
     { to: "/customer-inquiries", text: "Customer Inquiries" },
   ];
+
 
   return (
     <nav className="bg-indigo-600">
@@ -90,7 +91,12 @@ const AdminNavigation = () => {
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [salesData, setSalesData] = useState({});
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [branchRevenue, setBranchRevenue] = useState({});
+  const [categoryRevenue, setCategoryRevenue] = useState({});
+  const [paymentMethodBreakdown, setPaymentMethodBreakdown] = useState({});
+  const [topSellingItems, setTopSellingItems] = useState([]);
+  const [customerTraffic, setCustomerTraffic] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,8 +106,7 @@ const AdminDashboard = () => {
         const adminDoc = await getDoc(doc(db, 'admins', user.uid));
         if (adminDoc.exists() && adminDoc.data().isAdmin) {
           setIsAdmin(true);
-          // Fetch sales data here
-          // setSalesData(await fetchSalesData());
+          fetchDashboardData();
         } else {
           navigate('/menu');
         }
@@ -113,29 +118,84 @@ const AdminDashboard = () => {
     return () => unsubscribe();
   }, [navigate]);
 
+  const fetchDashboardData = async () => {
+    const ordersRef = collection(db, 'orders');
+    const ordersSnapshot = await getDocs(ordersRef);
+    let total = 0;
+    let branchRev = { 'Hogis Royale': 0, 'Hogis Luxury': 0, 'Hogis Exclusive': 0 };
+    let catRev = {};
+    let paymentMethods = {};
+    let itemsSold = {};
+    let traffic = {};
+
+    ordersSnapshot.forEach((doc) => {
+      const order = doc.data();
+      total += order.totalAmount;
+      branchRev[order.branchName] = (branchRev[order.branchName] || 0) + order.totalAmount;
+      paymentMethods[order.paymentMethod] = (paymentMethods[order.paymentMethod] || 0) + 1;
+
+      const orderDate = new Date(order.createdAt.seconds * 1000);
+      const dayOfWeek = orderDate.toLocaleString('en-US', { weekday: 'long' });
+      traffic[dayOfWeek] = (traffic[dayOfWeek] || 0) + 1;
+
+      order.items.forEach((item) => {
+        catRev[item.category] = (catRev[item.category] || 0) + (item.price * item.quantity);
+        itemsSold[item.name] = (itemsSold[item.name] || 0) + item.quantity;
+      });
+    });
+
+    setTotalRevenue(total);
+    setBranchRevenue(branchRev);
+    setCategoryRevenue(catRev);
+    setPaymentMethodBreakdown(paymentMethods);
+    setTopSellingItems(Object.entries(itemsSold).sort((a, b) => b[1] - a[1]).slice(0, 5));
+    setCustomerTraffic(traffic);
+  };
+
   if (!user || !isAdmin) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
-  const lineChartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+  const barChartData = {
+    labels: Object.keys(branchRevenue),
     datasets: [
       {
-        label: 'Sales',
-        data: [12, 19, 3, 5, 2, 3],
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1,
+        label: 'Revenue by Branch',
+        data: Object.values(branchRevenue),
+        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)'],
       },
     ],
   };
 
-  const doughnutChartData = {
-    labels: ['Red', 'Blue', 'Yellow'],
+  const pieChartData = {
+    labels: Object.keys(paymentMethodBreakdown),
     datasets: [
       {
-        data: [300, 50, 100],
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+        data: Object.values(paymentMethodBreakdown),
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+      },
+    ],
+  };
+
+  const topSellingItemsData = {
+    labels: topSellingItems.map(item => item[0]),
+    datasets: [
+      {
+        label: 'Units Sold',
+        data: topSellingItems.map(item => item[1]),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+      },
+    ],
+  };
+
+  const customerTrafficData = {
+    labels: Object.keys(customerTraffic),
+    datasets: [
+      {
+        label: 'Customer Traffic',
+        data: Object.values(customerTraffic),
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
       },
     ],
   };
@@ -164,7 +224,7 @@ const AdminDashboard = () => {
                     <div className="ml-5 w-0 flex-1">
                       <dl>
                         <dt className="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
-                        <dd className="text-3xl font-semibold text-gray-900">₦1,84,456.00</dd>
+                        <dd className="text-3xl font-semibold text-gray-900">₦{totalRevenue.toLocaleString()}</dd>
                       </dl>
                     </div>
                   </div>
@@ -172,17 +232,33 @@ const AdminDashboard = () => {
               </div>
               <div className="bg-white overflow-hidden shadow rounded-lg">
                 <div className="p-5">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Sales Overview</h3>
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Sales by Branch</h3>
                   <div className="mt-5">
-                    <Line data={lineChartData} />
+                    <Bar data={barChartData} />
                   </div>
                 </div>
               </div>
               <div className="bg-white overflow-hidden shadow rounded-lg">
                 <div className="p-5">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Sales by Category</h3>
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Payment Method Breakdown</h3>
                   <div className="mt-5">
-                    <Doughnut data={doughnutChartData} />
+                    <Pie data={pieChartData} />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="p-5">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Top Selling Items</h3>
+                  <div className="mt-5">
+                    <Bar data={topSellingItemsData} />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="p-5">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Customer Traffic by Day</h3>
+                  <div className="mt-5">
+                    <Line data={customerTrafficData} />
                   </div>
                 </div>
               </div>

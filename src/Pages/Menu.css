@@ -1,11 +1,16 @@
 /* Menu.css */
 
+.body {
+    background-color: rgb(83, 2, 2);
+    
+}
+
 .menu-container-menu {
     max-width: 870px;
     margin: 0 auto;
     padding: .5em;
     margin-bottom: 2rem;
-    /* border: 2px solid red; */
+  
 }
 
 header.menu-header {

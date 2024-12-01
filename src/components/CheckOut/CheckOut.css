@@ -15,6 +15,7 @@
   overflow: hidden;
 }
 
+
 .checkout-header {
   padding: 1.5rem;
   border-bottom: 1px solid #e2e8f0;
@@ -66,7 +67,7 @@
 
 @media (min-width: 768px) {
   .checkout-summary-container {
-    width: 40%;
+    width: 55%;
   }
 }
 
@@ -182,13 +183,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 1em;
   border-bottom: 1px solid #e2e8f0;
+
 }
 
 .invoice-item:last-child {
   border-bottom: none;
 }
+
+
 
 .summary-row {
   display: flex;

@@ -16,7 +16,7 @@ import { ShoppingCartProvider } from '../components/ShoppingCart/ShoppingCartCon
 import UserAccountPage from '../components/Auth/UserAccountPage';
 import NotificationPage from '../components/Notification/NotificationPage';
 import OrderConfirmation from '../components/CheckOut/OrderConfirmation';
-
+import CashierDashboard from '../components/Cashier/CashierDashboard';
 
 // Import the new pages
 import OrdersPage from '../components/Admin/OrdersPage';
@@ -48,6 +48,7 @@ const AppRoutes = () => {
         <Route path="/users" element={<UsersPage />} />
         <Route path="/sales-reports" element={<SalesReportsPage />} />
          <Route path="/customer-inquiries" element={<CustomerInquiriesPage />} />
+         <Route path="/cashier-dashboard" element={<CashierDashboard />} />
 
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>

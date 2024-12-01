@@ -168,7 +168,17 @@ export const handler = async (event, context) => {
         await handleSuccessfulPayment(orderRef, orderData, data);
         break;
       case 'charge.failed':
+      case 'payment.failed':
         await handleFailedPayment(orderRef, orderData, data);
+        break;
+      case 'transfer.success':
+        await handleTransferSuccess(orderRef, orderData, data);
+        break;
+      case 'transfer.failed':
+        await handleTransferFailed(orderRef, orderData, data);
+        break;
+      case 'transfer.reversed':
+        await handleTransferReversed(orderRef, orderData, data);
         break;
       default:
         console.warn('Unhandled webhook event:', webhookEvent);
