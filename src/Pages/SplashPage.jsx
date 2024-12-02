@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FaListUl } from 'react-icons/fa';
-import menuicon from '/order now logo.png';
+import menuicon from '/order now logo (1).png';
 import welcomeSound from '/hogis welcome sound.wav';
 import './SplashPage.css';
 
