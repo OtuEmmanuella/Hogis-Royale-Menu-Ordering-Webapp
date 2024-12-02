@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 export const branchConfig = {
     '1': {
       name: 'Hogis Royale And Apartment',

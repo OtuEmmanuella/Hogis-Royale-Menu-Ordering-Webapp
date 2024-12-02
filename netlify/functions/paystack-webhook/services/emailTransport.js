@@ -1,18 +1,25 @@
 import { createTransport } from 'nodemailer';
-import { emailConfig, getBranchCredentials } from '../config/emailConfig.js';
+import { branchConfig } from '../../config/branchConfig.js';
 
-export class EmailTransport {
+export class EmailTransporter {
   constructor() {
     this.transporters = new Map();
   }
 
   getTransporter(branchId) {
     if (!this.transporters.has(branchId)) {
-      const { email, password } = getBranchCredentials(branchId);
-      
+      const email = branchConfig[branchId].email;
+      const password = branchConfig[branchId].password;
+
+      if (!email || !password) {
+        throw new Error(`Missing email configuration for branch ${branchId}`);
+      }
+
       const transporter = createTransport({
-        ...emailConfig,
-        auth: { user: email, pass: password }
+        service: 'Gmail',
+        auth: { user: email, pass: password },
+        debug: true,
+        logger: true
       });
 
       this.transporters.set(branchId, transporter);
@@ -33,12 +40,12 @@ export class EmailTransport {
     }
   }
 
-  async sendMail(branchId, mailOptions) {
+  async sendEmail(branchId, options) {
     await this.verifyTransporter(branchId);
     const transporter = this.getTransporter(branchId);
-    
+
     try {
-      const result = await transporter.sendMail(mailOptions);
+      const result = await transporter.sendMail(options);
       console.log('Email sent successfully:', result.messageId);
       return result;
     } catch (error) {
@@ -48,4 +55,4 @@ export class EmailTransport {
   }
 }
 
-export const emailTransport = new EmailTransport();
+export const emailTransporter = new EmailTransporter();
