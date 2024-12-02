@@ -103,13 +103,6 @@ return `
     <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
       <p style="margin: 5px 0;"><strong>Delivery Location:</strong> ${orderDetails.deliveryOption}</p>
       <p style="margin: 5px 0;"><strong>Delivery Fee:</strong> ₦${orderDetails.deliveryPrice.toLocaleString()}</p>
-     <p style="margin: 5px 0;"><strong>Delivery Address:</strong> ${orderDetails.address}, ${orderDetails.city}</p>
-      <p style="margin: 5px 0;"><strong>Phone:</strong> ${orderDetails.phone}</p>
-      ${
-        orderDetails.payingForSomeone
-          ? `<p style="margin: 5px 0;"><strong>Recipient Name:</strong> ${orderDetails.recipientName}</p>`
-          : ''
-      }
       <p style="margin: 5px 0; font-size: 18px;"><strong>Total Amount:</strong> ₦${orderDetails.amount.toLocaleString()}</p>
     </div>
 
