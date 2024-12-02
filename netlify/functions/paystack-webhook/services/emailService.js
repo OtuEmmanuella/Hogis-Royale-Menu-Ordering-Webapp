@@ -1,84 +1,17 @@
-import { createTransport } from 'nodemailer';
-import dotenv from 'dotenv';
+import { firestoreService } from '../firestore.js';
+import { emailTransporter } from './transporter.js';
+import { createOrderHTML, createFailureHTML } from './templates.js';
+import { branchConfig } from '../../config/branchConfig.js';
 import { FieldValue } from 'firebase-admin/firestore';
-import { getDb } from './firebaseServices.js';
-
-dotenv.config();
-
-export const branchConfig = {
-  '1': {
-    name: 'Hogis Royale And Apartment',
-    email: process.env.BRANCH1_EMAIL,
-    password: process.env.BRANCH1_APP_PASSWORD,
-    phone: '+2348100072049',
-    address: '6 Bishop Moynagh Avenue, State Housing Calabar',
-  },
-  '2': {
-    name: 'Hogis Luxury Suites',
-    email: process.env.BRANCH2_EMAIL,
-    password: process.env.BRANCH2_APP_PASSWORD,
-    phone: '+2348100072049',
-    address: 'Hogis Luxury Suites Location',
-  },
-  '3': {
-    name: 'Hogis Exclusive Resorts',
-    email: process.env.BRANCH3_EMAIL,
-    password: process.env.BRANCH3_APP_PASSWORD,
-    phone: '+2348100072049',
-    address: 'Hogis Exclusive Resorts Location',
-  },
-};
+import { getDb } from '../../firebaseServices.js';
 
 class EmailService {
   constructor() {
-    this.transporters = new Map();
-  }
-
-  getTransporter(branchId) {
-    if (!this.transporters.has(branchId)) {
-      const email = branchConfig[branchId].email;
-      const password = branchConfig[branchId].password;
-
-      if (!email || !password) {
-        throw new Error(`Missing email configuration for branch ${branchId}`);
-      }
-
-      const transporter = createTransport({
-        service: 'Gmail',
-        auth: { user: email, pass: password },
-        debug: true,
-        logger: true
-      });
-
-      this.transporters.set(branchId, transporter);
-    }
-
-    return this.transporters.get(branchId);
-  }
-
-  async verifyTransporter(branchId) {
-    const transporter = this.getTransporter(branchId);
-    try {
-      await transporter.verify();
-      console.log(`Email transporter verified for branch ${branchId}`);
-      return true;
-    } catch (error) {
-      console.error(`Email transporter verification failed for branch ${branchId}:`, error);
-      throw error;
-    }
-  }
-
-  createOrderHTML(orderDetails) {
-    // ... (HTML template remains the same)
-  }
-
-  createFailureHTML(details, branch) {
-    // ... (HTML template remains the same)
+    this.db = getDb();
   }
 
   async sendOrderConfirmation(orderRef, orderData, paymentData) {
-    const db = getDb();
-    const emailLogRef = db.collection('emailLogs').doc(orderRef.id);
+    const emailLogRef = this.db.collection('emailLogs').doc(orderRef.id);
 
     try {
       // Check if confirmation email was already sent
@@ -88,47 +21,16 @@ class EmailService {
         return;
       }
 
-      // Create a transaction to ensure atomic updates
-      await db.runTransaction(async (transaction) => {
-        // 1. Update order status
-        transaction.update(orderRef, {
-          status: 'paid',
-          paymentDetails: paymentData,
-          paymentReference: paymentData.reference,
-          updatedAt: FieldValue.serverTimestamp(),
-          paymentDate: FieldValue.serverTimestamp()
-        });
+      // Process the order transaction
+      await firestoreService.runOrderTransaction(orderRef, paymentData, orderData.branchId);
 
-        // 2. Create payment record
-        const paymentRef = db.collection('payments').doc(orderRef.id);
-        transaction.set(paymentRef, {
-          orderId: orderRef.id,
-          status: 'success',
-          amount: paymentData.amount / 100,
-          currency: paymentData.currency,
-          paymentReference: paymentData.reference,
-          paymentGateway: 'paystack',
-          customerEmail: paymentData.customer.email,
-          branchId: orderData.branchId,
-          metadata: paymentData,
-          createdAt: FieldValue.serverTimestamp()
-        });
-
-        // 3. Create or update email log
-        transaction.set(emailLogRef, {
-          orderId: orderRef.id,
-          confirmationAttempts: FieldValue.increment(1),
-          lastAttempt: FieldValue.serverTimestamp()
-        }, { merge: true });
-      });
-
-      // 4. Send confirmation email with retry logic
+      // Send confirmation email with retry logic
       const emailOptions = {
         from: `${orderData.branchName} <${process.env[`BRANCH${orderData.branchId}_EMAIL`]}>`,
         to: orderData.customer.email,
         cc: process.env[`BRANCH${orderData.branchId}_EMAIL`],
         subject: `Order Confirmation #${orderRef.id}`,
-        html: this.createOrderHTML({
+        html: createOrderHTML({
           orderId: orderRef.id,
           amount: paymentData.amount / 100,
           items: orderData.items,
@@ -140,7 +42,7 @@ class EmailService {
       let retries = 3;
       while (retries > 0) {
         try {
-          await this.sendEmail(orderData.branchId, emailOptions);
+          await emailTransporter.sendEmail(orderData.branchId, emailOptions);
           // Mark email as sent in the log
           await emailLogRef.update({
             confirmationSent: true,
@@ -153,7 +55,6 @@ class EmailService {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
-
     } catch (error) {
       console.error('Error in sendOrderConfirmation:', error);
       await emailLogRef.update({
@@ -165,8 +66,7 @@ class EmailService {
   }
 
   async sendPaymentFailureNotification(email, details) {
-    const db = getDb();
-    const emailLogRef = db.collection('emailLogs').doc(details.orderId);
+    const emailLogRef = this.db.collection('emailLogs').doc(details.orderId);
 
     try {
       // Check if failure notification was already sent
@@ -186,10 +86,10 @@ class EmailService {
         to: email,
         cc: branch.email,
         subject: `Payment Failed for Order #${details.orderId}`,
-        html: this.createFailureHTML(details, branch)
+        html: createFailureHTML(details, branch)
       };
 
-      const result = await this.sendEmail(details.branchId, emailOptions);
+      const result = await emailTransporter.sendEmail(details.branchId, emailOptions);
 
       // Log the successful email send
       await emailLogRef.set({
@@ -209,23 +109,9 @@ class EmailService {
     }
   }
 
-  async sendEmail(branchId, options) {
-    await this.verifyTransporter(branchId);
-    const transporter = this.getTransporter(branchId);
-
-    try {
-      const result = await transporter.sendMail(options);
-      console.log('Email sent successfully:', result.messageId);
-      return result;
-    } catch (error) {
-      console.error('Failed to send email:', error);
-      throw error;
-    }
-  }
-
   async testEmailService(branchId = '1') {
     try {
-      await this.verifyTransporter(branchId);
+      await emailTransporter.verifyTransporter(branchId);
       return {
         status: 'success',
         message: 'Email service is configured correctly'
@@ -240,7 +126,6 @@ class EmailService {
 }
 
 export const emailService = new EmailService();
-
 
 // import { createTransport } from 'nodemailer';
 // import dotenv from 'dotenv';
