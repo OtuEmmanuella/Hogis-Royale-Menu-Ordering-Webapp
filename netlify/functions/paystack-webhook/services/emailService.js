@@ -74,7 +74,8 @@ return `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
 <h1 style="color: #333; text-align: center;">Thank you for your order!</h1>
 
-<div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;"> <p style="font-size: 16px; margin: 0;"><strong>Customer Name:</strong> ${orderDetails.customer.name}</p> <p style="font-size: 16px; margin: 0;"><strong>Order ID:</strong> ${orderDetails.reference}</p> <p style="font-size: 16px; margin: 0;">Your payment of ₦${orderDetails.amount.toLocaleString()} has been confirmed.</p> </div>
+<div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;"> 
+  <p style="font-size: 16px; margin: 0;">Your payment of ₦${orderDetails.amount.toLocaleString()} has been confirmed.</p> </div>
 
     <h2 style="color: #444; margin-top: 30px;">Order Details:</h2>
     <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
