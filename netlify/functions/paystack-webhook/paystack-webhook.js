@@ -18,6 +18,47 @@ export const initializeFirebase = () => {
   return admin;
 };
 
+// export const handleSuccessfulPayment = async (orderRef, orderData, paymentData) => {
+//   if (!orderRef || !orderRef.id) {
+//     console.error('Invalid orderRef:', orderRef);
+//     return;
+//   }
+  
+//   const updateData = {
+//     paymentStatus: 'paid',
+//     paymentDetails: paymentData,
+//     updatedAt: admin.firestore.FieldValue.serverTimestamp()
+//   };
+
+//   try {
+//     await orderRef.update(updateData);
+
+//      // Send order confirmation email
+//      await emailService.sendOrderConfirmation(orderRef, orderData, paymentData);
+
+//   } catch (error) {
+//     console.error('Error updating order:', error);
+//   }
+
+//   // Update inventory if necessary
+//   if (orderData.items) {
+//     const db = getFirestore();
+//     const batch = db.batch();
+
+//     for (const item of orderData.items) {
+//       const menuItemRef = db.collection('menu_items').doc(item.id);
+//       batch.update(menuItemRef, {
+//         quantity: admin.firestore.FieldValue.increment(-item.quantity)
+//       });
+//     }
+
+//     try {
+//       await batch.commit();
+//     } catch (error) {
+//       console.error('Error committing batch:', error);
+//     }
+//   }
+// };
 export const handleSuccessfulPayment = async (orderRef, orderData, paymentData) => {
   if (!orderRef || !orderRef.id) {
     console.error('Invalid orderRef:', orderRef);
@@ -33,8 +74,8 @@ export const handleSuccessfulPayment = async (orderRef, orderData, paymentData) 
   try {
     await orderRef.update(updateData);
 
-     // Send order confirmation email
-     await emailService.sendOrderConfirmation(orderRef, orderData, paymentData);
+    // Send order confirmation email
+    await emailService.sendOrderConfirmation(orderRef, orderData, paymentData);
 
   } catch (error) {
     console.error('Error updating order:', error);
@@ -46,10 +87,14 @@ export const handleSuccessfulPayment = async (orderRef, orderData, paymentData) 
     const batch = db.batch();
 
     for (const item of orderData.items) {
-      const menuItemRef = db.collection('menu_items').doc(item.id);
-      batch.update(menuItemRef, {
-        quantity: admin.firestore.FieldValue.increment(-item.quantity)
-      });
+      if (item.id) {  // Ensure item.id is not undefined
+        const menuItemRef = db.collection('menu_items').doc(item.id);
+        batch.update(menuItemRef, {
+          quantity: admin.firestore.FieldValue.increment(-item.quantity)
+        });
+      } else {
+        console.error('Invalid item id for:', item);
+      }
     }
 
     try {
