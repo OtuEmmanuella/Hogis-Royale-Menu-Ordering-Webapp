@@ -106,11 +106,7 @@ return `
       <p style="margin: 5px 0; font-size: 18px;"><strong>Total Amount:</strong> ₦${orderDetails.amount.toLocaleString()}</p>
     </div>
 
-    <div style="margin-top: 30px;">
-      <h2 style="color: #444;">Need Help?</h2>
-      <p>Please contact our branch support:</p>
-      <p><strong>Branch Phone:</strong> ${branchConfig[orderDetails.branchId].phone}</p>
-    </div>
+    
   </div>
 `;
 }
