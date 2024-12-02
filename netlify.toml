@@ -5,7 +5,7 @@
 [functions]
   node_bundler = "esbuild"
   directory = "netlify/functions"
-  included_files = ["services/**", "config/**"]
+  included_files = ["services/**"]
   external_node_modules = ["firebase-admin"]
 
 
