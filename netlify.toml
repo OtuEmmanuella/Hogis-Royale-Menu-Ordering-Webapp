@@ -6,8 +6,6 @@
   node_bundler = "esbuild"
   directory = "netlify/functions"
   included_files = ["services/**"]
-  external_node_modules = ["firebase-admin"]
-
 
 [[redirects]]
   from = "/*"
