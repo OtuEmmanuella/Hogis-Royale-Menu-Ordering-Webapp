@@ -1361,15 +1361,17 @@
       },
 
 
+
+
       {
         "name": "EKPANG NKUKWO",
         "category": "NATIVES",
-        "price": 4000
+        "price": 5000
       },
       {
         "name": "ABACHA(WEEKEND SPECIAL)",
         "category": "NATIVES",
-        "price": 2000
+        "price": 12000
       },
       {
         "name": "ISI EWU",
@@ -1379,7 +1381,7 @@
       {
         "name": "NKWOBI",
         "category": "NATIVES",
-        "price": 4500
+        "price": 2500
       },
       {
         "name": "CHICKEN NKWOBI",
@@ -1391,11 +1393,7 @@
         "category": "NATIVES",
         "price": 5000
       },
-      {
-        "name": "CHEF SPECIAL RICE (BASMATIC)",
-        "category": "NATIVES",
-        "price": 7000
-      },
+     
       {
         "name": "SURPRISE TRAY",
         "category": "NATIVES",
@@ -1409,7 +1407,7 @@
  {
       "name": "STEAMED BASMATI RICE WITH BEEF & MUSHROOM IN OYSTER SAUCE",
       "category": "RICE",
-      "price": 6500
+      "price": 7500
     },
     {
       "name": "ORIENTAL FRIED RICE WITH BEEF & MUSHROOM IN OYSTER SAUCE",
@@ -1424,22 +1422,22 @@
     {
       "name": "STEAMED WHITE RICE WITH CHICKEN CASSEROLE",
       "category": "RICE",
-      "price": 7000
+      "price": 6000
     },
     {
       "name": "OFADA RICE & SAUCE",
       "category": "RICE",
-      "price": 6000
+      "price": 6500
     },
     {
       "name": "STEAMED BASMATIC RICE/BEEF/MUSHROOM IN OYSTER SAUCE",
       "category": "RICE",
-      "price": 7000
+      "price": 7500
     },
     {
       "name": "JUMBO PRAWN SAUCE WITH BASMATI RICE",
       "category": "RICE",
-      "price": 9500
+      "price": 11000
     },
     {
       "name": "STEAMED BASMATI RICE ONLY",
@@ -1472,19 +1470,19 @@
       "price": 1500
     },
     {
-      "name": "STEAMED BASMATIC WHITE RICE WITH CHICKEN SAUCE",
+      "name": "STEAMED BASMATI WHITE RICE WITH CHICKEN SAUCE",
       "category": "RICE",
-      "price": 6000
+      "price": 6500
     },
     {
       "name": "EGG FRIED RICE",
       "category": "RICE",
-      "price": 4000
+      "price": 3500
     },
     {
       "name": "ORIENTAL FRIED RICE AND CHICKEN SAUCE",
       "category": "RICE",
-      "price": 6500
+      "price": 9000
     },
     {
       "name": "CARROT RICE",
@@ -1497,14 +1495,14 @@
       "price": 3000
     },
     {
-      "name": "HOGIS SPECIAL FRIED RICE(BASMATIC)",
+      "name": "HOGIS SPECIAL FRIED RICE(BASMATI)",
       "category": "RICE",
       "price": 3500
     },
     {
-      "name": "COCONUT RICE (BASMATIC)",
+      "name": "COCONUT RICE (BASMATI)",
       "category": "RICE",
-      "price": 3000
+      "price": 3500
     },
     {
       "name": "BASMATI JOLLOF RICE",
@@ -1532,21 +1530,16 @@
       "price": 6000
     },
     {
-      "name": "STEAMED BASMATIC RICE WITH CHICKEN, GOAT OR BEEF CURRY",
+      "name": "STEAMED BASMATI RICE WITH CHICKEN, GOAT OR BEEF CURRY",
       "category": "RICE",
       "price": 6000
     },
     {
-      "name": "STEAMED BASMATIC RICE WITH SHREDED CHICKEN, DICED GOAT OR BEEF IN TOMATOE SAUCE",
+      "name": "STEAMED BASMATI RICE WITH SHREDED CHICKEN, DICED GOAT OR BEEF IN TOMATOE SAUCE",
       "category": "RICE",
       "price": 6000
     },
-    {
-      "name": "SPAGHETTI BOLOGNAS",
-      "category": "RICE",
-      "price": 6000
-    },
-
+    
 
 
 
@@ -1557,10 +1550,21 @@
         "price": 5000
       },
       {
+        "name": "CHEF SPECIAL RICE (BASMATI)",
+        "category": "SIGNATURE MEAL",
+        "price": 6500
+      },
+      {
         "name": "SINGAPORE NOODLES",
         "category": "SIGNATURE MEAL",
         "price": 7500
       },
+      {
+        "name": "SPAGHETTI BOLOGNAS",
+        "category": "SIGNATURE MEAL",
+        "price": 6000
+      },
+  
       {
         "name": "SPAGHETTI CARBONARA WITH TURKEY OR GRILLED PORK CHOPS",
         "category": "SIGNATURE MEAL",
@@ -1620,12 +1624,12 @@
       {
         "name": "BUSH MEAT",
         "category": "PROTEIN",
-        "price": 3000
+        "price": 6500
       },
       {
         "name": "DRYFISH",
         "category": "PROTEIN",
-        "price": 3500
+        "price": 4500
       },
       {
         "name": "GIZZARD",
@@ -1640,7 +1644,7 @@
       {
         "name": "GOAT MEAT",
         "category": "PROTEIN",
-        "price": 4500
+        "price": 5000
       },
       {
         "name": "BEEF",
@@ -1655,12 +1659,12 @@
       {
         "name": "CAT FISH",
         "category": "PROTEIN",
-        "price": 4000
+        "price": 5500
       },
       {
         "name": "GRILLED BUFFALO TURKEY",
         "category": "PROTEIN",
-        "price": 6000
+        "price": 6500
       },
       {
         "name": "ASSORTED MEAT",
@@ -1670,7 +1674,7 @@
       {
         "name": "PEPPERED CATFISH",
         "category": "PROTEIN",
-        "price": 4500
+        "price": 6000
       },
       {
         "name": "LARGE CROAKER FISH",
@@ -1688,9 +1692,29 @@
         "price": 4500
       },
       {
+        "name": "PEPPERED DRY FISH",
+        "category": "PROTEIN",
+        "price": 4500
+      },
+      {
         "name": "HOGIS SPECIAL SNAIL",
         "category": "PROTEIN",
         "price": 6000
+      },
+      {
+        "name": "TROPICAL BEEF DELIGHT",
+        "category": "PROTEIN",
+        "price": 12000
+      },
+      {
+        "name": "TROPICAL CHICKEN DELIGHT",
+        "category": "PROTEIN",
+        "price": 12000
+      },
+      {
+        "name": "TROPICAL TURKEY DELIGHT",
+        "category": "PROTEIN",
+        "price": 15000
       },
       {
         "name": "SNAIL FOR MEALS",
@@ -1725,7 +1749,7 @@
       {
         "name": "SAUCED PROTEIN WITH YAM OR POTATO CHIPS",
         "category": "PROTEIN",
-        "price": 4000
+        "price": 6000
       },
       {
         "name": "GOAT MEAT (1 PIECE)",
@@ -1760,7 +1784,7 @@
       {
         "name": "TURKEY",
         "category": "PROTEIN",
-        "price": 6000
+        "price": 6500
       },
 
 
@@ -1821,12 +1845,12 @@
       {
         "name": "SAUCED FISH WITH YAM OR POTATO CHIPS",
         "category": "LIGHT MEAL",
-        "price": 4500
+        "price": 6000
       },
       {
         "name": "SAUCED SNAIL WITH SIDE CHIPS",
         "category": "LIGHT MEAL",
-        "price": 6000
+        "price": 8000
       },
       {
         "name": "YAM OR POTATO CHIPS",
@@ -2672,7 +2696,7 @@
         "price": 1200
       },
 
-
+ 
 
 
       {
@@ -2739,15 +2763,63 @@
         "name": "GREEN TEA",
         "category": "COFFEE/TEA",
         "price": 500
+      },
+
+
+
+
+
+
+      {
+        "name": "HENKEL",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 10000
+      },
+      {
+        "name": "4TH STREET",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 10000
+      },
+      {
+        "name": "J & W",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 8000
+      },
+      {
+        "name": "MALIBU",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 6000
+      },
+      {
+        "name": "MARTINELLIS",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 18000
+      },
+      {
+        "name": "TOMA",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 10000
+      },
+      {
+        "name": "EISBERG",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 15000
+      },
+      {
+        "name": "APOSTROPHE MELOT",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 18000
+      },
+      {
+        "name": "ELISBERG",
+        "category": "NON-ALCOHOLIC SWEET WINE",
+        "price": 10000
       }
-
-
-
-
-
-
-
       
+
+
+
+
 
 
       

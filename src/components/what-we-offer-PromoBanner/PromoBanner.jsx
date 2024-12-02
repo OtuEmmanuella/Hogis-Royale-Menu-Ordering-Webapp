@@ -6,6 +6,8 @@ import cinemaImage from '/cinema00.jpg';
 import arcadeImage from '/game 2.jpg';
 import clubImage from '/club.jpg';
 import hotelImage from '/hotel.jpg';
+import hogisluxury from '/hogisluxury.jpg'
+import hogisexclusive from '/hogis exclusive.jpg'
 import loungeImage from '/menu icon.png';
 import banquetImage from '/hall.jpg';
 import Recommended from '../Recommended/Recommended';
@@ -49,14 +51,14 @@ const banners = [
     description: "Your home away from home",
     buttonText: "Book a Room",
     startTime: "Check-in from 2 PM",
-    image: hotelImage
+    image: hogisluxury
   },
   {
     title: "Hogis Exclusive Suites",
     description: "Your home away from home",
     buttonText: "Book a Room",
     startTime: "Check-in from 2 PM",
-    image: hotelImage
+    image: hogisexclusive
   },
   {
     title: "The Lounge",
@@ -192,3 +194,5 @@ const PromoBanner = () => {
 };
 
 export default PromoBanner;
+
+

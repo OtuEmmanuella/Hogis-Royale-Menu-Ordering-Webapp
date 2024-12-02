@@ -6,266 +6,301 @@ import { getDb } from './firebaseServices.js';
 dotenv.config();
 
 export const branchConfig = {
-'1': {
-name: 'Hogis Royale And Apartment',
-email: process.env.BRANCH1_EMAIL,
-password: process.env.BRANCH1_APP_PASSWORD,
-phone: '+2348100072049',
-address: '6 Bishop Moynagh Avenue, State Housing Calabar',
-},
-'2': {
-name: 'Hogis Luxury Suites',
-email: process.env.BRANCH2_EMAIL,
-password: process.env.BRANCH2_APP_PASSWORD,
-phone: '+2348100072049',
-address: 'Hogis Luxury Suites Location',
-},
-'3': {
-name: 'Hogis Exclusive Resorts',
-email: process.env.BRANCH3_EMAIL,
-password: process.env.BRANCH3_APP_PASSWORD,
-phone: '+2348100072049',
-address: 'Hogis Exclusive Resorts Location',
-},
+  '1': {
+    name: 'Hogis Royale And Apartment',
+    email: process.env.BRANCH1_EMAIL,
+    password: process.env.BRANCH1_APP_PASSWORD,
+    phone: '+2348100072049',
+    address: '6 Bishop Moynagh Avenue, State Housing Calabar',
+  },
+  '2': {
+    name: 'Hogis Luxury Suites',
+    email: process.env.BRANCH2_EMAIL,
+    password: process.env.BRANCH2_APP_PASSWORD,
+    phone: '+2348100072049',
+    address: 'Hogis Luxury Suites Location',
+  },
+  '3': {
+    name: 'Hogis Exclusive Resorts',
+    email: process.env.BRANCH3_EMAIL,
+    password: process.env.BRANCH3_APP_PASSWORD,
+    phone: '+2348100072049',
+    address: 'Hogis Exclusive Resorts Location',
+  },
 };
 
 class EmailService {
-constructor() {
-this.transporters = new Map();
-}
-
-getTransporter(branchId) {
-if (!this.transporters.has(branchId)) {
-const email = branchConfig[branchId].email;
-const password = branchConfig[branchId].password;
-
-
-  if (!email || !password) {
-    throw new Error(`Missing email configuration for branch ${branchId}`);
+  constructor() {
+    this.transporters = new Map();
+    this.processingEmails = new Map();
+    this.emailLocks = new Map();
   }
 
-  const transporter = createTransport({
-    service: 'Gmail',
-    auth: { user: email, pass: password },
-    debug: true,
-    logger: true
-  });
-
-  this.transporters.set(branchId, transporter);
-}
-
-return this.transporters.get(branchId);
-}
-
-async verifyTransporter(branchId) {
-const transporter = this.getTransporter(branchId);
-try {
-await transporter.verify();
-console.log(`Email transporter verified for branch ${branchId}`);
-return true;
-} catch (error) {
-console.error(`Email transporter verification failed for branch ${branchId}:, error`);
-throw error;
-}
-}
-
-createOrderHTML(orderDetails) {
-return `
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
-<h1 style="color: #333; text-align: center;">Thank you for your order!</h1>
-
-<div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;"> 
-  <p style="font-size: 16px; margin: 0;">Your payment of ₦${orderDetails.amount.toLocaleString()} has been confirmed.</p> </div>
-
-    <h2 style="color: #444; margin-top: 30px;">Order Details:</h2>
-    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-      <thead>
-        <tr style="background-color: #f5f5f5;">
-          <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Item</th>
-          <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Quantity</th>
-          <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Price</th>
-          <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${orderDetails.items.map(item => `
-          <tr>
-            <td style="padding: 12px; border: 1px solid #ddd;">${item.name}</td>
-            <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${item.specifications}</td>
-            <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-            <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">₦${item.price.toLocaleString()}</td>
-            <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">₦${(item.price * item.quantity).toLocaleString()}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+  async acquireLock(lockKey, timeout = 30000) {
+    if (this.emailLocks.has(lockKey)) {
+      return false;
+    }
     
-    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-      <p style="margin: 5px 0;"><strong>Delivery Location:</strong> ${orderDetails.deliveryOption}</p>
-      <p style="margin: 5px 0;"><strong>Delivery Fee:</strong> ₦${orderDetails.deliveryPrice.toLocaleString()}</p>
-      <p style="margin: 5px 0; font-size: 18px;"><strong>Total Amount:</strong> ₦${orderDetails.amount.toLocaleString()}</p>
-    </div>
+    this.emailLocks.set(lockKey, true);
+    setTimeout(() => this.emailLocks.delete(lockKey), timeout);
+    return true;
+  }
 
-    
-  </div>
-`;
-}
+  releaseLock(lockKey) {
+    this.emailLocks.delete(lockKey);
+  }
 
-createFailureHTML(details, branch) {
-return `
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
-<h1 style="color: #dc3545; text-align: center;">Payment Failed</h1>
-<div style="background-color: #fff3f4; padding: 15px; border-radius: 5px; margin: 20px 0;">
-<p style="margin: 0;">We were unable to process your payment for order #${details.orderId}.</p>
-</div>
+  getTransporter(branchId) {
+    if (!this.transporters.has(branchId)) {
+      const email = branchConfig[branchId].email;
+      const password = branchConfig[branchId].password;
 
+      if (!email || !password) {
+        throw new Error(`Missing email configuration for branch ${branchId}`);
+      }
 
-    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-      <p style="margin: 5px 0;"><strong>Error:</strong> ${details.error}</p>
-    </div>
-    
-    <div style="margin-top: 30px;">
-      <h2 style="color: #444;">Need Help?</h2>
-      <p>Please contact our support team:</p>
-      <p><strong>Email:</strong> ${branch.email}</p>
-      <p><strong>Phone:</strong> ${branch.phone}</p>
-    </div>
-  </div>
-`;
-}
+      const transporter = createTransport({
+        service: 'Gmail',
+        auth: { user: email, pass: password },
+        debug: true,
+        logger: true
+      });
 
-async sendOrderConfirmation(orderRef, orderData, paymentData) {
-const db = getDb();
+      this.transporters.set(branchId, transporter);
+    }
 
+    return this.transporters.get(branchId);
+  }
 
-try {
-  // 1. Update order status
-  await orderRef.update({
-    status: 'paid',
-    paymentDetails: paymentData,
-    paymentReference: paymentData.reference,
-    updatedAt: FieldValue.serverTimestamp(),
-    paymentDate: FieldValue.serverTimestamp()
-  });
-
-  // 2. Create payment record
-  await db.collection('payments').doc(orderRef.id).set({
-    orderId: orderRef.id,
-    status: 'success',
-    amount: paymentData.amount / 100,
-    currency: paymentData.currency,
-    paymentReference: paymentData.reference,
-    paymentGateway: 'paystack',
-    customerEmail: paymentData.customer.email,
-    branchId: orderData.branchId,
-    metadata: paymentData,
-    createdAt: FieldValue.serverTimestamp()
-  });
-
-  // 3. Send confirmation email with retry logic
-  const emailOptions = {
-    from: `${orderData.branchName} <${process.env[`BRANCH${orderData.branchId}_EMAIL`]}>`,
-    to: orderData.customer.email,
-    cc: process.env[`BRANCH${orderData.branchId}_EMAIL`],
-    subject: `Order Confirmation #${orderRef.id}`,
-    html: this.createOrderHTML({
-      orderId: orderRef.id,
-      amount: paymentData.amount / 100,
-      items: orderData.items,
-      deliveryOption: orderData.deliveryOption,
-      deliveryPrice: orderData.deliveryPrice
-    })
-  };
-
-  let retries = 3;
-  while (retries > 0) {
+  async verifyTransporter(branchId) {
+    const transporter = this.getTransporter(branchId);
     try {
-      await this.sendEmail(orderData.branchId, emailOptions);
-      break;
+      await transporter.verify();
+      console.log(`Email transporter verified for branch ${branchId}`);
+      return true;
     } catch (error) {
-      retries--;
-      if (retries === 0) throw error;
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.error(`Email transporter verification failed for branch ${branchId}:`, error);
+      throw error;
     }
   }
 
-} catch (error) {
-  console.error('Error in sendOrderConfirmation:', error);
-  await orderRef.update({
-    emailError: error.message,
-    emailSendAttempts: FieldValue.increment(1)
-  });
-  throw error;
-}
-}
+  createOrderHTML(orderDetails) {
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+        <h1 style="color: #333; text-align: center;">Thank you for your order!</h1>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;"> 
+          <p style="font-size: 16px; margin: 0;">Your payment of ₦${orderDetails.amount.toLocaleString()} has been confirmed.</p>
+        </div>
+        <h2 style="color: #444; margin-top: 30px;">Order Details:</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <thead>
+            <tr style="background-color: #f5f5f5;">
+              <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Item</th>
+              <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Specifications</th>
+              <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Quantity</th>
+              <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Price</th>
+              <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orderDetails.items.map(item => `
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd;">${item.name}</td>
+                <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${item.specifications || '-'}</td>
+                <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+                <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">₦${item.price.toLocaleString()}</td>
+                <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">₦${(item.price * item.quantity).toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 5px 0;"><strong>Delivery Location:</strong> ${orderDetails.deliveryOption}</p>
+          <p style="margin: 5px 0;"><strong>Delivery Fee:</strong> ₦${orderDetails.deliveryPrice.toLocaleString()}</p>
+          <p style="margin: 5px 0; font-size: 18px;"><strong>Total Amount:</strong> ₦${orderDetails.amount.toLocaleString()}</p>
+        </div>
+      </div>
+    `;
+  }
 
-async sendPaymentFailureNotification(email, details) {
-try {
-const branch = {
-email: process.env[`BRANCH${details.branchId}_EMAIL`],
-phone: process.env[`BRANCH${details.branchId}_PHONE`] || '+2348100072049'
-};
+  createFailureHTML(details, branch) {
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+        <h1 style="color: #dc3545; text-align: center;">Payment Failed</h1>
+        <div style="background-color: #fff3f4; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 0;">We were unable to process your payment for order #${details.orderId}.</p>
+        </div>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 5px 0;"><strong>Error:</strong> ${details.error}</p>
+        </div>
+        <div style="margin-top: 30px;">
+          <h2 style="color: #444;">Need Help?</h2>
+          <p>Please contact our support team:</p>
+          <p><strong>Email:</strong> ${branch.email}</p>
+          <p><strong>Phone:</strong> ${branch.phone}</p>
+        </div>
+      </div>
+    `;
+  }
 
+  async sendOrderConfirmation(orderRef, orderData, paymentData) {
+    const db = getDb();
+    const lockKey = `order_confirmation_${orderRef.id}`;
 
-  const emailOptions = {
-    from: `${details.branchName} <${branch.email}>`,
-    to: email,
-    cc: branch.email,
-    subject: `Payment Failed for Order #${details.orderId}`,
-    html: this.createFailureHTML(details, branch)
-  };
+    if (!await this.acquireLock(lockKey)) {
+      console.log(`Skipping duplicate email processing for order ${orderRef.id}`);
+      return;
+    }
 
-  return await this.sendEmail(details.branchId, emailOptions);
-} catch (error) {
-  console.error('Failed to send payment failure notification:', error);
-  throw error;
-}
-}
+    try {
+      const orderSnapshot = await orderRef.get();
+      const orderCurrentData = orderSnapshot.data();
 
-async sendEmail(branchId, options) {
-await this.verifyTransporter(branchId);
-const transporter = this.getTransporter(branchId);
+      if (orderCurrentData.emailSent) {
+        console.log(`Email already sent for order ${orderRef.id}`);
+        return;
+      }
 
+      const batch = db.batch();
 
-try {
-  const result = await transporter.sendMail(options);
-  console.log('Email sent successfully:', result.messageId);
-  return result;
-} catch (error) {
-  console.error('Failed to send email:', error);
-  throw error;
-}
-}
+      // Update order document
+      const orderUpdate = {
+        status: 'paid',
+        paymentDetails: paymentData,
+        paymentReference: paymentData.reference,
+        updatedAt: FieldValue.serverTimestamp(),
+        paymentDate: FieldValue.serverTimestamp(),
+        emailProcessing: true,
+        emailProcessingStarted: FieldValue.serverTimestamp()
+      };
+      batch.update(orderRef, orderUpdate);
 
-async testEmailService(branchId = '1') {
-try {
-const testOrderDetails = {
-branchId,
-orderId: `TEST-${Date.now()}`,
-amount: 1000,
-items: [{
-name: 'Test Item',
-quantity: 1,
-price: 1000
-}],
-deliveryOption: 'Test Location',
-deliveryPrice: 0
-};
+      // Create payment document
+      const paymentRef = db.collection('payments').doc(orderRef.id);
+      const paymentData = {
+        orderId: orderRef.id,
+        status: 'success',
+        amount: paymentData.amount / 100,
+        currency: paymentData.currency,
+        paymentReference: paymentData.reference,
+        paymentGateway: 'paystack',
+        customerEmail: paymentData.customer.email,
+        branchId: orderData.branchId,
+        metadata: paymentData,
+        createdAt: FieldValue.serverTimestamp()
+      };
+      batch.set(paymentRef, paymentData);
 
+      await batch.commit();
 
-  await this.verifyTransporter(branchId);
-  
-  return {
-    status: 'success',
-    message: 'Email service is configured correctly'
-  };
-} catch (error) {
-  return {
-    status: 'error',
-    message: error.message
-  };
-}
-}
+      const emailOptions = {
+        from: `${orderData.branchName} <${process.env[`BRANCH${orderData.branchId}_EMAIL`]}>`,
+        to: orderData.customer.email,
+        cc: process.env[`BRANCH${orderData.branchId}_EMAIL`],
+        subject: `Order Confirmation #${orderRef.id}`,
+        html: this.createOrderHTML({
+          orderId: orderRef.id,
+          amount: paymentData.amount / 100,
+          items: orderData.items,
+          deliveryOption: orderData.deliveryOption,
+          deliveryPrice: orderData.deliveryPrice
+        })
+      };
+
+      let retryDelay = 1000;
+      let retries = 3;
+
+      while (retries > 0) {
+        try {
+          await this.sendEmail(orderData.branchId, emailOptions);
+          
+          await orderRef.update({
+            emailSent: true,
+            emailSentAt: FieldValue.serverTimestamp(),
+            emailProcessing: false
+          });
+          
+          console.log(`Email sent successfully for order ${orderRef.id}`);
+          break;
+        } catch (error) {
+          retries--;
+          if (retries === 0) throw error;
+          retryDelay *= 2;
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      }
+
+    } catch (error) {
+      console.error('Error in sendOrderConfirmation:', error);
+      await orderRef.update({
+        emailError: error.message,
+        emailSendAttempts: FieldValue.increment(1),
+        emailProcessing: false
+      });
+      throw error;
+    } finally {
+      this.releaseLock(lockKey);
+    }
+  }
+
+  async sendPaymentFailureNotification(email, details) {
+    const lockKey = `payment_failure_${details.orderId}`;
+
+    if (!await this.acquireLock(lockKey)) {
+      return;
+    }
+
+    try {
+      const branch = {
+        email: process.env[`BRANCH${details.branchId}_EMAIL`],
+        phone: process.env[`BRANCH${details.branchId}_PHONE`] || '+2348100072049'
+      };
+
+      const emailOptions = {
+        from: `${details.branchName} <${branch.email}>`,
+        to: email,
+        cc: branch.email,
+        subject: `Payment Failed for Order #${details.orderId}`,
+        html: this.createFailureHTML(details, branch)
+      };
+
+      return await this.sendEmail(details.branchId, emailOptions);
+    } catch (error) {
+      console.error('Failed to send payment failure notification:', error);
+      throw error;
+    } finally {
+      this.releaseLock(lockKey);
+    }
+  }
+
+  async sendEmail(branchId, options) {
+    await this.verifyTransporter(branchId);
+    const transporter = this.getTransporter(branchId);
+
+    try {
+      const result = await transporter.sendMail(options);
+      console.log('Email sent successfully:', result.messageId);
+      return result;
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw error;
+    }
+  }
+
+  async testEmailService(branchId = '1') {
+    try {
+      await this.verifyTransporter(branchId);
+      return {
+        status: 'success',
+        message: 'Email service is configured correctly'
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: error.message
+      };
+    }
+  }
 }
 
 export const emailService = new EmailService();

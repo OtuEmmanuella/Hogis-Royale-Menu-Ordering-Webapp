@@ -1,5 +1,7 @@
 import React from 'react';
-import { IoMdClose, IoMdCheckmark } from 'react-icons/io';
+import { IoMdClose, IoMdCheckmark, IoMdPrint } from 'react-icons/io';
+import Invoice from '../../components/Invoice/Invoice';
+import { printInvoice } from '../../utils/printInvoice';
 
 const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order }) => {
   if (!isOpen || !order) return null;
@@ -24,6 +26,10 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order }) => {
   const totalPrice = (order.items || []).reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const deliveryPrice = order.deliveryPrice || 0;
   const finalAmount = totalPrice + deliveryPrice;
+
+  const handlePrintInvoice = () => {
+    printInvoice(order);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -151,6 +157,13 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order }) => {
             Order placed on: {order.createdAt.toLocaleString()}
           </div>
           <div className="flex space-x-4">
+          <button
+              onClick={handlePrintInvoice}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors flex items-center"
+            >
+              <IoMdPrint className="mr-2" />
+              Print Invoice
+            </button>
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
@@ -167,6 +180,11 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order }) => {
               </button>
             )}
           </div>
+        </div>
+
+        {/* Hidden Invoice Component */}
+        <div className="hidden">
+          <Invoice order={order} />
         </div>
       </div>
     </div>
