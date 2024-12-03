@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Minus, Plus, Trash2, MapPin } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useShoppingCart } from './ShoppingCartContext';
+import BranchLocationModal from '../Modal/BranchLocationModal';
 import LoginModal from '../Modal/Modal';
 import emptybag from '/empty-bag.svg';
 
@@ -67,6 +68,8 @@ export const ShoppingCartPage = () => {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [deliveryOption, setDeliveryOption] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showBranchLocationModal, setShowBranchLocationModal] = useState(false);
+
 
   const getDeliveryPrice = () => {
     if (!selectedBranch || !deliveryOption) return 0;
@@ -86,13 +89,8 @@ export const ShoppingCartPage = () => {
   };
 
   const handleCheckout = () => {
-    if (!selectedBranch) {
-      toast.error('Please select a branch before proceeding to checkout.');
-      return;
-    }
-
-    if (!deliveryOption) {
-      toast.error('Please select your preferred delivery location before proceeding to checkout.');
+    if (!selectedBranch || !deliveryOption) {
+      setShowBranchLocationModal(true);
       return;
     }
 
@@ -106,6 +104,11 @@ export const ShoppingCartPage = () => {
 
   const handleSpecificationsChange = (cartItemId, specifications) => {
     updateItemSpecifications(cartItemId, specifications);
+  };
+
+  const handleBranchLocationSelect = (branch, location) => {
+    setSelectedBranch(branch);
+    setDeliveryOption(location);
   };
 
 
@@ -248,13 +251,22 @@ export const ShoppingCartPage = () => {
                     </dl>
                   </div>
                    
+                   <div>
                   <button
                     onClick={handleCheckout}
                     className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Proceed to Checkout
                   </button>
-
+                  {showBranchLocationModal && (
+                  <BranchLocationModal
+                    isOpen={showBranchLocationModal}
+                    onClose={() => setShowBranchLocationModal(false)}
+                    branches={branches}
+                    onSelect={handleBranchLocationSelect}
+                  />
+                )}
+                </div>
                   <Link
                     to="/menu"
                     className="text-sm text-indigo-600 hover:text-indigo-500 flex items-center justify-center mt-4"

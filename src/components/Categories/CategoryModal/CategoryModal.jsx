@@ -34,12 +34,20 @@ const CategoryModal = ({ category, items, onClose, onLoadMore }) => {
         {items && items.length > 0 ? (
           <ul className="category-modal-list">
             {items.map((item, index) => (
-              <li key={`${item.id || item.name}-${index}`} className="category-modal-item">
+              <li 
+                key={`${item.id || item.name}-${index}`}
+                className="category-modal-item"
+                onClick={() => handleAddToCart(item)} 
+              >
                 <span className="category-modal-item-name">{item.name}</span>
                 <span className="category-modal-item-price">{formatPrice(parseFloat(item.price))}</span>
                 <IoCartOutline
                   className="category-modal-add-to-cart-icon"
-                  onClick={() => handleAddToCart(item)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering `li`'s click
+                    handleAddToCart(item);
+                  }}
+  
                 />
               </li>
             ))}
