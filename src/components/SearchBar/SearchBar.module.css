@@ -3,6 +3,7 @@
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
+  border: 1px solid red;
 }
 
 .searchBar {
@@ -20,6 +21,12 @@
 .searchIcon {
   color: #666;
   margin: 0 10px;
+}
+
+.addToCartIcon {
+  cursor: pointer;
+  color: #4CAF50;
+  margin-left: 10px;
 }
 
 .searchBar input {
@@ -82,6 +89,7 @@
   overflow-y: auto;
   text-transform: uppercase;
   position: relative;
+
 }
 
 .modal h2 {
@@ -170,7 +178,9 @@
   overflow-y: auto;
   text-transform: uppercase;
   position: relative;
-  margin-top: 19em;
+  margin-top: 7em;
+  cursor: pointer;
+ 
 }
 
 .modalContent h2, .modalContent h3 {

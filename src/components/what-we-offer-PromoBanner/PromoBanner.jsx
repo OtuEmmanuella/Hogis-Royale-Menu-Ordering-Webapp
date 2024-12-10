@@ -74,6 +74,48 @@ const banners = [
     startTime: "Available for bookings",
     image: banquetImage
   },
+  {
+    title: "Hogis Fitness",
+    description: "The Premium fitness center @ 7 Akim street.Medical vitals every Saturday so your exercise is safe and efficient" ,
+    buttonText: "Register Today",
+    startTime: "Available for bookings",
+    image: banquetImage
+  },
+  {
+    title: "Hogis Unisex Salon",
+    description: "Experience luxury and relaxation at Hogis Unisex Salon with Our expert stylists",
+    buttonText: "Book Now",
+    startTime: "Available for bookings",
+    image: banquetImage
+  },
+  {
+    title: "Hogis Spa",
+    description: "Enjoy rejuvenating treatments and relaxation therapies tailored to your needs.",
+    buttonText: "Book Now",
+    startTime: "Available for bookings",
+    image: banquetImage
+  },
+  {
+    title: "De Voltage Lounge",
+    description: "Ultimate spot for relaxation and entertainment.",
+    buttonText: "Book Now",
+    startTime: "Available for bookings",
+    image: banquetImage
+  },
+  {
+    title: "Grill Bar Lounge",
+    description: "Enjoy a delicious meal and refreshing drinks at Grill Bar Lounge. ",
+    buttonText: "Book Now",
+    startTime: "Available for bookings",
+    image: banquetImage
+  },
+  {
+    title: "Hogis Cafe",
+    description: "Savor the best coffee and freshly made treats at Hogis Cafe.",
+    buttonText: "Book Now",
+    startTime: "Available for bookings",
+    image: banquetImage
+  }  
 ];
 
 const PromoBanner = () => {

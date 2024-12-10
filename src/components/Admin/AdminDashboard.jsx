@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Line, Doughnut, Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 
+
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
 
 const AdminNavigation = () => {
@@ -23,6 +24,7 @@ const AdminNavigation = () => {
     { to: "/users", text: "Users" },
     { to: "/sales-reports", text: "Sales Reports" },
     { to: "/customer-inquiries", text: "Customer Inquiries" },
+
   ];
 
 
@@ -122,7 +124,7 @@ const AdminDashboard = () => {
     const ordersRef = collection(db, 'orders');
     const ordersSnapshot = await getDocs(ordersRef);
     let total = 0;
-    let branchRev = { 'Hogis Royale': 0, 'Hogis Luxury': 0, 'Hogis Exclusive': 0 };
+    let branchRev = {  };
     let catRev = {};
     let paymentMethods = {};
     let itemsSold = {};
@@ -203,10 +205,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <ToastContainer />
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        </div>
+      <header className="bg-[#00000] shadow">
       </header>
       <AdminNavigation />
       <main>
@@ -265,6 +264,7 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+
       </main>
     </div>
   );

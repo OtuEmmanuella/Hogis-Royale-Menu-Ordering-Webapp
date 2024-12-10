@@ -17,6 +17,13 @@ import UserAccountPage from '../components/Auth/UserAccountPage';
 import NotificationPage from '../components/Notification/NotificationPage';
 import OrderConfirmation from '../components/CheckOut/OrderConfirmation';
 import CashierDashboard from '../components/Cashier/CashierDashboard';
+import OrderHistory from '../components/OrderHistory';
+import AboutUs from '../components/AccountPage/AboutUs';
+import FAQ from '../components/AccountPage/FAQ';
+import PrivacyPolicy from '../components/AccountPage/PrivacyPolicy';
+import HelpSupport from '../components/AccountPage/HelpSupport';
+import Profile from '../components/AccountPage/Profile';
+
 
 // Import the new pages
 import OrdersPage from '../components/Admin/OrdersPage';
@@ -43,12 +50,28 @@ const AppRoutes = () => {
         <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
         <Route path="/account" element={<UserAccountPage />} />
 
+
         {/* Add new routes for the admin pages */}
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/sales-reports" element={<SalesReportsPage />} />
          <Route path="/customer-inquiries" element={<CustomerInquiriesPage />} />
          <Route path="/cashier-dashboard" element={<CashierDashboard />} />
+         <Route path="/order-history" element={<OrderHistory />} />
+
+         {/* Account Page */}
+         <Route path="/about" element={<AboutUs />} />
+         <Route path="/faq" element={<FAQ />} />
+         <Route path="/privacy" element={<PrivacyPolicy />} />
+         <Route path="/support" element={<HelpSupport />} />
+         <Route path="/profile" element={<Profile />} />
+
+
+
+
+
+         
+
 
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>

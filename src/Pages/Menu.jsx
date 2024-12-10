@@ -17,7 +17,9 @@ import { DotSpinner } from '@uiball/loaders';
 import { checkUserRole } from '../utils/authUtils';
 import './Menu.css';
 import PromoBanner from '../components/what-we-offer-PromoBanner/PromoBanner';
-import PopularMeals from '../MealsData/popularMealsData';
+import PopularMeals from '../Popular/popularMealsData';
+import PopularDrinks from '../Popular/popularDrinks';
+import TrackingBanner from '../components/what-we-offer-PromoBanner/TrackingBanner';
 import BrevoConversationsWidget from '../components/Brevo/BrevoConversationsWidget';
 
 
@@ -146,7 +148,7 @@ const Menu = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: adds a semi-transparent overlay
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', 
       }}>
       <DotSpinner size={40} speed={0.9} color="white" />
       </div>
@@ -180,11 +182,13 @@ const Menu = () => {
         <Categories addToCart={handleAddToCart} />
         <PromoBanner />
         <PopularMeals />
+        <TrackingBanner />
+        <PopularDrinks />
         {/* <RecommendedSection recipes={recommendedRecipes} addToCart={handleAddToCart} /> */}
       </main>
-      <ToastContainer 
-        position="bottom-right" 
-        autoClose={3000} 
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -192,14 +196,13 @@ const Menu = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        className="custom-toast-container" 
       />
+
       <NavBar />
     </div>
     </div>
     
   );
 };
-
-
-
 export default Menu;

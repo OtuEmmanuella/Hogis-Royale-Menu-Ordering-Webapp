@@ -1,112 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import { auth, db } from '../Firebase/FirebaseConfig';
-import { signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { useNavigate, Link } from 'react-router-dom';
-import { ChevronRight, LogOut } from 'lucide-react';
-import { useShoppingCart } from '../ShoppingCart/ShoppingCartContext';
-import UserInfo from '../UserInfo';
-import CurrentCart from '../CurrentCart';
-import OrderHistory from '../OrderHistory';
-import LoadingSpinner from '../LoadingSpinner';
-import '../../styles/UserAccount.css';
+
+
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Breadcrumb from '../BreadCrumbs/breadCrumbs';
+import {
+  User,
+  HelpCircle,
+  FileText,
+  Info,
+  HelpingHand,
+  Share2,
+  Globe,
+  ChevronRight,
+  MapPin,
+  Phone,
+  Mail,
+  Shield
+} from 'lucide-react';
 
 const UserAccountPage = () => {
-  const [user, setUser] = useState(null);
-  const [orderHistory, setOrderHistory] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState('English');
   const navigate = useNavigate();
-  const { cartItems } = useShoppingCart();
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-      if (currentUser) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          const adminDoc = await getDoc(doc(db, 'admins', currentUser.uid));
 
-          if (adminDoc.exists() && adminDoc.data().isAdmin) {
-            setIsAdmin(true);
-            setUser({ id: currentUser.uid, email: currentUser.email, ...adminDoc.data() });
-          } else if (userDoc.exists()) {
-            setUser({ id: currentUser.uid, ...userDoc.data() });
-            setOrderHistory(userDoc.data().orderHistory || []);
-          } else {
-            console.error('User authenticated but not in Firestore');
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      } else {
-        navigate('/login');
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate('/menu');
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
-
-  const handleImageUpdate = (photoURL) => {
-    setUser(prev => ({ ...prev, photoURL }));
-  };
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!user) {
-    return (
-      <div className="p-4 text-center text-red-600 bg-red-50 rounded-lg">
-        Error loading user data
-      </div>
-    );
-  }
+  const menuItems = [
+    { icon: <User className="w-6 h-6" />, title: 'Profile', path: '/profile' },
+    { icon: <HelpCircle className="w-6 h-6" />, title: 'Help & Support', path: '/support' },
+    { icon: <Shield className="w-6 h-6" />, title: 'Privacy Policy', path: '/privacy' },
+    { icon: <Info className="w-6 h-6" />, title: 'About Us', path: '/about' },
+    { icon: <HelpingHand className="w-6 h-6" />, title: 'FAQ', path: '/faq' },
+    { icon: <Share2 className="w-6 h-6" />, title: 'Refer a Friend', path: '/refer' },
+   
+  ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <nav className="flex items-center space-x-2 mb-6 text-gray-600">
-        <Link to="/menu" className="hover:text-gray-900 transition-colors">
-          Menu
-        </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-gray-900 font-medium">My Account</span>
-      </nav>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white px-4 py-6 shadow-sm">
+      <Breadcrumb 
+      />
+      <h1 className="text-sm font-bold text-gray-900 text-right">My Account</h1>
+      </div>
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">My Account</h1>
-      
-      <div className="grid gap-8 max-w-4xl mx-auto">
-        <UserInfo 
-          user={user} 
-          isAdmin={isAdmin} 
-          onImageUpdate={handleImageUpdate}
-        />
-
-        {!isAdmin && (
-          <>
-            <CurrentCart cartItems={cartItems} />
-            <OrderHistory userId={user.id} />
-          </>
-        )}
-
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <LogOut className="h-5 w-5" />
-            <span>Logout</span>
-          </button>
+      {/* Main Content */}
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+        {/* Menu Items */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          {menuItems.map((item, index) => (
+            <div
+              key={index}
+              onClick={() => navigate(item.path)}
+              className="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="text-gray-600">{item.icon}</div>
+                <span className="text-gray-800 font-medium">{item.title}</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            </div>
+          ))}
         </div>
+     
       </div>
     </div>
   );

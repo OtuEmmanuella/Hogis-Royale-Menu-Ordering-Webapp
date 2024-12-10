@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FiSearch } from 'react-icons/fi';
-import { IoClose, IoFastFoodOutline } from 'react-icons/io5';
+import { IoClose, IoFastFoodOutline, IoCartOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
 import styles from './SearchBar.module.css';
 import menuItemsData from '../MenuItemsFallBackData/menuItemsData.json';
 import { categories as categoryData } from '../DataCategory/Data.json';
+import { useShoppingCart } from '../ShoppingCart/ShoppingCartContext';
 
 const formatPrice = (price) => {
   return price.toLocaleString('en-NG', {
@@ -55,6 +57,13 @@ const FilterModal = ({ isOpen, onClose, filters, setFilters }) => {
 };
 
 const SearchResultsModal = ({ items, categories, onClose }) => {
+  const { addToCart } = useShoppingCart();
+
+  const handleAddToCart = (item) => {
+    addToCart(item);
+    toast.success(`${item.name} added to cart!`);
+  };
+
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div
@@ -82,11 +91,22 @@ const SearchResultsModal = ({ items, categories, onClose }) => {
                 <h3 className={styles.categoriesName}>Menu Items</h3>
                 <ul>
                   {items.map((item, index) => (
-                    <li key={`item-${index}`}>
+                    <li 
+                      key={`item-${index}`} 
+                      className={styles.searchResultItem}
+                      onClick={() => handleAddToCart(item)}
+                    >
                       <span className={styles.itemName}>{item.name}</span>
                       <span className={styles.itemPrice}>
                         {formatPrice(parseFloat(item.price))}
                       </span>
+                      <IoCartOutline
+                        className={styles.addToCartIcon}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(item);
+                        }}
+                      />
                     </li>
                   ))}
                 </ul>

@@ -13,11 +13,11 @@ const branches = [
     name: 'Hogis Royale And Apartment', 
     address: 'Main Branch, Calabar',
     deliveryLocations: {
-      'Unical': 2000,
       'Calabar Municipality': 1500,
-      'Calabar South': 1500,
-      '8 miles': 2000,
-      'Akpabuyo': 3000
+      'Calabar South': 2000,
+      '8 Miles': 3000,
+      'Akpabuyo': 5000,
+      'Odukpani': 5000
     }
   },
   { 
@@ -25,11 +25,11 @@ const branches = [
     name: 'Hogis Luxury Suites', 
     address: 'Secondary Branch, Calabar',
     deliveryLocations: {
-      'Unical': 2000,
       'Calabar Municipality': 1500,
-      'Calabar South': 1500,
-      '8 miles': 2000,
-      'Akpabuyo': 3000
+      'Calabar South': 2000,
+      '8 Miles': 3000,
+      'Akpabuyo': 5000,
+      'Odukpani': 5000
     }
   },
   { 
@@ -37,11 +37,11 @@ const branches = [
     name: 'Hogis Exclusive Resorts', 
     address: 'Premium Branch, Calabar',
     deliveryLocations: {
-      'Unical': 2000,
       'Calabar Municipality': 1500,
-      'Calabar South': 1500,
-      '8 miles': 2000,
-      'Akpabuyo': 3000
+      'Calabar South': 2000,
+      '8 Miles': 3000,
+      'Akpabuyo': 5000,
+      'Odukpani': 5000
     }
   }
 ];
@@ -63,21 +63,22 @@ export const ShoppingCartIcon = () => {
 };
 
 export const ShoppingCartPage = () => {
-  const { cartItems, incrementQuantity, decrementQuantity, removeItem,updateItemSpecifications, user } = useShoppingCart();
+  const { cartItems, incrementQuantity, decrementQuantity, removeItem, updateItemSpecifications, user } = useShoppingCart();
   const navigate = useNavigate();
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const [deliveryOption, setDeliveryOption] = useState('');
+  const [orderType, setOrderType] = useState('');
+  const [deliveryLocation, setDeliveryLocation] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBranchLocationModal, setShowBranchLocationModal] = useState(false);
 
-
   const getDeliveryPrice = () => {
-    if (!selectedBranch || !deliveryOption) return 0;
-    return selectedBranch.deliveryLocations[deliveryOption] || 0;
+    if (orderType !== 'delivery' || !deliveryLocation || !selectedBranch) return 0;
+    return selectedBranch.deliveryLocations[deliveryLocation] || 0;
   };
 
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deliveryPrice = getDeliveryPrice();
+  const finalPrice = totalPrice + deliveryPrice;
 
   const formatPrice = (price) => {
     return `₦${price.toLocaleString('en-NG', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -89,7 +90,7 @@ export const ShoppingCartPage = () => {
   };
 
   const handleCheckout = () => {
-    if (!selectedBranch || !deliveryOption) {
+    if (!selectedBranch || !orderType || (orderType === 'delivery' && !deliveryLocation)) {
       setShowBranchLocationModal(true);
       return;
     }
@@ -99,34 +100,34 @@ export const ShoppingCartPage = () => {
       return;
     }
 
-    navigate(`/checkout?branch=${selectedBranch.id}&delivery=${encodeURIComponent(deliveryOption)}&deliveryPrice=${deliveryPrice}`);
+    navigate(`/checkout?branch=${selectedBranch.id}&orderType=${orderType}&deliveryLocation=${encodeURIComponent(deliveryLocation)}&deliveryPrice=${deliveryPrice}`);
   };
 
   const handleSpecificationsChange = (cartItemId, specifications) => {
     updateItemSpecifications(cartItemId, specifications);
   };
 
-  const handleBranchLocationSelect = (branch, location) => {
+  const handleBranchLocationSelect = (branch, type, location) => {
     setSelectedBranch(branch);
-    setDeliveryOption(location);
+    setOrderType(type);
+    setDeliveryLocation(location);
   };
 
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-red-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Cart</h1>
+          <h1 className="text-3xl font-bold text-gray-10">My Cart 🛒</h1>
           <ShoppingCartIcon />
         </div>
 
         {cartItems.length === 0 ? (
           <div className="text-center py-12">
             <img src={emptybag} alt="Empty cart" className="mx-auto h-48 w-auto mb-6" />
-            <h3 className="text-xl font-medium text-gray-900 mb-4">Your cart is empty</h3>
+            <h3 className="text-xl font-medium text-gray-10 mb-4">Your cart is empty</h3>
             <Link
               to="/menu"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-900 hover:bg-indigo-700"
             >
               Browse Our Menu
             </Link>
@@ -134,14 +135,14 @@ export const ShoppingCartPage = () => {
         ) : (
           <div className="lg:grid lg:grid-cols-12 lg:gap-8">
             <div className="lg:col-span-7">
-              <div className="bg-white shadow sm:rounded-lg mb-8">
-                <ul className="divide-y divide-gray-200">
+            <div className="bg-white shadow-glow sm:rounded-lg mb-8 rounded-[16px]">
+            <ul className="divide-y divide-gray-200">
                   {cartItems.map((item) => (
                     <li key={item.cartItemId} className="p-4 sm:p-6">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <h4 className="text-lg font-medium text-gray-900">{item.name}</h4>
-                          <p className="mt-1 text-sm text-gray-500">{formatPrice(item.price)}</p>
+                          <p className="mt-1 text-sm text-gray-500">{formatPrice(item.price * item.quantity)} ({item.quantity} @ {formatPrice(item.price)} each)</p>
                         </div>
                         <div className="flex items-center space-x-4">
                           <div className="flex items-center border rounded-lg">
@@ -187,7 +188,7 @@ export const ShoppingCartPage = () => {
             </div> 
 
             <div className="lg:col-span-5">
-              <div className="bg-white shadow sm:rounded-lg p-6">
+              <div className="bg-white shadow sm:rounded-lg p-6 rounded-[16px]">
                 <h2 className="text-lg font-medium text-gray-900 mb-6">Order Summary</h2>
                 
                 <div className="space-y-6">
@@ -201,7 +202,8 @@ export const ShoppingCartPage = () => {
                       onChange={(e) => {
                         const branch = branches.find(b => b.id === e.target.value);
                         setSelectedBranch(branch);
-                        setDeliveryOption('');
+                        setOrderType('');
+                        setDeliveryLocation('');
                       }}
                       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     >
@@ -217,11 +219,32 @@ export const ShoppingCartPage = () => {
                   {selectedBranch && (
                     <div>
                       <label className="text-sm font-medium text-gray-700 mb-2 block">
+                        Order Type
+                      </label>
+                      <select
+                        value={orderType}
+                        onChange={(e) => {
+                          setOrderType(e.target.value);
+                          setDeliveryLocation('');
+                        }}
+                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                      >
+                        <option value="">Select order type</option>
+                        <option value="dine-in">Dine-In (Eat at Branch)</option>
+                        <option value="pickup">Takeout - Pickup</option>
+                        <option value="delivery">Takeout - Delivery</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {orderType === 'delivery' && selectedBranch && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">
                         Delivery Location
                       </label>
                       <select
-                        value={deliveryOption}
-                        onChange={(e) => setDeliveryOption(e.target.value)}
+                        value={deliveryLocation}
+                        onChange={(e) => setDeliveryLocation(e.target.value)}
                         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                       >
                         <option value="">Select delivery location</option>
@@ -240,36 +263,30 @@ export const ShoppingCartPage = () => {
                         <dt className="text-sm text-gray-600">Subtotal</dt>
                         <dd className="text-sm font-medium text-gray-900">{formatPrice(totalPrice)}</dd>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <dt className="text-sm text-gray-600">Delivery</dt>
-                        <dd className="text-sm font-medium text-gray-900">{formatPrice(deliveryPrice)}</dd>
-                      </div>
+                      {orderType === 'delivery' && (
+                        <div className="flex items-center justify-between">
+                          <dt className="text-sm text-gray-600">Delivery</dt>
+                          <dd className="text-sm font-medium text-gray-900">{formatPrice(deliveryPrice)}</dd>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                         <dt className="text-base font-medium text-gray-900">Total</dt>
-                        <dd className="text-base font-medium text-gray-900">{formatPrice(totalPrice + deliveryPrice)}</dd>
+                        <dd className="text-base font-medium text-gray-900">{formatPrice(finalPrice)}</dd>
                       </div>
                     </dl>
                   </div>
                    
-                   <div>
-                  <button
-                    onClick={handleCheckout}
-                    className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Proceed to Checkout
-                  </button>
-                  {showBranchLocationModal && (
-                  <BranchLocationModal
-                    isOpen={showBranchLocationModal}
-                    onClose={() => setShowBranchLocationModal(false)}
-                    branches={branches}
-                    onSelect={handleBranchLocationSelect}
-                  />
-                )}
-                </div>
+                  <div>
+                    <button
+                      onClick={handleCheckout}
+                      className="w-full bg-red-900 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      Proceed to Checkout
+                    </button>
+                  </div>
                   <Link
                     to="/menu"
-                    className="text-sm text-indigo-600 hover:text-indigo-500 flex items-center justify-center mt-4"
+                    className="text-sm text-red-900 hover:text-red-800 flex items-center justify-center mt-4"
                   >
                     ← Continue Shopping
                   </Link>
@@ -283,8 +300,18 @@ export const ShoppingCartPage = () => {
       {showLoginModal && (
         <LoginModal onClose={() => setShowLoginModal(false)} />
       )}
+
+      {showBranchLocationModal && (
+        <BranchLocationModal
+          isOpen={showBranchLocationModal}
+          onClose={() => setShowBranchLocationModal(false)}
+          branches={branches}
+          onSelect={handleBranchLocationSelect}
+        />
+      )}
     </div>
   );
 };
 
 export default ShoppingCartPage;
+

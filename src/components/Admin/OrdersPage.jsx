@@ -116,6 +116,32 @@ const OrdersPage = () => {
     return `₦${price.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+      const orderRef = doc(db, 'orders', orderId);
+      await updateDoc(orderRef, {
+        status: newStatus,
+        updatedAt: new Date()
+      });
+
+      // Update both orders and filteredOrders
+      const updateOrderStatus = (orderList) => 
+        orderList.map(order => 
+          order.id === orderId ? { ...order, status: newStatus } : order
+        );
+
+      setOrders(updateOrderStatus);
+      setFilteredOrders(updateOrderStatus);
+
+      // Update the selectedOrder if it's the one being modified
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder({ ...selectedOrder, status: newStatus });
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
@@ -367,6 +393,7 @@ const OrdersPage = () => {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onMarkAsCompleted={handleMarkAsCompleted}
+        onUpdateStatus={handleStatusUpdate}
         order={selectedOrder}
       />
     </div>

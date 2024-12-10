@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaHome, FaSearch, FaPlus } from 'react-icons/fa';
 import { IoIosNotifications } from 'react-icons/io';
 import { BiSolidMessageRoundedDots } from 'react-icons/bi';
+import {RiFileList3Fill } from 'react-icons/ri'
 import { auth, db } from '../Firebase/FirebaseConfig';
 import { collection, query, where, onSnapshot, updateDoc, doc, getDocs } from 'firebase/firestore';
 import { motion } from 'framer-motion';
@@ -98,6 +99,7 @@ const TempNavBar = () => {
         <Link to="/feedback" className="nav-item">
           <BiSolidMessageRoundedDots />
         </Link>
+        
         {/* Uncomment if you want to include the add button
         <Link to="/add" className="nav-item">
           <FaPlus />
@@ -117,6 +119,11 @@ const TempNavBar = () => {
             {user && hasNewNotifications && <div className="notification-badge"></div>}
           </motion.div>
         </Link>
+
+        <Link to="/order-history" className="nav-item">
+          <RiFileList3Fill/>
+        </Link>
+
         <Link to="/account" className="nav-item">
           <div className="profile-icon"></div>
         </Link>
