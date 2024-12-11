@@ -3,8 +3,10 @@ import react from '@vitejs/plugin-react';
 import { writeFileSync } from 'fs';
 
 export default defineConfig(({ mode }) => {
+  // Load environment variables based on the mode
   const env = loadEnv(mode, process.cwd(), '');
 
+  // Generate Firebase config dynamically
   const generateFirebaseConfig = () => {
     const firebaseConfig = {
       apiKey: env.VITE_FIREBASE_API_KEY,
@@ -13,17 +15,19 @@ export default defineConfig(({ mode }) => {
       storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
       messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
       appId: env.VITE_FIREBASE_APP_ID,
-      measurementId: env.VITE_FIREBASE_MEASUREMENT_ID
+      measurementId: env.VITE_FIREBASE_MEASUREMENT_ID,
     };
 
     console.log('Firebase config:', firebaseConfig);
 
+    // Filter out null or undefined values
     const filteredConfig = Object.fromEntries(
       Object.entries(firebaseConfig).filter(([_, v]) => v != null)
     );
 
     console.log('Filtered config:', filteredConfig);
 
+    // Write the config to a file in the `public` directory
     const configContent = `const firebaseConfig = ${JSON.stringify(filteredConfig, null, 2)};`;
     writeFileSync('public/firebase-config.js', configContent);
   };
@@ -39,32 +43,37 @@ export default defineConfig(({ mode }) => {
       },
     ],
     server: {
-      host: true, // This is more flexible than '0.0.0.0'
-      port: 5173, // Default Vite port
-      strictPort: false, // Allow port to change if 5173 is occupied
+      host: true, // Allows accessing the dev server from the local network
+      port: 5173,
+      strictPort: false, // Falls back to another port if 5173 is unavailable
       hmr: {
-        // Remove clientPort to use default
-        overlay: true
+        overlay: true, // Displays errors as overlays in the browser
+      },
+      proxy: {
+        '/.netlify/functions': {
+          target: 'http://localhost:8888',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/.netlify\/functions/, ''),
+        },
       }
     },
     define: {
-      'process.env': env
+      'process.env': JSON.stringify(env), // Provides environment variables to the client-side
     },
     build: {
-      outDir: 'dist',
-      assetsDir: 'assets',
-      emptyOutDir: true,
+      outDir: 'dist', // Directory for production build
+      assetsDir: 'assets', // Directory for static assets within the build folder
+      emptyOutDir: true, // Clears the output directory before building
       rollupOptions: {
         output: {
           manualChunks: {
-            vendor: ['react', 'react-dom'],
+            vendor: ['react', 'react-dom'], // Splits vendor dependencies into a separate chunk
           },
         },
       },
     },
     optimizeDeps: {
-      include: ['react', 'react-dom'],
+      include: ['react', 'react-dom'], // Ensures these dependencies are optimized
     },
   };
 });
-

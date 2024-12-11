@@ -6,6 +6,8 @@ import { auth, db, storage } from '../Firebase/FirebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import axios from 'axios';
+import Breadcrumb from '../BreadCrumbs/breadCrumbs';
 import './Feedback.css';
 
 const EMOJI_RATINGS = [
@@ -105,6 +107,9 @@ const useFeedbackForm = () => {
 
     try {
       await addDoc(collection(db, 'feedbacks'), feedbackData);
+      
+      // Send email notifications
+      await axios.post('/.netlify/functions/send-feedback-notification', feedbackData);
       
       Swal.fire({
         title: 'Thank you!',
@@ -261,11 +266,12 @@ const FeedbackForm = () => {
 
   return (
     <div className="custom-feedback-page">
-      <nav className="custom-breadcrumb">
+      {/* <nav className="custom-breadcrumb">
         <Link to="/menu" className="custom-back-to-menu">
           <TiArrowBack className="custom-back-icon" />
         </Link>
-      </nav>
+      </nav> */}
+      <Breadcrumb />
       <div className="custom-feedback-wrapper">
         <div className="custom-feedback-container">
           <div className="custom-feedback-header">
