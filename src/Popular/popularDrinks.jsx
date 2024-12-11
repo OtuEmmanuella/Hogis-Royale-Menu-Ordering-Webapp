@@ -57,9 +57,17 @@ const popularDrinks = [
     volume: '750 ml',
     abv: '9% ABV',
     quantity: 1
-  }
+  },
+  {
+    id: '7',
+    name: 'Chivita Exotic',
+    image: 'public/populardrinks/chivita.png',
+    price: 1000,
+    volume: '750 ml',
+    abv: '9% ABV',
+    quantity: 1
+  },
 ];
-
 const SimilarItems = () => {
   const { addToCart } = useShoppingCart();
   const [drinks, setDrinks] = useState(popularDrinks);

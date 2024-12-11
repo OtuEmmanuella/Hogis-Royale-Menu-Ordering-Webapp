@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Clock, Package, ShoppingBag, Timer, Truck } from 'lucide-react'
+import { FaFileInvoice } from "react-icons/fa";
+import { RiEBikeFill } from "react-icons/ri";
+
+
 
 const Illustration = ({ children }) => (
   <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 bg-white/10 rounded-full flex items-center justify-center">
@@ -12,6 +16,20 @@ export default function TrackingBanner() {
   const [currentBanner, setCurrentBanner] = useState(0)
   
   const banners = [
+    {
+      icon: <RiEBikeFill className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />,
+      title: "Delivery Tracking",
+      description: "Know when your order is out for delivery",
+      illustration: (
+        <Illustration>
+        <img
+          src="/trackeranime/dispatch (4).gif"
+          alt="Invoice Icon"
+          className="w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-white/80"
+        />
+      </Illustration>
+      )
+    },
     {
       icon: <Clock className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />,
       title: "Order Ahead",
@@ -62,21 +80,30 @@ export default function TrackingBanner() {
         </Illustration>
       )
     },
+    
     {
-      icon: <Truck className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />,
-      title: "Delivery Tracking",
-      description: "Know when your order is out for delivery",
+      icon: <FaFileInvoice className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />,
+      title: "Invoice Download",
+      description: "Download your invoice after your order is confirmed.",
       illustration: (
         <Illustration>
-          <svg viewBox="0 0 24 24" className="w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-white/80" fill="none" stroke="currentColor">
-            <path d="M3 3h18v18H3z" />
-            <path d="M3 9h18" />
-            <path d="M3 15h18" />
-            <path d="M12 3v18" />
-          </svg>
-        </Illustration>
+        <svg
+          viewBox="0 0 24 24"
+          className="w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-white/80"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M9 2h6a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+          <path d="M9 8h6" />
+          <path d="M9 12h4" />
+        </svg>
+      </Illustration>
+      
       )
-    }
+    }, 
   ]
 
   useEffect(() => {
