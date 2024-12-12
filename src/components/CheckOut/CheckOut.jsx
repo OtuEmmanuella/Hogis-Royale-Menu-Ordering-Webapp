@@ -130,7 +130,12 @@ const CheckoutPage = () => {
 
   const createOrder = async () => {
     const user = auth.currentUser;
+
+    const orderRef = doc(collection(db, 'orders'));
+    const orderId = orderRef.id;
+
     const orderData = {
+      id: orderId,
       customer: {
         userId: user ? user.uid : null,
         customerName: name,
@@ -155,9 +160,10 @@ const CheckoutPage = () => {
       branchName: branches[branchId] || 'Unknown Branch'
     };
 
-    const orderRef = await addDoc(collection(db, 'orders'), orderData);
-    setOrderId(orderRef.id); // Set the order ID
-    return orderRef.id;
+  await setDoc(orderRef, orderData);
+  
+  setOrderId(orderId); // Set the order ID in state
+  return orderId;
   };
 
   const handleSubmit = async (e) => {

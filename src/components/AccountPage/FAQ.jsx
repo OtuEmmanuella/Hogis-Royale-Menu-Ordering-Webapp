@@ -66,10 +66,10 @@ const FAQ = () => {
   };
 
   return (
-<div className="min-h-screen bg-gradient-to-b from-red-00 to-red-700 py-8 px-4 sm:px-6 lg:px-8">
+<div className="min-h-screen bg-white to-red-700 py-8 px-4 sm:px-6 lg:px-8">
 <div className="max-w-3xl mx-auto">
      <Breadcrumb className="text-white" />
-        <h1 className="text-3x font-extrabold text-center text-white mb-8">
+        <h1 className="text-3x font-extrabold text-center text-black mb-8">
           Frequently Asked Questions
         </h1>
         <div className="space-y-4">

@@ -7,7 +7,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SearchBar from '../components/SearchBar/SearchBar';
 import Categories from '../components/Categories/categories';
-import RecommendedSection from '../components/Recommended/Recommended';
 import { ShoppingCartIcon } from '../components/ShoppingCart/ShoppingCart';
 import { auth, db } from '../components/Firebase/FirebaseConfig';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';

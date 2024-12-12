@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { IoMdClose, IoMdCheckmark, IoMdPrint } from 'react-icons/io';
-import { FiTruck, FiPackage, FiUser, FiMail, FiPhone, FiMapPin, FiClock } from 'react-icons/fi';
+import { FiTruck, FiPackage, FiUser, FiMail, FiPhone, FiMapPin, FiClock, FiCreditCard } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Invoice from '../../components/Invoice/Invoice';
 import { printInvoice } from '../../utils/printInvoice';
@@ -155,8 +155,39 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdate
                   <div className="space-y-3">
                     <InfoItem icon={<FiMapPin />} label="Branch" value={order.branchName} />
                     <InfoItem icon={<FiPackage />} label="Order Type" value={formattedOrderType} />
-                    <InfoItem icon={<FiTruck />} label="Option" value={order.deliveryOption} />
+                    <InfoItem icon={<FiTruck />} label="Delivery Option" value={order.deliveryOption} />
                     <InfoItem icon={<FiClock />} label="Reference" value={order.paymentReference} />
+                  </div>
+                </div>
+
+                {/* New Payment Details Section */}
+                <div className="bg-gray-50 p-6 rounded-xl shadow-md">
+                  <h3 className="text-2xl font-semibold mb-4 text-gray-800">Payment Details</h3>
+                  <div className="space-y-3">
+                    {order.paymentDetails?.authorization && (
+                      <>
+                        <InfoItem 
+                          icon={<FiCreditCard />} 
+                          label="Card Brand" 
+                          value={order.paymentDetails.authorization.brand?.toUpperCase() || 'N/A'} 
+                        />
+                        <InfoItem 
+                          icon={<FiCreditCard />} 
+                          label="Payment Channel" 
+                          value={order.paymentDetails.channel?.toUpperCase() || 'N/A'} 
+                        />
+                        <InfoItem 
+                          icon={<FiCreditCard />} 
+                          label="Bank" 
+                          value={order.paymentDetails.authorization.bank?.toUpperCase() || 'N/A'} 
+                        />
+                        <InfoItem 
+                          icon={<FiCreditCard />} 
+                          label="Card Type" 
+                          value={order.paymentDetails.authorization.card_type?.toUpperCase() || 'N/A'} 
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -166,9 +197,7 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdate
                 <div className="bg-gray-50 p-6 rounded-xl shadow-md">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-2xl font-semibold text-gray-800">Order Items</h3>
-                    <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </span>
+                    <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>                    </span>
                   </div>
                   <div className="space-y-4">
                     {(order.items || []).map((item, index) => (

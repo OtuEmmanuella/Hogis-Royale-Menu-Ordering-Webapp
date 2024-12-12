@@ -275,7 +275,7 @@ const FeedbackForm = () => {
       <div className="custom-feedback-wrapper">
         <div className="custom-feedback-container">
           <div className="custom-feedback-header">
-            <img src="/Hogis.jpg" alt="Hogis Logo" className="custom-feedback-logo" />
+            <img src="/Hogis Group Logo 2.jpg" alt="Hogis Logo" className="custom-feedback-logo" />
             <h2 className="custom-feedback-title">We'd love your feedback!👍🏼</h2>
           </div>
           <form onSubmit={handleSubmit}>

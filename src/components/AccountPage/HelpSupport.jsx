@@ -1,81 +1,68 @@
 import React from 'react';
-import { MapPin, Phone, Mail, Clock, MessageCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import Breadcrumb from '../BreadCrumbs/breadCrumbs';
 
 const HelpSupport = () => {
   const branches = [
     {
-        name: 'Hogis Royale And Apartments',
-        address: '123 Main Street, Lagos',
-        phone: '+234 123 456 7890',
-        email: 'main@hogis.com',
-        hours: 'Always Available 24/7'
-      },
-      {
-        name: 'Hogis Luxury Suites',
-        address: '456 Victoria Island, Lagos',
-        phone: '+234 098 765 4321',
-        email: 'express@hogis.com',
-        hours: 'Always Available 24/7'
-      },
-      {
-        name: 'Hogis Exclusive Suites',
-        address: '456 Victoria Island, Lagos',
-        phone: '+234 098 765 4321',
-        email: 'express@hogis.com',
-        hours: 'Always Available 24/7'
-      }
+      name: 'Hogis Royale And Apartments',
+      address: 'No. 6 Bishop Moynagh Ave, Atekong, State Housing Estate, Calabar 540222, Cross River State',
+      phone: '+234707 353 6464',
+      email: 'hogisroyaleandapartment@gmail.com',
+      hours: 'Always Available 24/7'
+    },
+    {
+      name: 'Hogis Luxury Suites',
+      address: 'No. 7 Akim Close State Housing Estate off Ndidem Usang Iso(Marian) Road, Calabar Cross River State',
+      phone: '08099903335 / 08099903336',
+      email: 'info@hogisluxurysuites.com',
+      hours: 'Always Available 24/7'
+    },
+    {
+      name: 'Hogis Exclusive Suites',
+      address: 'No. 4 Ifebem Ezima Street E1 Estate off Technical Roundabout, Calabar, Cross River State',
+      phone: '+2348109516906',
+      email: 'info@hogisluxurysuites.com',
+      hours: 'Always Available 24/7'
+    }
   ];
 
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-3xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumb />
-        <div className="bg-white rounded-xl shadow-sm p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Help & Support</h1>
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-6">Help & Support</h1>
 
-          <div className="space-y-8">
-            {/* Live Chat Section */}
-            <div className="bg-blue-50 p-6 rounded-xl">
-              <div className="flex items-center space-x-4 mb-4">
-                <MessageCircle className="w-6 h-6 text-blue-600" />
-                <h2 className="text-xl font-semibold text-gray-900">Live Chat Support</h2>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Our customer service team is available 24/7 to assist you.
-              </p>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                Start Chat
-              </button>
-            </div>
-
+          <div className="space-y-6">
             {/* Branch Information */}
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900">Our Locations</h2>
-              {branches.map((branch, index) => (
-                <div key={index} className="border border-gray-200 rounded-xl p-6">
-                  <h3 className="font-semibold text-lg text-gray-900 mb-4">{branch.name}</h3>
-                  <div className="space-y-3 text-gray-600">
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="w-5 h-5 text-gray-400" />
-                      <span>{branch.address}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Phone className="w-5 h-5 text-gray-400" />
-                      <span>{branch.phone}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Mail className="w-5 h-5 text-gray-400" />
-                      <span>{branch.email}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Clock className="w-5 h-5 text-gray-400" />
-                      <span>{branch.hours}</span>
+            <div className="space-y-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Our Locations</h2>
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                {branches.map((branch, index) => (
+                  <div 
+                    key={index} 
+                    className="border border-gray-200 rounded-lg p-3 sm:p-4"
+                  >
+                    <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3">
+                      {branch.name}
+                    </h3>
+                    <div className="space-y-2 text-sm sm:text-base text-gray-600">
+                      {[
+                        { icon: <MapPin />, content: branch.address },
+                        { icon: <Phone />, content: branch.phone },
+                        { icon: <Mail />, content: branch.email },
+                        { icon: <Clock />, content: branch.hours },
+                      ].map(({ icon, content }, idx) => (
+                        <div key={idx} className="flex items-start space-x-2">
+                          {React.cloneElement(icon, { className: "w-4 h-4 sm:w-5 sm:h-5 text-gray-400" })}
+                          <span>{content}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>

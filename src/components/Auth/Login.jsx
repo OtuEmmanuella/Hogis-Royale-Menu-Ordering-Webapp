@@ -4,10 +4,10 @@ import { signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, Google
 import { useNavigate, Link } from 'react-router-dom';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { FcGoogle } from "react-icons/fc";
-import { AiFillApple } from "react-icons/ai";
 import { FaChevronRight } from 'react-icons/fa';
 import { TiArrowBack } from "react-icons/ti";
 import { DotSpinner } from '@uiball/loaders';
+import { Mail, Lock } from 'lucide-react';
 import './Auth-styles.css';
 
 const checkUserRole = async (uid) => {
@@ -94,7 +94,7 @@ function Login() {
   };
 
   const handleGoogleLogin = () => handleOAuthLogin(new GoogleAuthProvider());
-  const handleAppleLogin = () => handleOAuthLogin(new OAuthProvider('apple.com'));
+  
 
   if (loading) {
     return (
@@ -155,14 +155,22 @@ function Login() {
             <FcGoogle className="google-icon" /> Sign in with Google
           </button>
 
-          <button type="button" className="auth-button apple-button" onClick={handleAppleLogin}>
-            <AiFillApple className="apple-icon" /> Sign in with Apple
-          </button>
+          
 
           <div className="auth-links">
             <Link to="/signup" className="auth-link">Don't have an account? <span className='link'>Sign up</span></Link>
             <Link to="/forgot-password" className="auth-link">Forgot Password?</Link>
           </div>
+
+          <div className="mt-6 border-t border-gray-200 pt-4">
+              <p className="text-xs text-gray-500 text-center">
+                By logging in, you agree to our{' '}
+                <Link to="/privacy" className="text-blue-500 hover:underline">
+                  Privacy Policy
+                </Link>
+                . We collect and process your data as described in our policy.
+              </p>
+            </div>
         </form>
       </div>
     </div>

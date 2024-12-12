@@ -49,7 +49,7 @@ const PrivacyPolicy = () => {
 
   return (
     <motion.div 
-      className="min-h-screen bg-gradient-to-b from-red-00 to-white py-6 px-4 sm:px-6 lg:px-8 text-sm"
+      className="min-h-screen bg-gradient-to-b from-white to-white py-6 px-4 sm:px-6 lg:px-8 text-sm"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}

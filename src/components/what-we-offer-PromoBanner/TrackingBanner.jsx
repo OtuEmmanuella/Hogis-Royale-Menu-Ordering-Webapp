@@ -16,20 +16,7 @@ export default function TrackingBanner() {
   const [currentBanner, setCurrentBanner] = useState(0)
   
   const banners = [
-    {
-      icon: <RiEBikeFill className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />,
-      title: "Delivery Tracking",
-      description: "Know when your order is out for delivery",
-      illustration: (
-        <Illustration>
-        <img
-          src="/trackeranime/dispatch (4).gif"
-          alt="Invoice Icon"
-          className="w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-white/80"
-        />
-      </Illustration>
-      )
-    },
+   
     {
       icon: <Clock className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />,
       title: "Order Ahead",
@@ -53,6 +40,20 @@ export default function TrackingBanner() {
             <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
           </svg>
         </Illustration>
+      )
+    },
+    {
+      icon: <RiEBikeFill className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />,
+      title: "Delivery Tracking",
+      description: "Know when your order is out for delivery",
+      illustration: (
+        <Illustration>
+        <img
+          src="/trackeranime/dispatch (4).gif"
+          alt="Invoice Icon"
+          className="w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-white/80"
+        />
+      </Illustration>
       )
     },
     {

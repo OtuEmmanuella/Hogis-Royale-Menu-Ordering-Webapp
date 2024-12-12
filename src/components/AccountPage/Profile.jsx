@@ -47,14 +47,6 @@ const Profile = () => {
     return () => unsubscribe();
   }, [navigate]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate('/menu');
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   const handleImageUpdate = (photoURL) => {
     setUser(prev => ({ ...prev, photoURL }));
@@ -77,6 +69,8 @@ const Profile = () => {
   }
 
   return (
+    <div className="max-w-md mx-auto mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
+
     <div className="container mx-auto px-4 py-8">
     
       <Breadcrumb />
@@ -114,16 +108,9 @@ const Profile = () => {
           </>
         )}
 
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <LogOut className="h-5 w-5" />
-            <span>Logout</span>
-          </button>
-        </div>
+       
       </div>
+    </div>
     </div>
   );
 };

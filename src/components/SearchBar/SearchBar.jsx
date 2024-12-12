@@ -183,7 +183,7 @@ const SearchBar = () => {
         </div>
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="Quick search..."
           value={searchTerm}
           onChange={handleSearch}
         />

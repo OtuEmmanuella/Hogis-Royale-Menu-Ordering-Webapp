@@ -1,121 +1,90 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './PromoBanner.css';
 
-// Import your images here
-import cinemaImage from '/cinema00.jpg';
-import arcadeImage from '/game 2.jpg';
-import clubImage from '/club.jpg';
+// Import your images and videos here
+import cinemaImage from '/whatWeOffer/cinema.jpg';
+import arcadeImage from '/whatWeOffer/Game Arcade (1).mp4';
+import clubImage from '/whatWeOffer/club voltage (1).mp4';
 import hotelImage from '/hotel.jpg';
-import hogisluxury from '/hogisluxury.jpg'
-import hogisexclusive from '/hogis exclusive.jpg'
-import loungeImage from '/menu icon.png';
+import hogisluxury from '/hogisluxury.jpg';
+import hogisexclusive from '/hogis exclusive.jpg';
 import banquetImage from '/hall.jpg';
-import Recommended from '../Recommended/Recommended';
+import HogisCafe from '/whatWeOffer/Hogis Cafe.jpg';
+import deVoltageLounge from '/whatWeOffer/de voltage lounge.jpg';
+import hogisfitness from '/whatWeOffer/hogis fitness.mp4';
 
 const banners = [
-    {
-        title: "Hogis Cinemas",
-        description: "Experience the latest blockbusters",
-        buttonText: "Book Now",
-        startTime: "Shows start at 12PM Daily",
-        image: cinemaImage,
-        buttonLink: {
-          url: "https://www.hogiscinemas.com/",
-          target: "_blank"
-        }
-      },
-      
   {
     title: "Games Arcade",
     description: "Fun for all ages",
-    buttonText: "Play Now",
     startTime: "Open 10 AM - 10 PM",
-    image: arcadeImage
+    media: { type: 'video', source: arcadeImage },
+    showButton: false,
   },
   {
     title: "Club Voltage",
     description: "Dance the night away",
-    buttonText: "Get on the List",
     startTime: "Opens at 10PM",
-    image: clubImage
-  },
-  {
-    title: "Hogis Royale & Apartments",
-    description: "Your home away from home",
-    buttonText: "Book a Room",
-    startTime: "Check-in from 2 PM",
-    image: hotelImage
-  },
-  {
-    title: "Hogis Luxury Suites",
-    description: "Your home away from home",
-    buttonText: "Book a Room",
-    startTime: "Check-in from 2 PM",
-    image: hogisluxury
-  },
-  {
-    title: "Hogis Exclusive Suites",
-    description: "Your home away from home",
-    buttonText: "Book a Room",
-    startTime: "Check-in from 2 PM",
-    image: hogisexclusive
-  },
-  {
-    title: "The Lounge",
-    description: "Relax and unwind",
-    buttonText: "Reserve a Table",
-    startTime: "Always Open",
-    image: loungeImage
-  },
-  {
-    title: "Royale Banquet Hall",
-    description: "Perfect for your special events",
-    buttonText: "Plan Your Event",
-    startTime: "Available for bookings",
-    image: banquetImage
-  },
-  {
-    title: "Hogis Fitness",
-    description: "The Premium fitness center @ 7 Akim street.Medical vitals every Saturday so your exercise is safe and efficient" ,
-    buttonText: "Register Today",
-    startTime: "Available for bookings",
-    image: banquetImage
-  },
-  {
-    title: "Hogis Unisex Salon",
-    description: "Experience luxury and relaxation at Hogis Unisex Salon with Our expert stylists",
-    buttonText: "Book Now",
-    startTime: "Available for bookings",
-    image: banquetImage
-  },
-  {
-    title: "Hogis Spa",
-    description: "Enjoy rejuvenating treatments and relaxation therapies tailored to your needs.",
-    buttonText: "Book Now",
-    startTime: "Available for bookings",
-    image: banquetImage
-  },
-  {
-    title: "De Voltage Lounge",
-    description: "Ultimate spot for relaxation and entertainment.",
-    buttonText: "Book Now",
-    startTime: "Available for bookings",
-    image: banquetImage
-  },
-  {
-    title: "Grill Bar Lounge",
-    description: "Enjoy a delicious meal and refreshing drinks at Grill Bar Lounge. ",
-    buttonText: "Book Now",
-    startTime: "Available for bookings",
-    image: banquetImage
+    media: { type: 'video', source: clubImage },
+    buttonContent: { whatsapp: "+2348061535774" },
   },
   {
     title: "Hogis Cafe",
     description: "Savor the best coffee and freshly made treats at Hogis Cafe.",
-    buttonText: "Book Now",
     startTime: "Available for bookings",
-    image: banquetImage
-  }  
+    media: { type: 'image', source: HogisCafe },
+    buttonContent: { whatsapp: "+2349064515288" },
+  },
+  {
+    title: "Hogis Cinemas",
+    description: "Savor the best coffee and freshly made treats at Hogis Cafe.",
+    startTime: "Available for bookings",
+    media: { type: 'image', source: cinemaImage },
+    buttonContent: { whatsapp: "+1234567890" },
+  },
+ 
+  {
+    title: "Hogis Royale And Apartments",
+    description: "Luxury experiences",
+    startTime: "Check-in from 2 PM",
+    media: { type: 'image', source: hotelImage },
+    buttonContent: { whatsapp: "+2347073536464" },
+  },
+  {
+    title: "Hogis Luxury Suites",
+    description: "Your home away from home",
+    startTime: "Check-in from 2 PM",
+    media: { type: 'image', source: hogisluxury },
+    buttonContent: { whatsapp: "+2348099903335" },
+  },
+  {
+    title: "Hogis Exclusive Suites",
+    description: "Exclusive luxury experiences",
+    startTime: "Check-in from 2 PM",
+    media: { type: 'image', source: hogisexclusive },
+    buttonContent: { whatsapp: "+2348109516906" },
+  },
+  {
+    title: "De Voltage Lounge",
+    description: "Ultimate spot for relaxation and entertainment.",
+    startTime: "Available for bookings",
+    media: { type: 'image', source: deVoltageLounge },
+    showButton: false,
+  },
+  {
+    title: "Royale Banquet Hall",
+    description: "Perfect for your special events",
+    startTime: "Available for bookings",
+    media: { type: 'image', source: banquetImage },
+    buttonContent: { whatsapp: "+2348132060974" },
+  },
+  {
+    title: "Hogis Fitness",
+    description: "The Premium fitness center @ 7 Akim street.",
+    startTime: "Available for bookings",
+    media: { type: 'video', source: hogisfitness },
+    buttonContent: { whatsapp: "+2348099903335" },
+  },
 ];
 
 const PromoBanner = () => {
@@ -131,7 +100,7 @@ const PromoBanner = () => {
     setTimeout(() => {
       setCurrentBanner(nextBanner);
       setIsTransitioning(false);
-    }, 50); 
+    }, 50);
   }, []);
 
   const resetAutoSwipeTimer = useCallback(() => {
@@ -140,7 +109,7 @@ const PromoBanner = () => {
     }
     autoSwipeTimerRef.current = setInterval(() => {
       changeBanner((prev) => (prev + 1) % banners.length);
-    }, 4000); 
+    }, 4000);
   }, [changeBanner]);
 
   useEffect(() => {
@@ -155,6 +124,9 @@ const PromoBanner = () => {
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
     touchEndX.current = null;
+    if (autoSwipeTimerRef.current) {
+      clearInterval(autoSwipeTimerRef.current);
+    }
   };
 
   const handleTouchMove = (e) => {
@@ -163,7 +135,7 @@ const PromoBanner = () => {
 
   const handleTouchEnd = () => {
     if (!touchStartX.current || !touchEndX.current) return;
-    
+
     const distance = touchStartX.current - touchEndX.current;
     const isSignificantSwipe = Math.abs(distance) > 50;
 
@@ -173,9 +145,8 @@ const PromoBanner = () => {
       } else {
         changeBanner((currentBanner - 1 + banners.length) % banners.length);
       }
-      resetAutoSwipeTimer(); 
+      resetAutoSwipeTimer();
     } else {
-     
       changeBanner(currentBanner);
     }
 
@@ -184,57 +155,63 @@ const PromoBanner = () => {
   };
 
   return (
-  <div className='promo-banner-wrapper'>
-    <h2>What We Offer</h2>
-    <div className="promo-banner-container">
-      <div
-        className={`promo-banner ${isTransitioning ? 'transitioning' : ''}`}
-        style={{transform: `translateX(-${currentBanner * 100}%)`}}
-        ref={bannerRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-      {banners.map((banner, index) => (
-  <div key={index} className="banner-slide">
-    <div className="banner-content">
-      <h2>{banner.title}</h2>
-      <p>{banner.description}</p>
-      {banner.buttonLink ? (
-        <a href={banner.buttonLink.url} target={banner.buttonLink.target} rel="noopener noreferrer">
-          <button>{banner.buttonText}</button>
-        </a>
-      ) : (
-        <button>{banner.buttonText}</button>
-      )}
-      <span className="start-time">{banner.startTime}</span>
-    </div>
-    <div 
-      className="banner-image" 
-      style={{ backgroundImage: `url(${banner.image})` }}
-    ></div>
-  </div>
-))}
+    <div className="promo-banner-wrapper">
+      <h2>What We Offer</h2>
+      <div className="promo-banner-container">
+        <div
+          className={`promo-banner ${isTransitioning ? 'transitioning' : ''}`}
+          style={{ transform: `translateX(-${currentBanner * 100}%)` }}
+          ref={bannerRef}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {banners.map((banner, index) => (
+            <div key={index} className="banner-slide">
+              <div className="banner-content">
+                <h2>{banner.title}</h2>
+                <p>{banner.description}</p>
+                {banner.showButton === false ? null : banner.buttonContent ? (
+                <a
+                  href={`https://wa.me/${banner.buttonContent.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contact-button"
+                >
+                  Book
+                </a>
+              ) : null}
 
-
+                <span className="start-time">{banner.startTime}</span>
+              </div>
+              <div className="banner-media">
+                {banner.media.type === 'video' ? (
+                  <video autoPlay loop muted playsInline>
+                    <source src={banner.media.source} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img src={banner.media.source} alt={banner.title} />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="banner-indicators">
+          {banners.map((_, index) => (
+            <span
+              key={index}
+              className={`indicator ${index === currentBanner ? 'active' : ''}`}
+              onClick={() => {
+                changeBanner(index);
+                resetAutoSwipeTimer();
+              }}
+            ></span>
+          ))}
+        </div>
       </div>
-      <div className="banner-indicators">
-        {banners.map((_, index) => (
-          <span
-            key={index}
-            className={`indicator ${index === currentBanner ? 'active' : ''}`}
-            onClick={() => {
-              changeBanner(index);
-              resetAutoSwipeTimer(); // Reset the timer when clicking on an indicator
-            }}
-          ></span>
-        ))}
-      </div>
-    </div>
     </div>
   );
 };
 
 export default PromoBanner;
-
-

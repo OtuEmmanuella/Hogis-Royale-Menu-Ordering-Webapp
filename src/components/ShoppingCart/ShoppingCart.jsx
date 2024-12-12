@@ -34,7 +34,7 @@ const branches = [
   },
   { 
     id: '3', 
-    name: 'Hogis Exclusive Resorts', 
+    name: 'Hogis Exclusive Suites', 
     address: 'Premium Branch, Calabar',
     deliveryLocations: {
       'Calabar Municipality': 1500,
