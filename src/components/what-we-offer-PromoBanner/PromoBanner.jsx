@@ -12,6 +12,7 @@ import banquetImage from '/hall.jpg';
 import HogisCafe from '/whatWeOffer/Hogis Cafe.jpg';
 import deVoltageLounge from '/whatWeOffer/de voltage lounge.jpg';
 import hogisfitness from '/whatWeOffer/hogis fitness.mp4';
+import grillLounge from '/whatWeOffer/grilllounge.jpg'
 
 const banners = [
   {
@@ -40,7 +41,7 @@ const banners = [
     description: "Savor the best coffee and freshly made treats at Hogis Cafe.",
     startTime: "Available for bookings",
     media: { type: 'image', source: cinemaImage },
-    buttonContent: { whatsapp: "+1234567890" },
+    buttonContent: { whatsapp: "+2349064515288" },
   },
  
   {
@@ -71,12 +72,20 @@ const banners = [
     media: { type: 'image', source: deVoltageLounge },
     showButton: false,
   },
+
   {
     title: "Royale Banquet Hall",
     description: "Perfect for your special events",
     startTime: "Available for bookings",
     media: { type: 'image', source: banquetImage },
     buttonContent: { whatsapp: "+2348132060974" },
+  },
+  {
+    title: "Grill Lounge",
+    description: "Premium spot for relaxation and entertainment.",
+    startTime: "Available for bookings",
+    media: { type: 'image', source: grillLounge },
+    showButton: false,
   },
   {
     title: "Hogis Fitness",
