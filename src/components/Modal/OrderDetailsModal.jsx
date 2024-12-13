@@ -2,13 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { IoMdClose, IoMdCheckmark, IoMdPrint } from 'react-icons/io';
 import { FiTruck, FiPackage, FiUser, FiMail, FiPhone, FiMapPin, FiClock, FiCreditCard } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../Firebase/FirebaseConfig';
 import Invoice from '../../components/Invoice/Invoice';
 import { printInvoice } from '../../utils/printInvoice';
 
-const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdateStatus }) => {
+const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdateStatus, orderId }) => {
   const [currentStatus, setCurrentStatus] = useState(order ? order.status : 'pending');
   const [formattedOrderType, setFormattedOrderType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [orderData, setOrderData] = useState(null);
+
+  // Enhanced delivery and location retrieval
+  const getDeliveryMethod = () => {
+    return order?.deliveryMethod || 
+           orderData?.deliveryMethod || 
+           order?.paymentDetails?.metadata?.deliveryMethod || 
+           'Not Specified';
+  };
+
+  const getDeliveryLocation = () => {
+    return order?.deliveryLocation || 
+           orderData?.deliveryLocation || 
+           order?.paymentDetails?.metadata?.deliveryLocation || 
+           'Not Specified';
+  };
 
   useEffect(() => {
     if (order?.paymentDetails?.metadata?.orderType) {
@@ -17,6 +35,30 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdate
       setFormattedOrderType('Unknown Type');
     }
   }, [order]);
+
+  useEffect(() => {
+    const fetchOrderData = async () => {
+      if (!orderId) return;
+      
+      setIsLoading(true);
+      try {
+        const orderRef = doc(db, "orders", orderId);
+        const orderSnap = await getDoc(orderRef);
+
+        if (orderSnap.exists()) {
+          setOrderData(orderSnap.data());
+        } else {
+          console.error("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching document:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrderData();
+  }, [orderId]);
 
   if (!isOpen || !order) return null;
 
@@ -155,12 +197,13 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdate
                   <div className="space-y-3">
                     <InfoItem icon={<FiMapPin />} label="Branch" value={order.branchName} />
                     <InfoItem icon={<FiPackage />} label="Order Type" value={formattedOrderType} />
-                    <InfoItem icon={<FiTruck />} label="Delivery Option" value={order.deliveryOption} />
-                    <InfoItem icon={<FiClock />} label="Reference" value={order.paymentReference} />
+                    <InfoItem icon={<FiMapPin />} label="Geo. Location" value={getDeliveryLocation()} />
+                    <InfoItem  label="Delivery Method" value={getDeliveryMethod()} />
+                    <InfoItem label="Reference" value={order.paymentReference} />
                   </div>
                 </div>
 
-                {/* New Payment Details Section */}
+                {/* Payment Details Section */}
                 <div className="bg-gray-50 p-6 rounded-xl shadow-md">
                   <h3 className="text-2xl font-semibold mb-4 text-gray-800">Payment Details</h3>
                   <div className="space-y-3">
@@ -197,7 +240,9 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdate
                 <div className="bg-gray-50 p-6 rounded-xl shadow-md">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-2xl font-semibold text-gray-800">Order Items</h3>
-                    <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>                    </span>
+                    <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
                   </div>
                   <div className="space-y-4">
                     {(order.items || []).map((item, index) => (
@@ -327,265 +372,3 @@ const ActionButton = ({ onClick, disabled, icon, label, className }) => (
 );
 
 export default OrderDetailsModal;
-
-
-
-
-// import React, { useState, useEffect } from 'react';
-// import { IoMdClose, IoMdCheckmark, IoMdPrint } from 'react-icons/io';
-// import { FiTruck, FiPackage } from 'react-icons/fi';
-// import Invoice from '../../components/Invoice/Invoice';
-// import { printInvoice } from '../../utils/printInvoice';
-
-// const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdateStatus }) => {
-//   const [currentStatus, setCurrentStatus] = useState(order ? order.status : 'pending');
-//   const [formattedOrderType, setFormattedOrderType] = useState('');
-
-//   useEffect(() => {
-//     if (order?.paymentDetails?.metadata?.orderType) {
-//       setFormattedOrderType(formatOrderType(order.paymentDetails.metadata.orderType));
-//     } else {
-//       setFormattedOrderType('Unknown Type');
-//     }
-//   }, [order]);
-  
-  
-
-//   if (!isOpen || !order) return null;
-
-//   const formatPrice = (price) => {
-//     return `₦${Number(price || 0).toLocaleString('en-NG', {
-//       minimumFractionDigits: 0,
-//       maximumFractionDigits: 0
-//     })}`;
-//   };
-
-//   const getStatusColor = (status) => {
-//     switch (status) {
-//       case 'completed': return 'bg-green-100 text-green-800';
-//       case 'pending': return 'bg-yellow-100 text-yellow-800';
-//       case 'processing': return 'bg-blue-100 text-blue-800';
-//       case 'out_for_delivery': return 'bg-purple-100 text-purple-800';
-//       case 'delivered': return 'bg-indigo-100 text-indigo-800';
-//       default: return 'bg-gray-100 text-gray-800';
-//     }
-//   };
-
-//   const formatOrderType = (type) => {
-//     if (!type) return 'Unknown Type'; 
-//     switch (type) {
-//       case 'dine-in': return 'Dine-In';
-//       case 'pickup': return 'Takeout - Pickup';
-//       case 'delivery': return 'Takeout - Delivery';
-//       default: return 'Unknown Type';
-//     }
-//   };
-  
-  
-//   const formatDate = (timestamp) => {
-//     if (!timestamp) return 'N/A';
-//     try {
-//       if (timestamp.seconds) {
-//         // Handle Firestore Timestamp
-//         return new Date(timestamp.seconds * 1000).toLocaleString('en-US', {
-//           year: 'numeric',
-//           month: 'long',
-//           day: 'numeric',
-//           hour: '2-digit',
-//           minute: '2-digit'
-//         });
-//       } else if (timestamp instanceof Date) {
-//         // Handle Date object
-//         return timestamp.toLocaleString('en-US', {
-//           year: 'numeric',
-//           month: 'long',
-//           day: 'numeric',
-//           hour: '2-digit',
-//           minute: '2-digit'
-//         });
-//       } else if (typeof timestamp === 'string') {
-//         // Handle ISO string
-//         return new Date(timestamp).toLocaleString('en-US', {
-//           year: 'numeric',
-//           month: 'long',
-//           day: 'numeric',
-//           hour: '2-digit',
-//           minute: '2-digit'
-//         });
-//       }
-//       return 'Invalid Date';
-//     } catch (error) {
-//       console.error('Error formatting date:', error);
-//       return 'Invalid Date';
-//     }
-//   };
-
-//   // Calculate total and subtotal
-//   const totalPrice = (order.items || []).reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
-//   const deliveryPrice = order.deliveryPrice || 0;
-//   const finalAmount = totalPrice + deliveryPrice;
-
-//   const handlePrintInvoice = () => {
-//     printInvoice(order);
-//   };
-
-//   const handleStatusUpdate = (newStatus) => {
-//     onUpdateStatus(order.id, newStatus);
-//     setCurrentStatus(newStatus);
-//   };
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-//       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-//         {/* Header */}
-//         <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-//           <div>
-//             <h2 className="text-2xl font-bold text-gray-800">Order Details</h2>
-//             <p className="text-sm text-gray-500 mt-1">Order #{order.id}</p>
-//           </div>
-//           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 transition-colors">
-//             <IoMdClose className="h-8 w-8" />
-//           </button>
-//         </div>
-
-//         {/* Content */}
-//         <div className="grid md:grid-cols-2 gap-8 p-6 overflow-y-auto">
-//           {/* Left Column: Customer & Order Info */}
-//           <div className="space-y-6">
-//             <div className="bg-gray-50 p-4 rounded-xl">
-//               <h3 className="text-xl font-semibold mb-4">Customer Information</h3>
-//               <div className="space-y-2">
-//                 <div className="flex items-center">
-//                   <span className="font-medium w-24">Name:</span>
-//                   <span>{order.customer?.customerName}</span>
-//                 </div>
-//                 {order.customer?.recipientName && (
-//                   <div className="flex items-center">
-//                     <span className="font-medium w-24">Recipient:</span>
-//                     <span>{order.customer.recipientName}</span>
-//                   </div>
-//                 )}
-//                 <div className="flex items-center">
-//                   <span className="font-medium w-24">Email:</span>
-//                   <span>{order.customer?.email}</span>
-//                 </div>
-//                 <div className="flex items-center">
-//                   <span className="font-medium w-24">Phone:</span>
-//                   <span>{order.customer?.phone}</span>
-//                 </div>
-//                 <div className="flex items-center">
-//                   <span className="font-medium w-24">Address:</span>
-//                   <span>{order.customer?.address}</span>
-//                 </div>
-//               </div>
-//             </div>
-
-//             <div className="bg-gray-50 p-4 rounded-xl">
-//               <h3 className="text-xl font-semibold mb-4">Order Information</h3>
-//               <div className="space-y-2">
-//                 <div className="flex items-center">
-//                   <span className="font-medium w-24">Branch:</span>
-//                   <span>{order.branchName}</span>
-//                 </div>
-//                 <div className="flex items-center">
-//   <span className="font-medium w-24">Order Type:</span>
-//   <span>{formattedOrderType}</span>
-// </div>
-
-
-//                 {order.deliveryLocation && (
-//                   <div className="flex items-center">
-//                     <span className="font-medium w-24">Delivery To:</span>
-//                     <span>{order.deliveryLocation}</span>
-//                   </div>
-//                 )}
-//                 <div className="flex items-center">
-//                   <span className="font-medium w-24">Reference:</span>
-//                   <span>{order.paymentReference || 'N/A'}</span>
-//                 </div>
-//                 <div className="flex items-center">
-//                   <span className="font-medium w-24">Payment:</span>
-//                   <span className="capitalize">{order.paymentMethod}</span>
-//                 </div>
-//                 <div className="flex items-center">
-//                   <span className="font-medium w-24">Status:</span>
-//                   <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>
-//                     {order.status}
-//                   </span>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Right Column: Order Items & Summary */}
-//           <div className="space-y-6">
-//             <div className="bg-gray-50 p-4 rounded-xl">
-//               <h3 className="text-xl font-semibold mb-4">Order Items</h3>
-//               <div className="space-y-4">
-//                 {(order.items || []).map((item, index) => (
-//                   <div key={index} className="flex justify-between border-b pb-2 last:border-b-0">
-//                     <div>
-//                       <span className="font-medium">{item.name}</span>
-//                       {item.specifications && item.specifications !== 'No special instructions' && (
-//                         <span className="text-sm text-gray-500 block">
-//                           Note: {item.specifications}
-//                         </span>
-//                       )}
-//                     </div>
-//                     <div className="text-right">
-//                       <span>{item.quantity} x {formatPrice(item.price)}</span>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-
-//             <div className="bg-gray-50 p-4 rounded-xl">
-//               <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
-//               <div className="space-y-2">
-//                 <div className="flex justify-between">
-//                   <span>Subtotal</span>
-//                   <span>{formatPrice(totalPrice)}</span>
-//                 </div>
-//                 <div className="flex justify-between">
-//                   <span>Delivery Fee</span>
-//                   <span>{formatPrice(deliveryPrice)}</span>
-//                 </div>
-//                 <div className="flex justify-between font-bold text-lg border-t pt-2">
-//                   <span>Total</span>
-//                   <span>{formatPrice(finalAmount)}</span>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Footer */}
-//         <div className="p-6 border-t border-gray-200 flex justify-end space-x-4">
-//           <button
-//             className="btn btn-primary"
-//             onClick={handlePrintInvoice}
-//           >
-//             <IoMdPrint className="mr-2" />
-//             Print Invoice
-//           </button>
-//           <button
-//             className="btn btn-green"
-//             onClick={() => onMarkAsCompleted(order.id)}
-//           >
-//             <IoMdCheckmark className="mr-2" />
-//             Mark as Completed
-//           </button>
-//           <button
-//             className="btn btn-red"
-//             onClick={onClose}
-//           >
-//             Close
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default OrderDetailsModal;

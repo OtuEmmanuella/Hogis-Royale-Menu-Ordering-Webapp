@@ -15,13 +15,14 @@ const popularDrinks = [
   },
   {
     id: '2',
-    name: 'Jack Daniels Big',
-    image: '/populardrinks/jack daniels.png',
-    price: 50000,
+    name: 'Chivita Exotic',
+    image: '/populardrinks/chivita.png',
+    price: 1000,
     volume: '750 ml',
     abv: '9% ABV',
     quantity: 1
   },
+  
   {
     id: '3',
     name: 'Jameson Black Barrel',
@@ -33,6 +34,15 @@ const popularDrinks = [
   },
   {
     id: '4',
+    name: 'Jack Daniels Big',
+    image: '/populardrinks/jack daniels.png',
+    price: 50000,
+    volume: '750 ml',
+    abv: '9% ABV',
+    quantity: 1
+  },
+  {
+    id: '5',
     name: 'Four Cousins | Red Wine',
     image: '/populardrinks/Four Cousin.png',
     price: 6000,
@@ -41,7 +51,7 @@ const popularDrinks = [
     quantity: 1
   },
   {
-    id: '5',
+    id: '6',
     name: 'Coke',
     image: '/populardrinks/coke.png',
     price: 800,
@@ -50,7 +60,7 @@ const popularDrinks = [
     quantity: 1
   },
   {
-    id: '6',
+    id: '7',
     name: 'Nestle Bottle Water',
     image: '/populardrinks/Nestle water.png',
     price: 1000,
@@ -59,13 +69,10 @@ const popularDrinks = [
     quantity: 1
   },
   {
-    id: '7',
+    id: '8',
     name: 'Chivita Exotic',
     image: '/populardrinks/chivita.png',
     price: 1000,
-    volume: '750 ml',
-    abv: '9% ABV',
-    quantity: 1
   },
 ];
 const SimilarItems = () => {
@@ -79,7 +86,7 @@ const SimilarItems = () => {
       price: drink.price,
       quantity: drink.quantity
     });
-    toast.success('Item added to cart!');
+    toast.success(`${drink.name} added to cart!`);
   };
 
   return (
@@ -90,17 +97,12 @@ const SimilarItems = () => {
           {drinks.map((drink) => (
             <div key={drink.id} className={styles.item}>
               <img src={drink.image} alt={drink.name} className={styles.image} />
-              <div className={styles.itemDetails}>
                 <div className={styles.name}>{drink.name}</div>
-                <div className={styles.details}>
-                  {drink.volume} • {drink.abv}
-                </div>
                 <div className={styles.price}>₦{drink.price.toLocaleString()}</div>
                 <button className={styles.addToCartButton} onClick={() => handleAddToCart(drink)}>
                   Add to Cart
                 </button>
               </div>
-            </div>
           ))}
         </div>
       </div>

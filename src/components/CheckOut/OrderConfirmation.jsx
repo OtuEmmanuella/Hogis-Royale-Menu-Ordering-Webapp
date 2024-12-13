@@ -163,7 +163,15 @@ const OrderConfirmation = () => {
                   <dd className="text-sm text-gray-900 col-span-2">
                     {order.paymentDetails?.channel || 'Not Available'}
                   </dd>
+                </div> <div className="grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-gray-500">Name</dt>
+                  <dd className="text-sm text-gray-900 col-span-2">
+                    {order.customer.customerName|| 'Not Available'}
+                  </dd>
                 </div>
+
+
+                
                 <div className="grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Payment Status</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
@@ -173,17 +181,48 @@ const OrderConfirmation = () => {
                   </dd>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-gray-500">Branch</dt>
+                  <dd className="text-sm text-gray-900 col-span-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      {order.branchName}
+                    </span>
+                  </dd>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-gray-500">Delivery Method</dt>
+                  <dd className="text-sm text-gray-900 col-span-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      {order.deliveryMethod}
+                    </span>
+                  </dd>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Payment Reference</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
                     {order.paymentDetails?.reference || 'N/A'}
                   </dd>
                 </div>
+                
                 <div className="grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Order Type</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
                     {formattedOrderType}
                   </dd>
                 </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-gray-500">Geo. Location</dt>
+                  <dd className="text-sm text-gray-900 col-span-2">
+                    {order.deliveryLocation || 'N/A'}
+                  </dd>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-gray-500">Delivery Address</dt>
+                  <dd className="text-sm text-gray-900 col-span-2">
+                    {order.customer.address || 'N/A'}
+                  </dd>
+                </div>
+                
               </dl>
             </div>
 
