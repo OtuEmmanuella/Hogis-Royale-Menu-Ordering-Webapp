@@ -256,7 +256,7 @@ class EmailService {
   createOrderHTML(orderDetails, isVendor = false) {
     const vendorSpecificInfo = isVendor ? `
       <h2>Customer Information:</h2>
-      <p>Phone:${orderDetails?.customer?.customerName || 'Unknown Customer'};</p>
+     <p>Name: ${orderDetails.customer.customerName}</p>
       <p>Email: ${orderDetails.customer.email}</p>
       <p>Phone: ${orderDetails.customer.phone}</p>
     ` : '';
@@ -293,7 +293,7 @@ class EmailService {
 <body style="margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; background-color: #f4f4f4; color: #333333;">
   <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="max-width: 600px; margin: auto; background-color: #ffffff;">
     <tr>
-      <td style="padding: 20px 0; text-align: center; background-color: #DA291C;">
+      <td style="padding: 20px 0; text-align: center; background-color: #00000;">
         <img src="https://drive.google.com/thumbnail?id=1hVz4ADITDRxa5ZVI9ZYY2SgWyWFY-SjT&sz=w200" alt="Hogis Logo" style="max-width: 150px; height: auto;">
       </td>
     </tr>
@@ -310,7 +310,7 @@ class EmailService {
           <tr>
             <td style="padding: 15px; background-color: #FFC72C; border-radius: 5px;">
               <h2 style="color: #DA291C; margin: 0 0 10px 0; font-size: 20px;">Customer Information</h2>
-              <p style="margin: 5px 0;"><strong>Name:</strong> ${orderDetails?.customer?.customerName || 'Unknown Customer'}</p>
+              <p style="margin: 5px 0;"><strong>Name:</strong> ${orderDetails.customer.customerName}</p>
               <p style="margin: 5px 0;"><strong>Email:</strong> ${orderDetails.customer.email}</p>
               <p style="margin: 5px 0;"><strong>Phone:</strong> ${orderDetails.customer.phone}</p>
             </td>
@@ -343,11 +343,8 @@ class EmailService {
     </tr>
     <tr>
       <td style="padding: 20px; background-color: #DA291C; color: #ffffff; text-align: center;">
-        <p style="margin: 0 0 10px 0;">Connect with us</p>
-        <a href="#" style="display: inline-block; margin: 0 5px;"><img src="https://drive.google.com/thumbnail?id=1rBwnwcrBK6sJEiTDdmvy8_PlljpsKI7a&sz=w50" alt="Facebook" style="width: 24px; height: 24px;"></a>
-        <a href="#" style="display: inline-block; margin: 0 5px;"><img src="https://drive.google.com/thumbnail?id=1rBwnwcrBK6sJEiTDdmvy8_PlljpsKI7a&sz=w50" alt="Twitter" style="width: 24px; height: 24px;"></a>
-        <a href="#" style="display: inline-block; margin: 0 5px;"><img src="https://drive.google.com/thumbnail?id=1rBwnwcrBK6sJEiTDdmvy8_PlljpsKI7a&sz=w50" alt="Instagram" style="width: 24px; height: 24px;"></a>
-        <p style="margin: 10px 0 0 0; font-size: 12px;">© 2023 Hogis. All rights reserved.</p>
+        <p style="margin: 0 0 10px 0;">Connect with us on Instagram @hogisgroup</p>
+        <p style="margin: 10px 0 0 0; font-size: 12px;">© 2024 Hogis. All rights reserved.</p>
       </td>
     </tr>
   </table>
