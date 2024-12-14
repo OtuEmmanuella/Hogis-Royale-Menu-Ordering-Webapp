@@ -37,7 +37,7 @@ const FAQ = () => {
     },
     {
       question: "Who handles your dispatch services?",
-      answer: "We partner with reliable dispatch services, including FoodExpress, to ensure timely and safe delivery of your orders."
+      answer: "We partner with reliable dispatch services, including NowNow dispatch, to ensure timely and safe delivery of your orders."
     },
     {
       question: "What should I do if there is an issue with my order?",

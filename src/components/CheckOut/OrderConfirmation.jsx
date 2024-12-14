@@ -150,7 +150,7 @@ const OrderConfirmation = () => {
               <div className="flex items-center">
                 <Bell className="h-6 w-6 text-blue-500 mr-3" />
                 <p className="text-blue-700 font-medium">
-                  You'll be receiving a notification with your order details
+                  You will receive a notification with your order details. Kindly check your email.
                 </p>
               </div>
             </div>

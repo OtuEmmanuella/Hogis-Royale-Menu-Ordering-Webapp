@@ -31,18 +31,9 @@ export const popularRestaurants = [
       tags: ['SNAP'],
       isFavorite: false
     },
+   
     {
       id: '2',
-      name: 'Classic Caesar Delight',
-      image: '/popularmeals/popular 2.jpg',
-      rating: 4.8,
-      reviews: '900+',
-     price: '7500',
-      buy: 'Add to Cart',
-      isFavorite: true
-    },
-    {
-      id: '3',
       name: "Royale Chef's Special Basmati Bliss",
       image: '/popularmeals/popular 4.jpg',
       rating: 4.9,
@@ -52,7 +43,7 @@ export const popularRestaurants = [
       isFavorite: false
     },
     {
-      id: '4',
+      id: '3',
       name: 'Loaded Veggie-Beef Fries',
       image: '/popularmeals/popular 5.jpg',
       rating: 4.7,
@@ -61,6 +52,17 @@ export const popularRestaurants = [
       buy: 'Add to Cart',
       isFavorite: false
     },
+    {
+      id: '4',
+      name: 'Classic Caesar Delight',
+      image: '/popularmeals/popular 2.jpg',
+      rating: 4.8,
+      reviews: '900+',
+     price: '7500',
+      buy: 'Add to Cart',
+      isFavorite: true
+    },
+   
     {
       id: '5',
       name: 'Royale Grill Fiesta',

@@ -256,6 +256,7 @@ class EmailService {
   createOrderHTML(orderDetails, isVendor = false) {
     const vendorSpecificInfo = isVendor ? `
       <h2>Customer Information:</h2>
+      <p>Phone:${orderDetails?.customer?.customerName || 'Unknown Customer'};</p>
       <p>Email: ${orderDetails.customer.email}</p>
       <p>Phone: ${orderDetails.customer.phone}</p>
     ` : '';
@@ -270,40 +271,88 @@ class EmailService {
     `;
   
     return `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Hogis Feedback</title>
-        <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .logo { text-align: left; margin-bottom: 20px; }
-        .logo img { max-width: 150px; width: 100%; height: auto; display: inline-block; }
-        .banner { width: 100%; max-width: 600px; height: auto; margin-bottom: 20px; display: block; }
-        h2 { color: #2c3e50; margin-top: 0; }
-        .content { background-color: #f9f9f9; padding: 20px; border-radius: 5px; }
-        img { -ms-interpolation-mode: bicubic; }
-        @media only screen and (max-width: 600px) {
-          .container { width: 100% !important; }
-          .content { padding: 10px !important; }
-          .logo img { max-width: 80px !important; }
-        }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="logo">
-            <img src="https://drive.google.com/thumbnail?id=1hVz4ADITDRxa5ZVI9ZYY2SgWyWFY-SjT&sz=w600" alt="Hogis Logo" style="max-width: 150px; width: 100%; height: auto;">
-          </div>
-          <img src="https://drive.google.com/thumbnail?id=1rBwnwcrBK6sJEiTDdmvy8_PlljpsKI7a&sz=w600" alt="Hogis Banner" class="banner" style="display: block; max-width: 600px; width: 100%;">
-          <div class="content">
-            ${content}
-          </div>
-        </div>
-      </body>
-      </html>
+     <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hogis Order Confirmation</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+  </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; background-color: #f4f4f4; color: #333333;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="max-width: 600px; margin: auto; background-color: #ffffff;">
+    <tr>
+      <td style="padding: 20px 0; text-align: center; background-color: #DA291C;">
+        <img src="https://drive.google.com/thumbnail?id=1hVz4ADITDRxa5ZVI9ZYY2SgWyWFY-SjT&sz=w200" alt="Hogis Logo" style="max-width: 150px; height: auto;">
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 20px;">
+        <h1 style="color: #DA291C; text-align: center; font-size: 28px; margin-bottom: 20px;">
+          ${isVendor ? 'New Order Received' : 'Thank You for Your Order!'}
+        </h1>
+        <p style="font-size: 18px; text-align: center; margin-bottom: 30px;">
+          Order #${orderDetails.orderId} - Total: <strong>₦${orderDetails.amount.toLocaleString()}</strong>
+        </p>
+        ${isVendor ? `
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
+          <tr>
+            <td style="padding: 15px; background-color: #FFC72C; border-radius: 5px;">
+              <h2 style="color: #DA291C; margin: 0 0 10px 0; font-size: 20px;">Customer Information</h2>
+              <p style="margin: 5px 0;"><strong>Name:</strong> ${orderDetails?.customer?.customerName || 'Unknown Customer'}</p>
+              <p style="margin: 5px 0;"><strong>Email:</strong> ${orderDetails.customer.email}</p>
+              <p style="margin: 5px 0;"><strong>Phone:</strong> ${orderDetails.customer.phone}</p>
+            </td>
+          </tr>
+        </table>
+        ` : ''}
+        <h2 style="color: #DA291C; font-size: 22px; margin-bottom: 15px;">Order Details</h2>
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
+          <tr style="background-color: #FFC72C; color: #DA291C;">
+            <th style="padding: 10px; text-align: left; border-bottom: 2px solid #DA291C;">Item</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #DA291C;">Quantity</th>
+            <th style="padding: 10px; text-align: right; border-bottom: 2px solid #DA291C;">Price</th>
+          </tr>
+          ${orderDetails.items.map(item => `
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${item.name}</td>
+            <td style="padding: 10px; text-align: center; border-bottom: 1px solid #e0e0e0;">${item.quantity}</td>
+            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #e0e0e0;">₦${(item.price * item.quantity).toLocaleString()}</td>
+          </tr>
+          `).join('')}
+          <tr style="background-color: #f9f9f9;">
+            <td colspan="2" style="padding: 10px; text-align: right; font-weight: bold;">Total:</td>
+            <td style="padding: 10px; text-align: right; font-weight: bold;">₦${orderDetails.amount.toLocaleString()}</td>
+          </tr>
+        </table>
+        <p style="text-align: center; font-size: 16px; color: #666666; margin-top: 30px;">
+          Thank you for choosing Hogis. We hope you enjoy your meal!
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 20px; background-color: #DA291C; color: #ffffff; text-align: center;">
+        <p style="margin: 0 0 10px 0;">Connect with us</p>
+        <a href="#" style="display: inline-block; margin: 0 5px;"><img src="https://drive.google.com/thumbnail?id=1rBwnwcrBK6sJEiTDdmvy8_PlljpsKI7a&sz=w50" alt="Facebook" style="width: 24px; height: 24px;"></a>
+        <a href="#" style="display: inline-block; margin: 0 5px;"><img src="https://drive.google.com/thumbnail?id=1rBwnwcrBK6sJEiTDdmvy8_PlljpsKI7a&sz=w50" alt="Twitter" style="width: 24px; height: 24px;"></a>
+        <a href="#" style="display: inline-block; margin: 0 5px;"><img src="https://drive.google.com/thumbnail?id=1rBwnwcrBK6sJEiTDdmvy8_PlljpsKI7a&sz=w50" alt="Instagram" style="width: 24px; height: 24px;"></a>
+        <p style="margin: 10px 0 0 0; font-size: 12px;">© 2023 Hogis. All rights reserved.</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
     `;
   }
 

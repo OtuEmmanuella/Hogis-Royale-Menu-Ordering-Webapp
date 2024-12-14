@@ -131,6 +131,24 @@
   background-color: #d69b1b; /* Darker blue on hover */
 }
 
+.banner-media video {
+  pointer-events: none; /* Prevents video from being clickable */
+  object-fit: cover; /* Ensures video covers the area without distortion */
+  width: 100%;
+  height: 100%;
+  user-select: none; /* Prevents text selection on video */
+  -webkit-user-select: none; /* For Safari */
+}
+
+/* Optional: Remove video controls completely */
+.banner-media video::-webkit-media-controls {
+  display: none !important;
+}
+
+.banner-media video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
 
 @media (max-width: 768px) {
   .promo-banner-container {

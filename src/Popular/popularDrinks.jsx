@@ -70,8 +70,8 @@ const popularDrinks = [
   },
   {
     id: '8',
-    name: 'Chivita Exotic',
-    image: '/populardrinks/chivita.png',
+    name: 'Pepsi',
+    image: '/populardrinks/pepsi.png',
     price: 1000,
   },
 ];
