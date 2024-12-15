@@ -251,6 +251,7 @@ const vendorEmailTemplate = (feedback) => ({
     <h2>New Feedback Received</h2>
     <p><strong>Branch:</strong> ${feedback.branch}</p>
     <p><strong>Customer Name:</strong> ${feedback.name}</p>
+     <p><strong>Customer Phone:</strong> ${feedback.phone}</p>
     <p><strong>Rating:</strong> ${feedback.rating}/5</p>
     <p><strong>Comments:</strong> ${feedback.comment}</p>
     ${feedback.email ? `<p><strong>Customer Email:</strong> ${feedback.email}</p>` : ''}
