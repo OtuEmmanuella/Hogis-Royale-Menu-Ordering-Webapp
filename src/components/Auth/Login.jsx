@@ -4,8 +4,7 @@ import { signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, Google
 import { useNavigate, Link } from 'react-router-dom';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { FcGoogle } from "react-icons/fc";
-import { FaChevronRight } from 'react-icons/fa';
-import { TiArrowBack } from "react-icons/ti";
+import { FaChevronLeft } from 'react-icons/fa';
 import { DotSpinner } from '@uiball/loaders';
 import { Mail, Lock } from 'lucide-react';
 import './Auth-styles.css';
@@ -114,14 +113,14 @@ function Login() {
     );
   }
 
+  
+
   return (
-    <div className="auth-page">
-      <nav className="breadcrumb">
+<div className="auth-page bg-red-00 h-[100vh]">
+<nav className="breadcrumb">
         <Link to="/menu" className="back-to-menu">
-          <TiArrowBack className="back-icon" />
+          <FaChevronLeft className="back-icon" />
         </Link>
-        <FaChevronRight className="breadcrumb-separator" />
-        <span>Login</span>
       </nav>
       <div className="auth-container">
         <form className="auth-form" onSubmit={handleLogin}>
