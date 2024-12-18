@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaSearch, FaPlus } from 'react-icons/fa';
+import { FaHome, FaSearch, FaPlus, FaUserCircle } from 'react-icons/fa';
 import { IoIosNotifications } from 'react-icons/io';
 import { BiSolidMessageRoundedDots } from 'react-icons/bi';
-import {RiFileList3Fill } from 'react-icons/ri'
+import { RiFileList3Fill } from 'react-icons/ri';
 import { auth, db } from '../Firebase/FirebaseConfig';
 import { collection, query, where, onSnapshot, updateDoc, doc, getDocs } from 'firebase/firestore';
 import { motion } from 'framer-motion';
@@ -30,12 +30,25 @@ const TempNavBar = () => {
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
   const [user, setUser] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       if (currentUser) {
         setUser(currentUser);
+        
+        // Handle the profile image URL
+        if (currentUser.photoURL) {
+          // Add a timestamp to bypass cache
+          const photoURLWithTimestamp = `${currentUser.photoURL}?t=${new Date().getTime()}`;
+          setProfileImage(photoURLWithTimestamp);
+          setImageError(false);
+        } else {
+          setProfileImage(null);
+        }
+        
         const q = query(collection(db, `users/${currentUser.uid}/notifications`), where('read', '==', false));
         const unsubscribeSnapshot = onSnapshot(q, (querySnapshot) => {
           setHasNewNotifications(querySnapshot.size > 0);
@@ -43,25 +56,30 @@ const TempNavBar = () => {
         return () => unsubscribeSnapshot();
       } else {
         setUser(null);
+        setProfileImage(null);
+        setImageError(false);
         setHasNewNotifications(false);
       }
     });
     return () => unsubscribe();
   }, []);
 
-  const handleNotificationClick = async (e) => {
-    e.preventDefault(); // Prevent default link behavior for all cases
+  const handleImageError = () => {
+    console.log('Image failed to load, using fallback icon');
+    setImageError(true);
+    setProfileImage(null);
+  };
 
+  // Rest of your event handlers...
+  const handleNotificationClick = async (e) => {
+    e.preventDefault();
     if (user) {
-      // Mark all notifications as read
       const q = query(collection(db, `users/${user.uid}/notifications`), where('read', '==', false));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach(async (doc) => {
         await updateDoc(doc.ref, { read: true });
       });
       setHasNewNotifications(false);
-
-      // Navigate to the notifications page
       navigate('/message');
     } else {
       setShowAlert(true);
@@ -90,6 +108,24 @@ const TempNavBar = () => {
     },
   };
 
+  const renderProfileImage = () => {
+    if (profileImage && !imageError) {
+      return (
+        <div className="profile-container">
+          <img 
+            src={profileImage}
+            alt="Profile"
+            className="profile-image"
+            onError={handleImageError}
+            referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
+          />
+        </div>
+      );
+    }
+    return <FaUserCircle className="profile-icon" size={24} />;
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -100,17 +136,12 @@ const TempNavBar = () => {
           <BiSolidMessageRoundedDots />
         </Link>
         
-        {/* Uncomment if you want to include the add button
-        <Link to="/add" className="nav-item">
-          <FaPlus />
-        </Link>
-        */}
-        <Link 
-          to="/message" 
-          className="nav-item" 
+        <Link
+          to="/message"
+          className="nav-item"
           onClick={handleNotificationClick}
         >
-          <motion.div 
+          <motion.div
             className="notification-icon"
             variants={shakeVariants}
             animate={hasNewNotifications ? "shake" : ""}
@@ -125,10 +156,11 @@ const TempNavBar = () => {
         </Link>
 
         <Link to="/account" className="nav-item">
-          <div className="profile-icon"></div>
+          {renderProfileImage()}
         </Link>
       </nav>
-      <AlertModal 
+
+      <AlertModal
         isOpen={showAlert}
         message="Please log in to view notifications"
         onClose={handleCloseAlert}

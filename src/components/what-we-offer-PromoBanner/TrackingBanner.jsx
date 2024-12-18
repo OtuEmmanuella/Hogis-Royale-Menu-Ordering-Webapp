@@ -115,8 +115,8 @@ export default function TrackingBanner() {
   }, [])
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-orange-400 to-amber-500 text-white rounded-[10px]">
-    <div className="relative mx-auto max-w-7xl px-3 sm:px-4 py-3 sm:py-4 md:py-6">
+<div className="relative overflow-hidden bg-gradient-to-r from-[#AF6E1C] to-[#C49402] text-white rounded-[10px]">
+      <div className="relative mx-auto max-w-7xl px-3 sm:px-4 py-3 sm:py-4 md:py-6">
         <div className="relative h-24 sm:h-28 md:h-32">
           {banners.map((banner, index) => (
             <motion.div

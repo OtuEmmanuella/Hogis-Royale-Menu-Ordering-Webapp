@@ -1,8 +1,8 @@
 /* Menu.css */
 
 .body {
-    background-color: rgb(83, 2, 2);
-    
+    /* background-color: rgb(83, 2, 2); */
+    background-color: 00000;
 }
 
 .menu-container-menu {
@@ -295,41 +295,51 @@ h1, h2, h3 {
     }
 }
 
-/* Custom styles for the ToastContainer */
+/* Update the custom-toast-container class */
 .custom-toast-container {
-    width: 250px;  /* Adjust width to make it smaller */
-    font-size: 12px;  /* Smaller text size */
-    bottom: 20px;  /* Adjust the position from the bottom */
-    right: 20px;  /* Adjust the position from the right */
+    width: 250px;  
+    font-size: 12px;  
+    position: fixed !important;  /* Force fixed positioning */
+    top: 50% !important;  /* Center vertically */
+    right: 20px !important;  /* Distance from right edge */
+    transform: translateY(-50%) !important;  /* Perfect vertical centering */
     z-index: 99999;
-  }
-  
-  .toast {
-    padding: 8px 10px; /* Smaller padding inside each toast */
-    font-size: 12px;  /* Reduce font size for smaller toast */
-    border-radius: 6px;  /* Slightly rounded corners */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Soft shadow */
-  }
-  
-  .toast .toast-body {
-    padding: 5px 10px;  /* Less padding for the body */
-  }
-  
-  .toast .toast-close-button {
-    font-size: 10px;  /* Smaller close button */
-    padding: 0 4px;  /* Smaller close button padding */
-  }
-  
-  .toast .progress-bar {
-    height: 3px;  /* Smaller progress bar height */
-  }
-  
-  /* Customize the success or error toast color */
-  .toastify-success {
-    background-color: #28a745 !important; /* Custom success color */
-  }
-  
-  .toastify-error {
-    background-color: #dc3545 !important; /* Custom error color */
-  }
-  
+}
+
+/* Add media query for mobile devices */
+@media (max-width: 768px) {
+    .custom-toast-container {
+        bottom: 20px !important;  /* Reset bottom position for mobile */
+        top: auto !important;  /* Remove top positioning */
+        transform: none !important;  /* Remove transform for mobile */
+    }
+}
+
+/* Rest of your toast styles remain the same */
+.toast {
+    padding: 8px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.toast .toast-body {
+    padding: 5px 10px;
+}
+
+.toast .toast-close-button {
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+.toast .progress-bar {
+    height: 3px;
+}
+
+.toastify-success {
+    background-color: #28a745 !important;
+}
+
+.toastify-error {
+    background-color: #dc3545 !important;
+}

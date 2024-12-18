@@ -209,7 +209,7 @@ const OrdersPage = () => {
             <p>{error}</p>
             <button 
               onClick={() => window.location.reload()}
-              className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
             >
               Retry
             </button>
@@ -220,8 +220,8 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Orders</h1>
@@ -251,143 +251,165 @@ const OrdersPage = () => {
                 setSearchTerm('');
                 setDateRange({ start: '', end: '' });
               }}
-              className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+              className="mt-4 text-blue-600 hover:text-blue-800 font-medium transition-colors"
             >
               Clear all filters
             </button>
           </div>
         ) : (
-          <>
-            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-              <ul className="divide-y divide-gray-200">
-                {currentOrders.map((order) => (
-                  <li key={order.id} className="hover:bg-gray-50 transition-colors">
-                    <div className="px-4 py-4 sm:px-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-indigo-600 truncate">
-                            Order #{order.id}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {order.branchName}
-                          </p>
-                        </div>
-                       
-                        <div className="ml-2 flex-shrink-0 flex items-center space-x-2">
-                          <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusStyle(order.status)}`}>
-                            {order.status}
-                          </p>
-                          <button
-                            onClick={() => handleViewDetails(order)}
-                            className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
-                          >
-                            View Details
-                          </button>
-                        </div>
-                      </div>
-                      <div className="mt-2 sm:flex sm:justify-between">
-                        <div className="sm:flex">
-                          <p className="flex items-center text-sm text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                            {order.customerName}
-                          </p>
-                         
-                          <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                            </svg>
-                            {order.createdAt.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                            <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
-                          </svg>
-                          {formatPrice(order.total)}
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Order ID
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Customer
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Total
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{order.id}</div>
+                        <div className="text-sm text-gray-500">{order.branchName}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.customerName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.createdAt.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatPrice(order.total)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusStyle(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => handleViewDetails(order)}
+                          className="text-indigo-600 hover:text-indigo-900 transition-colors"
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
+        )}
 
-            {/* Pagination controls */}
-            <div className="mt-6 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-              <div className="flex flex-1 justify-between sm:hidden">
+        {/* Pagination controls */}
+        <div className="mt-6 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+          <div className="flex flex-1 justify-between sm:hidden">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 ${
+                currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+              }`}
+            >
+              Previous
+            </button>
+            <button
+              onClick={nextPage}
+              disabled={currentPage === Math.ceil(filteredOrders.length / ordersPerPage)}
+              className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 ${
+                currentPage === Math.ceil(filteredOrders.length / ordersPerPage) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing <span className="font-medium">{indexOfFirstOrder + 1}</span> to{' '}
+                <span className="font-medium">
+                  {Math.min(indexOfLastOrder, filteredOrders.length)}
+                </span>{' '}
+                of <span className="font-medium">{filteredOrders.length}</span> results
+              </p>
+            </div>
+            <div>
+              <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                 <button
                   onClick={prevPage}
                   disabled={currentPage === 1}
-                  className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 ${
-                    currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+                  className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
+                    currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  Previous
+                  <span className="sr-only">Previous</span>
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                 </button>
-                <button
-                  onClick={nextPage}
-                  disabled={currentPage === Math.ceil(filteredOrders.length / ordersPerPage)}
-                  className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 ${
-                    currentPage === Math.ceil(filteredOrders.length / ordersPerPage) ? 'opacity-50 cursor-not-allowed': 'hover:bg-gray-50'
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
-              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">{indexOfFirstOrder + 1}</span> to{' '}
-                    <span className="font-medium">
-                      {Math.min(indexOfLastOrder, filteredOrders.length)}
-                    </span>{' '}
-                    of <span className="font-medium">{filteredOrders.length}</span> results
-                  </p>
-                </div>
-                <div>
-                  <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                    <button
-                      onClick={prevPage}
-                      disabled={currentPage === 1}
-                      className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                        currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    >
-                      <span className="sr-only">Previous</span>
-                      <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                    {[...Array(Math.ceil(filteredOrders.length / ordersPerPage)).keys()].map((number) => (
+                {[...Array(Math.ceil(filteredOrders.length / ordersPerPage)).keys()].map((number) => {
+                  const pageNumber = number + 1;
+                  const isCurrentPage = currentPage === pageNumber;
+                  const isNearCurrentPage = Math.abs(currentPage - pageNumber) <= 2;
+                  const isFirstPage = pageNumber === 1;
+                  const isLastPage = pageNumber === Math.ceil(filteredOrders.length / ordersPerPage);
+
+                  if (isCurrentPage || isNearCurrentPage || isFirstPage || isLastPage) {
+                    return (
                       <button
-                        key={number + 1}
-                        onClick={() => paginate(number + 1)}
+                        key={pageNumber}
+                        onClick={() => paginate(pageNumber)}
                         className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                          currentPage === number + 1
+                          isCurrentPage
                             ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
                             : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                         }`}
                       >
-                        {number + 1}
+                        {pageNumber}
                       </button>
-                    ))}
-                    <button
-                      onClick={nextPage}
-                      disabled={currentPage === Math.ceil(filteredOrders.length / ordersPerPage)}
-                      className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                        currentPage === Math.ceil(filteredOrders.length / ordersPerPage) ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    >
-                      <span className="sr-only">Next</span>
-                      <ChevronRight className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                  </nav>
-                </div>
-              </div>
+                    );
+                  } else if (
+                    (pageNumber === currentPage - 3 && currentPage > 4) ||
+                    (pageNumber === currentPage + 3 && currentPage < Math.ceil(filteredOrders.length / ordersPerPage) - 3)
+                  ) {
+                    return (
+                      <span key={pageNumber} className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
+                        ...
+                      </span>
+                    );
+                  }
+                  return null;
+                })}
+                <button
+                  onClick={nextPage}
+                  disabled={currentPage === Math.ceil(filteredOrders.length / ordersPerPage)}
+                  className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
+                    currentPage === Math.ceil(filteredOrders.length / ordersPerPage) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <span className="sr-only">Next</span>
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </nav>
             </div>
-          </>
-        )}
+          </div>
+        </div>
       </div>
       <OrderDetailsModal
         isOpen={isModalOpen}

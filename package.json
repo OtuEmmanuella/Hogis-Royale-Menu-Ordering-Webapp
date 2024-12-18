@@ -36,6 +36,7 @@
     "i18next-browser-languagedetector": "^8.0.2",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.2",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.424.0",
     "nodemailer": "^6.9.16",
     "papaparse": "^5.4.1",

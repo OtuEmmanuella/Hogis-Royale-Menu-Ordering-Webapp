@@ -291,6 +291,15 @@ const OrderItem = ({ order, index }) => {
                 <InfoItem label="Name" value={order.customer.customerName} />
                 <InfoItem label="Email" value={order.customer.email} />
                 <InfoItem label="Phone" value={order.customer.phone} />
+                {order.customer.recipientName && order.customer.recipientPhone && (
+  <>
+    <InfoItem label="Recipient" value={order.customer.recipientName} />
+    <InfoItem label="Recipient's Phone" value={order.customer.recipientPhone} />
+  </>
+)}
+
+
+
               </InfoSection>
 
               {order.items.specifications && (

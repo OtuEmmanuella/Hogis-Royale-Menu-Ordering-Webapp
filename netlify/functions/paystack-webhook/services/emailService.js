@@ -308,9 +308,8 @@ class EmailService {
         ${isVendor ? `
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
           <tr>
-            <td style="padding: 15px; background-color: #FFC72C; border-radius: 5px;">
+            <td style="padding: 15px; background-color: #FFF; border-radius: 5px;">
               <h2 style="color: #DA291C; margin: 0 0 10px 0; font-size: 20px;">Customer Information</h2>
-              <p style="margin: 5px 0;"><strong>Name:</strong> ${orderDetails.customer.customerName}</p>
               <p style="margin: 5px 0;"><strong>Email:</strong> ${orderDetails.customer.email}</p>
               <p style="margin: 5px 0;"><strong>Phone:</strong> ${orderDetails.customer.phone}</p>
             </td>

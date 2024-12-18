@@ -113,12 +113,20 @@ const Menu = () => {
    }, [location]);
 
   const handleAddToCart = (item) => {
-    addToCart(item);
-    console.log('Adding item to cart:', item);
-    toast.success(`${item.name} added to cart!`, {
-      onClick: () => navigate('/cart')
-    });
+    // Create a unique toast ID to prevent duplicate toasts
+    const toastId = `add-to-cart-${item.id}`;
+    
+    // Check if a toast with this ID already exists
+    if (!toast.isActive(toastId)) {
+      addToCart(item);
+      console.log('Adding item to cart:', item);
+      toast.success(`${item.name} added to cart!`, {
+        toastId, // Use unique ID to prevent duplicates
+        onClick: () => navigate('/cart')
+      });
+    }
   };
+
 
   const showLoginAlert = () => {
     Swal.fire({

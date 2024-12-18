@@ -31,7 +31,8 @@
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    background-color: rgb(123, 39, 39);
+    /* background-color: rgb(123, 39, 39); */
+    background: #343b3f;
     gap: 8px; 
   }
   
@@ -45,7 +46,7 @@
   .name {
     font-size: 14px;
     font-weight: 500;
-    color: #ffffff;
+    color: #C49402;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -55,12 +56,12 @@
   .price {
     font-size: 16px;
     font-weight: 700;
-    color: #13a80e;
+    color: #C49402;
     margin-bottom: 4px; 
   }
   
   .addToCartButton {
-    background-color: #047918;
+    background: linear-gradient(to right, #AF6E1C, #C49402);
     color: white;
     border: none;
     padding: 6px 6px;
@@ -72,7 +73,7 @@
   
   
   .addToCartButton:hover {
-    background-color: #2980b9;
+    background: #C49402;
   }
   
   @media (max-width: 768px) {

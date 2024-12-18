@@ -19,7 +19,6 @@ const CheckoutPage = () => {
   const initialDeliveryPrice = Number(searchParams.get('deliveryPrice')) || 0;
   const [deliveryMethod, setDeliveryMethod] = useState(searchParams.get('deliveryMethod') || '');
 
-
   const [paymentMethod, setPaymentMethod] = useState('paystack');
   const [saveInfo, setSaveInfo] = useState(true);
   const [payingForSomeone, setPayingForSomeone] = useState(false);
@@ -35,8 +34,11 @@ const CheckoutPage = () => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [recipientName, setRecipientName] = useState('');
-  const [orderId, setOrderId] = useState(null); // Added state for order ID
-  const [paymentStatus, setPaymentStatus] = useState('pending'); // Added state for payment status
+  const [recipientPhone, setRecipientPhone] = useState('');
+  const [orderId, setOrderId] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState('pending');
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [paymentProcessingMessage, setPaymentProcessingMessage] = useState('');
 
   const { cartItems, clearCart } = useShoppingCart();
 
@@ -81,7 +83,6 @@ const CheckoutPage = () => {
     fetchUserDetails();
   }, []);
 
-  // Listen for changes in order status
   useEffect(() => {
     let unsubscribe;
     if (orderId) {
@@ -90,11 +91,17 @@ const CheckoutPage = () => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.status === 'success' || data.status === 'paid') {
-            setPaymentStatus('success');
-            navigate(`/order-confirmation/${orderId}`);
+            setProcessingPayment(true);
+            setPaymentProcessingMessage('Payment confirmed. Preparing your order...');
+            
+            setTimeout(() => {
+              setPaymentStatus('success');
+              navigate(`/order-confirmation/${orderId}`);
+            }, 2000);
           } else if (data.status === 'failed') {
+            setProcessingPayment(false);
+            setPaymentProcessingMessage('Payment failed. Please try again.');
             setPaymentStatus('failed');
-            // Optionally, show an error message to the user here
           }
         }
       });
@@ -142,6 +149,7 @@ const CheckoutPage = () => {
         userId: user ? user.uid : null,
         customerName: name,
         recipientName: payingForSomeone ? recipientName : null,
+        recipientPhone: payingForSomeone ? recipientPhone : null, 
         email,
         phone,
         address,
@@ -163,10 +171,10 @@ const CheckoutPage = () => {
       branchName: branches[branchId] || 'Unknown Branch'
     };
 
-  await setDoc(orderRef, orderData);
+    await setDoc(orderRef, orderData);
   
-  setOrderId(orderId); // Set the order ID in state
-  return orderId;
+    setOrderId(orderId);
+    return orderId;
   };
 
   const handleSubmit = async (e) => {
@@ -176,6 +184,9 @@ const CheckoutPage = () => {
 
     try {
       const orderId = await createOrder();
+
+      setProcessingPayment(true);
+      setPaymentProcessingMessage('Initiating payment...');
 
       const config = {
         reference: orderId,
@@ -193,16 +204,31 @@ const CheckoutPage = () => {
       const initializePayment = usePaystackPayment(config);
       initializePayment(
         (response) => {
-          console.log('Payment successful:', response);
-          // The payment status change will now be handled via Firebase listener
+          console.log('Payment initiated:', response);
+          setPaymentProcessingMessage('Processing payment...');
         },
         () => {
+          setProcessingPayment(false);
+          setPaymentProcessingMessage('Payment process cancelled.');
           console.log("Payment closed");
         }
       );
     } catch (error) {
+      setProcessingPayment(false);
+      setPaymentProcessingMessage('Error processing order. Please try again.');
       console.error("Order creation failed:", error);
     }
+  };
+
+  const PaymentProcessingOverlay = () => {
+    return (
+      <div className="payment-processing-overlay">
+        <div className="payment-processing-content">
+          <div className="spinner"></div>
+          <p>{paymentProcessingMessage}</p>
+        </div>
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -215,6 +241,8 @@ const CheckoutPage = () => {
 
   return (
     <div className="checkout-page">
+      {processingPayment && <PaymentProcessingOverlay />}
+      
       <div className="checkout-container">
         <div className="checkout-header">
           <button onClick={() => navigate(-1)} className="back-link">
@@ -267,7 +295,7 @@ const CheckoutPage = () => {
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Address"
+                    placeholder="Your Address Or Recipient's address if your paying for someone else"
                     required
                   />
                 </div>
@@ -281,6 +309,41 @@ const CheckoutPage = () => {
                   />
                 </div>
               </div>
+              <div className="form-section">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={payingForSomeone}
+                    onChange={() => setPayingForSomeone(!payingForSomeone)}
+                  />
+                  <span>Paying for someone else?</span>
+                </label>
+              </div>
+
+              {payingForSomeone && (
+                <>
+                  <div className="form-group">
+                    <FaUser className="input-icon" />
+                    <input
+                      type="text"
+                      value={recipientName}
+                      onChange={(e) => setRecipientName(e.target.value)}
+                      placeholder="Recipient's name"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <FaPhone className="input-icon" />
+                    <input
+                      type="tel"
+                      value={recipientPhone}
+                      onChange={(e) => setRecipientPhone(e.target.value)}
+                      placeholder="Recipient's phone number"
+                      required
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="form-section">
                 <h2 className="section-title">Payment Method</h2>
@@ -307,34 +370,13 @@ const CheckoutPage = () => {
                 </label>
               </div>
 
-              <div className="form-section">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={payingForSomeone}
-                    onChange={() => setPayingForSomeone(!payingForSomeone)}
-                  />
-                  <span>Paying for someone else?</span>
-                </label>
-              </div>
-
-              {payingForSomeone && (
-                <div className="form-group">
-                  <FaUser className="input-icon" />
-                  <input
-                    type="text"
-                    value={recipientName}
-                    onChange={(e) => setRecipientName(e.target.value)}
-                    placeholder="Recipient's name"
-                    required
-                  />
-                </div>
-              )}
-
               <button type="submit" className="pay-button">
                 Pay {formatPrice(finalAmount)}
                 <IoMdLock className="lock-icon" />
               </button>
+              <small className="text-gray-500 text-center block mt-1">
+  Secured with Paystack
+</small>
             </form>
           </div>
         </div>
@@ -344,4 +386,3 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
-

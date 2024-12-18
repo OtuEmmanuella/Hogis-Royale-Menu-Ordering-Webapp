@@ -179,16 +179,38 @@ const OrderDetailsModal = ({ isOpen, onClose, onMarkAsCompleted, order, onUpdate
             <div className="grid md:grid-cols-2 gap-8 p-6 overflow-y-auto">
               {/* Left Column: Customer & Order Info */}
               <div className="space-y-6">
-                <div className="bg-gray-50 p-6 rounded-xl shadow-md">
-                  <h3 className="text-2xl font-semibold mb-4 text-gray-800">Customer Information</h3>
-                  <div className="space-y-3">
-                    <InfoItem icon={<FiUser />} label="Name" value={order.customerName} />
-                    {order.recipientName && order.recipientName !== order.customerName && (
-                      <InfoItem icon={<FiUser />} label="Recipient" value={order.recipientName} />
+              <div className="bg-gray-50 p-6 rounded-xl shadow-md">
+  <h3 className="text-2xl font-semibold mb-4 text-gray-800">Customer Information</h3>
+  <div className="space-y-3">
+    <InfoItem icon={<FiUser />} label="Name" value={order.customerName} />
+    <InfoItem icon={<FiMail />} label="Email" value={order.email} />
+    <InfoItem icon={<FiPhone />} label="Phone" value={order.phone} />
+    <InfoItem icon={<FiMapPin />} label="Address" value={order.address} />
+
+          {/* Recipient Information */}
+          {((order.recipientName && order.recipientName !== order.customerName) ||
+            (order.customer?.recipientName && order.customer?.recipientName !== order.customer?.customerName)) && (
+            <>
+              <div className="mt-6 mb-3">
+                <h4 className="text-lg font-semibold text-gray-800 border-b pb-2">Paying for Someone</h4>
+              </div>
+              <InfoItem 
+                icon={<FiUser />} 
+                label="Recipient Name" 
+                value={order.customer?.recipientName || order.recipientName} 
+              />
+              {(order.customer?.recipientPhone || order.recipientPhone) && (
+                <InfoItem 
+                  icon={<FiPhone />} 
+                  label="Recipient Phone" 
+                  value={order.customer?.recipientPhone || order.recipientPhone} 
+                />
+              )}
+                      </>
                     )}
-                    <InfoItem icon={<FiMail />} label="Email" value={order.email} />
+                    {/* <InfoItem icon={<FiMail />} label="Email" value={order.email} />
                     <InfoItem icon={<FiPhone />} label="Phone" value={order.phone} />
-                    <InfoItem icon={<FiMapPin />} label="Address" value={order.address} />
+                    <InfoItem icon={<FiMapPin />} label="Address" value={order.address} /> */}
                   </div>
                 </div>
 

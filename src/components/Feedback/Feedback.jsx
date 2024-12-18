@@ -707,7 +707,7 @@ const FeedbackForm = () => {
         <button 
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full p-3 bg-blue-900 text-white rounded text-sm hover:bg-blue-800 disabled:bg-blue-300"
+          className="w-full p-3 bg-gradient-to-r from-[#AF6E1C] to-[#C49402] text-white rounded text-sm hover:bg-gradient-to-r from-[#AF6E1C] to-[#C49408] disabled:bg-gradient-to-r from-[#AF6E1C] to-[#C49404]"
         >
           {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
         </button>

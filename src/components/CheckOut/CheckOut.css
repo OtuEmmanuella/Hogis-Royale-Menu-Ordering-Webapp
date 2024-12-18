@@ -133,7 +133,7 @@
 }
 
 .payment-option img.paystack {
-  max-width: 130px; /* Slightly smaller max-width for Paystack */
+  max-width: 100px; /* Slightly smaller max-width for Paystack */
 }
 
 .payment-option:hover,
@@ -212,7 +212,7 @@
 }
 
 .pay-button {
-  background-color: #4299e1;
+  background: linear-gradient(to right, #AF6E1C, #C49402);;
   color: #ffffff;
   border: none;
   padding: 1rem;
@@ -229,7 +229,7 @@
 }
 
 .pay-button:hover {
-  background-color: #3182ce;
+  background: #C49402;
 }
 
 .lock-icon {
@@ -265,6 +265,48 @@
   object-fit: contain;
 }
 
+
+.payment-processing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.payment-processing-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.payment-processing-content .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.payment-processing-content p {
+  margin-top: 15px;
+  color: #333;
+  font-weight: 500;
+}
 
 
 @media (max-width: 768px) {
@@ -388,3 +430,4 @@ a {
 html {
   touch-action: manipulation;
 }
+

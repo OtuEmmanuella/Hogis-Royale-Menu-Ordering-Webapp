@@ -8,6 +8,14 @@ export const ShoppingCartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [user, setUser] = useState(null);
+  
+
+  const removeFromCart = async (cartItemId) => {
+    const updatedCart = cartItems.filter(item => item.cartItemId !== cartItemId);
+    setCartItems(updatedCart);
+    await saveCartToFirebase(updatedCart);
+  };
+
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -121,6 +129,7 @@ export const ShoppingCartProvider = ({ children }) => {
     <ShoppingCartContext.Provider
       value={{
         cartItems,
+        removeFromCart,
         updateItemSpecifications,
         selectedBranch,
         setSelectedBranch,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { db } from '../Firebase/FirebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
-import { CheckCircle, ArrowLeft, Bell } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Bell, Phone } from 'lucide-react';
 import { IoMdDownload } from 'react-icons/io';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -164,14 +164,32 @@ const OrderConfirmation = () => {
                     {order.paymentDetails?.channel || 'Not Available'}
                   </dd>
                 </div> <div className="grid grid-cols-3 gap-4">
+                  
                   <dt className="text-sm font-medium text-gray-500">Name</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
                     {order.customer.customerName|| 'Not Available'}
                   </dd>
                 </div>
 
+                {order.payingForSomeone && (
+                <>
+                  <div className="grid grid-cols-3 gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Recipient Name</dt>
+                    <dd className="text-sm text-gray-900 col-span-2">
+                      {order.customer.recipientName || 'N/A'}
+                    </dd>
+                  </div>
 
-                
+                  <div className="grid grid-cols-3 gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Recipient Phone</dt>
+                    <dd className="text-sm text-gray-900 col-span-2">
+                      {order.customer.recipientPhone || 'N/A'}
+                    </dd>
+                  </div>
+                </>
+              )}
+
+
                 <div className="grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Payment Status</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
@@ -188,6 +206,15 @@ const OrderConfirmation = () => {
                     </span>
                   </dd>
                 </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-gray-500">Delivery Address</dt>
+                  <dd className="text-sm text-gray-900 col-span-2">
+                    {order.customer.address || 'N/A'}
+                  </dd>
+                </div>
+                {order.delivery && (
+                  <>
                 <div className="grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Delivery Method</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
@@ -196,7 +223,16 @@ const OrderConfirmation = () => {
                     </span>
                   </dd>
                 </div>
-                
+
+                <div className="grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-gray-500">Geo. Location</dt>
+                  <dd className="text-sm text-gray-900 col-span-2">
+                    {order.deliveryLocation || 'N/A'}
+                  </dd>
+                </div>
+                </>
+                              )}
+
                 <div className="grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Payment Reference</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
@@ -210,19 +246,8 @@ const OrderConfirmation = () => {
                     {formattedOrderType}
                   </dd>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <dt className="text-sm font-medium text-gray-500">Geo. Location</dt>
-                  <dd className="text-sm text-gray-900 col-span-2">
-                    {order.deliveryLocation || 'N/A'}
-                  </dd>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <dt className="text-sm font-medium text-gray-500">Delivery Address</dt>
-                  <dd className="text-sm text-gray-900 col-span-2">
-                    {order.customer.address || 'N/A'}
-                  </dd>
-                </div>
-                
+               
+            
               </dl>
             </div>
 

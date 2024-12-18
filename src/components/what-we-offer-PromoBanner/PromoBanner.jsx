@@ -43,27 +43,26 @@ const banners = [
     media: { type: 'image', source: cinemaImage },
     buttonContent: { whatsapp: "+2349064515288" },
   },
- 
   {
     title: "Hogis Royale And Apartments",
     description: "Luxury experiences",
     startTime: "Check-in from 2 PM",
     media: { type: 'image', source: hotelImage },
-    buttonContent: { whatsapp: "+2347073536464" },
+    buttonContent: { link: "https://hogisgroup.com/", target: "_blank" },
   },
   {
     title: "Hogis Luxury Suites",
     description: "Your home away from home",
     startTime: "Check-in from 2 PM",
     media: { type: 'image', source: hogisluxury },
-    buttonContent: { whatsapp: "+2348099903335" },
+    buttonContent: { link: "https://hogisgroup.com/", target: "_blank" },
   },
   {
     title: "Hogis Exclusive Suites",
     description: "Exclusive luxury experiences",
     startTime: "Check-in from 2 PM",
     media: { type: 'image', source: hogisexclusive },
-    buttonContent: { whatsapp: "+2348109516906" },
+    buttonContent: { link: "https://hogisgroup.com/", target: "_blank" },
   },
   {
     title: "De Voltage Lounge",
@@ -72,7 +71,6 @@ const banners = [
     media: { type: 'image', source: deVoltageLounge },
     showButton: false,
   },
-
   {
     title: "Royale Banquet Hall",
     description: "Perfect for your special events",
@@ -180,17 +178,27 @@ const PromoBanner = () => {
               <div className="banner-content">
                 <h2>{banner.title}</h2>
                 <p>{banner.description}</p>
-                {banner.showButton === false ? null : banner.buttonContent ? (
-                <a
-                  href={`https://wa.me/${banner.buttonContent.whatsapp}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="contact-button"
-                >
-                  Book
-                </a>
-              ) : null}
-
+                {banner.showButton === false ? null : banner.buttonContent && (
+                  banner.buttonContent.link ? (
+                    <a
+                      href={banner.buttonContent.link}
+                      target={banner.buttonContent.target || "_blank"}
+                      rel="noopener noreferrer"
+                      className="contact-button"
+                    >
+                      Book
+                    </a>
+                  ) : banner.buttonContent.whatsapp ? (
+                    <a
+                      href={`https://wa.me/${banner.buttonContent.whatsapp}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="contact-button"
+                    >
+                      Book
+                    </a>
+                  ) : null
+                )}
                 <span className="start-time">{banner.startTime}</span>
               </div>
               <div className="banner-media">
